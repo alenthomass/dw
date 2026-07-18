@@ -1,0 +1,38 @@
+[
+  {
+    "id": "job_1",
+    "title": "Visual Systems Integration Engineer",
+    "location": "Dubai, UAE",
+    "type": "Full-time",
+    "desc": "Design, calibrate, and install modular high-end LED screen video walls and control center displays for aviation and commercial sectors.",
+    "requirements": [
+      "BSc in Electrical Engineering, Robotics, or equivalent field experience.",
+      "3+ years working directly with NovaStar screen controllers, sending loops, and fiber receivers.",
+      "Familiarity with structural AutoCAD design parameters and thermal ventilation load planning."
+    ]
+  },
+  {
+    "id": "job_2",
+    "title": "CMS Network Coordinator",
+    "location": "Dubai, UAE",
+    "type": "Full-time",
+    "desc": "Manage content playback engines, configure display controllers, and coordinate signal redundancy matrices over corporate local network architectures.",
+    "requirements": [
+      "2+ years experience configuring enterprise digital signage CMS systems (Scala, BrightSign, or matching platforms).",
+      "Solid understanding of IP networking, firewalls, and remote terminal connections.",
+      "Strong diagnostic capabilities to solve live network signal issues under tight schedules."
+    ]
+  },
+  {
+    "id": "job_3",
+    "title": "AMC Operations Technician",
+    "location": "Al Quoz, Dubai",
+    "type": "Full-time",
+    "desc": "Perform scheduled preventive maintenance checks, lead on-site repair operations, and swap out modules for our Annual Maintenance Contract clients.",
+    "requirements": [
+      "Technical Diploma in Electronics, Mechatronics, or equivalent hands-on experience.",
+      "Experience with SMD manual soldering, pixel chip diagnostic runs, and module swaps.",
+      "Valid UAE driving license to handle site dispatches."
+    ]
+  }
+]

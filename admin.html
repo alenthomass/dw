@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Display World Admin Panel. Manage digital signage project cases.">
+  <title>Admin Panel | Display World</title>
+  <link rel="icon" href="https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png" sizes="32x32">
+  <link rel="stylesheet" href="index.css">
+  
+  <!-- Firebase Compat CDNs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <style>
+    .admin-hero {
+      padding-top: 180px;
+      padding-bottom: 3rem;
+    }
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: #030308;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      transition: opacity 0.5s ease, visibility 0.5s;
+    }
+    .auth-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .auth-card {
+      background: #080812;
+      border: 1px solid var(--border);
+      padding: 3rem 2.5rem;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+    }
+    .auth-card h2 {
+      font-family: var(--font-d);
+      color: #fff;
+      margin-bottom: 1.5rem;
+      font-size: 1.6rem;
+    }
+    .auth-card input {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .auth-card input:focus {
+      border-color: var(--pink);
+    }
+
+    .admin-dashboard {
+      margin-bottom: 5rem;
+    }
+    .admin-table-wrap {
+      background: rgba(255,255,255,0.01);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .admin-table th, .admin-table td {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-table th {
+      background: rgba(255,255,255,0.02);
+      font-family: var(--font-d);
+      color: #fff;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .admin-table td {
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .action-btn-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .action-btn {
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      color: #fff;
+      cursor: none;
+      transition: all 0.3s;
+    }
+    .action-btn.edit:hover {
+      border-color: var(--green);
+      background: rgba(97,206,112,0.08);
+      color: var(--green);
+    }
+    .action-btn.delete:hover {
+      border-color: var(--pink);
+      background: rgba(250,3,110,0.08);
+      color: var(--pink);
+    }
+
+    /* Modal Form Styles */
+    .admin-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(3,3,8,0.85);
+      z-index: 1900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s var(--ease);
+    }
+    .admin-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: #080812;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2.5rem;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .modal-header h3 {
+      font-family: var(--font-d);
+      color: #fff;
+      font-size: 1.4rem;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.5rem;
+      cursor: none;
+    }
+    .modal-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .modal-field.full-width {
+      grid-column: span 2;
+    }
+    .modal-field label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .modal-field input, .modal-field select, .modal-field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
+      border-color: var(--pink);
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 1.25rem;
+    }
+
+    /* Category Tag style list */
+    .category-manager-box {
+      background: rgba(255,255,255,0.01);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    .category-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    .category-tag {
+      background: rgba(250, 3, 110, 0.08);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .category-tag button {
+      background: none;
+      border: none;
+      color: var(--pink);
+      cursor: none;
+      font-weight: bold;
+    }
+
+    /* Light Theme Compatibility overrides */
+    [data-theme="light"] .auth-overlay {
+      background: #f8f9fa;
+    }
+    [data-theme="light"] .auth-card {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    [data-theme="light"] .auth-card h2 {
+      color: #0a0a12;
+    }
+    [data-theme="light"] .auth-card input {
+      background: #f1f3f5;
+      color: #0a0a12;
+      border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .admin-table-wrap {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .admin-table th {
+      background: #f1f3f5;
+      color: #0a0a12;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .admin-table td {
+      color: rgba(10,10,18,0.75);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    [data-theme="light"] .action-btn {
+      background: #f8f9fa;
+      border-color: rgba(0,0,0,0.1);
+      color: #0a0a12;
+    }
+    [data-theme="light"] .modal-content {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 15px 45px rgba(0,0,0,0.15);
+    }
+    [data-theme="light"] .modal-header h3 {
+      color: #0a0a12;
+    }
+    [data-theme="light"] .modal-field label {
+      color: rgba(10,10,18,0.5);
+    }
+    [data-theme="light"] .modal-field input,
+    [data-theme="light"] .modal-field select,
+    [data-theme="light"] .modal-field textarea {
+      background: #f1f3f5;
+      color: #0a0a12;
+      border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .category-manager-box {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .category-tag {
+      background: rgba(250, 3, 110, 0.05);
+      color: #0a0a12;
+      border-color: rgba(250, 3, 110, 0.15);
+    }
+
+    /* Dashboard Split Workspace Layout */
+    .dashboard-workspace {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      margin-top: 2rem;
+    }
+    @media (max-width: 991px) {
+      .dashboard-workspace {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+    
+    /* Sidebar Styling */
+    .admin-sidebar {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 100px;
+    }
+    .admin-profile-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .admin-avatar {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--pink), #9c27b0);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .admin-info h4 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--white);
+      font-family: var(--font-d);
+    }
+    .admin-info span {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    /* Sidebar Navigation Items */
+    .admin-sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .sidebar-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: none;
+      border: 1px solid transparent;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      color: var(--text-dim);
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      position: relative;
+    }
+    .sidebar-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--white);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+    .sidebar-nav-btn.active {
+      background: rgba(250, 3, 110, 0.08);
+      border-color: rgba(250, 3, 110, 0.2);
+      color: var(--pink);
+      font-weight: 600;
+    }
+    .sidebar-badge {
+      position: absolute;
+      right: 1rem;
+      background: var(--pink);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      box-shadow: 0 0 8px rgba(250, 3, 110, 0.5);
+    }
+    
+    /* Section Content Heading Bars */
+    .section-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+    }
+    .section-title-wrap h2 {
+      font-family: var(--font-d);
+      font-size: 1.6rem;
+      color: var(--white);
+      margin: 0 0 0.25rem 0;
+    }
+    .section-title-wrap p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin: 0;
+    }
+    
+    /* Overview Layout Components */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .overview-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.3s;
+    }
+    .overview-card:hover {
+      border-color: rgba(250,3,110,0.3);
+    }
+    .overview-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .overview-card-val {
+      font-size: 2.2rem;
+      font-family: var(--font-d);
+      color: var(--white);
+      line-height: 1;
+    }
+    .overview-card-cta {
+      font-size: 0.8rem;
+      color: var(--pink);
+      text-decoration: none;
+      margin-top: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Light Theme Compatibility overrides */
+    [data-theme="light"] .admin-sidebar {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    [data-theme="light"] .sidebar-nav-btn:hover {
+      background: #f1f3f5;
+      color: #0a0a12;
+    }
+    [data-theme="light"] .sidebar-nav-btn.active {
+      background: rgba(250, 3, 110, 0.05);
+      border-color: rgba(250, 3, 110, 0.15);
+      color: var(--pink);
+    }
+    [data-theme="light"] .overview-card {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    /* Settings Panel Styles */
+    .settings-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media(max-width: 768px) {
+      .settings-form-grid { grid-template-columns: 1fr; }
+    }
+    .settings-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .settings-field.full-width {
+      grid-column: 1 / -1;
+    }
+    .settings-field label {
+      font-size: 0.8rem;
+      color: var(--pink);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: var(--font-d);
+    }
+    .settings-field input,
+    .settings-field textarea {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      font-family: inherit;
+    }
+    .settings-field input:focus,
+    .settings-field textarea:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(250, 3, 110, 0.1);
+    }
+    .settings-field .field-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.15rem;
+    }
+    .settings-actions {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .settings-save-msg {
+      font-size: 0.85rem;
+      color: #25d366;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .settings-save-msg.visible {
+      opacity: 1;
+    }
+    .settings-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .settings-card h3 {
+      font-family: var(--font-d);
+      font-size: 1.15rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .settings-card > p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+    }
+    [data-theme="light"] .settings-field input,
+    [data-theme="light"] .settings-field textarea {
+      background: #f8f9fa;
+      color: #0a0a12;
+      border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .settings-card {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- AUTHENTICATION OVERLAY -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-card">
+      <h2>Project Registry Login</h2>
+      <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:1.5rem;">Enter credential passkey to access engineering management terminal.</p>
+      <input type="password" id="passkey-input" placeholder="Passcode (use admin123)">
+      <button class="btn-primary btn-full" id="login-btn"><span>Authenticate</span></button>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav scrolled" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+        <li><a href="portfolio.html" class="nav-link">Projects</a></li>
+        <li><a href="innovation.html" class="nav-link">Innovation</a></li>
+        <li><a href="insights.html" class="nav-link">Insights</a></li>
+        <li><a href="about.html" class="nav-link">Company</a></li>
+        <li><a href="contact.html" class="nav-link">Let's Talk</a></li>
+        <li><a href="help-center.html" class="nav-link nav-cta">Help Center</a></li>
+      </ul>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="admin-hero section-dark">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1.5rem;">
+      <div>
+        <span class="label-tag">Management Console</span>
+        <h1 class="section-title">Display World <br><span class="accent-text">Control Panel</span></h1>
+      </div>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <button class="btn-outline" id="reset-btn">Reset Defaults</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD TABLES -->
+  <section class="admin-dashboard">
+    <div class="container">
+      
+      <!-- Connection Status Banner -->
+      <div id="conn-banner" style="background:rgba(255,255,255,0.01); border:1px solid var(--border); padding:1rem; border-radius:8px; margin-bottom:2rem; display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; font-family:monospace;">
+        <span style="width:8px; height:8px; background:var(--pink); border-radius:50%; display:inline-block;" id="conn-indicator"></span>
+        <span id="conn-text" style="color:var(--text);">Mode: Local Storage Simulation</span>
+      </div>
+
+      <!-- Dashboard Workspace Split Grid -->
+      <div class="dashboard-workspace">
+        
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+          <div class="admin-profile-box">
+            <div class="admin-avatar">AD</div>
+            <div class="admin-info">
+              <h4>Administrator</h4>
+              <span>Main Controller</span>
+            </div>
+          </div>
+          <nav class="admin-sidebar-nav">
+            <button class="sidebar-nav-btn active" id="tab-overview-btn" onclick="switchTab('overview', this)">
+              <span class="nav-item-icon">📊</span>
+              <span class="nav-item-text">Overview</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-projects-btn" onclick="switchTab('projects', this)">
+              <span class="nav-item-icon">🖥️</span>
+              <span class="nav-item-text">Hardware Projects</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-casestudies-btn" onclick="switchTab('casestudies', this)">
+              <span class="nav-item-icon">📖</span>
+              <span class="nav-item-text">Case Studies</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-products-btn" onclick="switchTab('products', this)">
+              <span class="nav-item-icon">📦</span>
+              <span class="nav-item-text">Products Catalog</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-services-btn" onclick="switchTab('services', this)">
+              <span class="nav-item-icon">🛠️</span>
+              <span class="nav-item-text">Integration Services</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-insights-btn" onclick="switchTab('insights', this)">
+              <span class="nav-item-icon">✍️</span>
+              <span class="nav-item-text">Blog & Insights</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-inquiries-btn" onclick="switchTab('inquiries', this)">
+              <span class="nav-item-icon">📬</span>
+              <span class="nav-item-text">Inquiries</span>
+              <span class="sidebar-badge" id="sidebar-inquiries-badge" style="display:none;">0</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-careers-btn" onclick="switchTab('careers', this)">
+              <span class="nav-item-icon">💼</span>
+              <span class="nav-item-text">Job Openings</span>
+            </button>
+            <div style="height:1px; background:var(--border); margin:0.75rem 0;"></div>
+            <button class="sidebar-nav-btn" id="tab-settings-btn" onclick="switchTab('settings', this)">
+              <span class="nav-item-icon">⚙️</span>
+              <span class="nav-item-text">Site Settings</span>
+            </button>
+          </nav>
+        </aside>
+
+        <!-- MAIN WINDOW -->
+        <main class="admin-main-content" style="width:100%;">
+          
+          <!-- 1. OVERVIEW -->
+          <div id="overview-section" class="admin-tab-content">
+            <div class="section-header-bar" style="border:none; margin-bottom:1.5rem; padding-bottom:0;">
+              <div class="section-title-wrap">
+                <h2>Dashboard Overview</h2>
+                <p>Welcome back! Monitor system statistics and handle dynamic updates.</p>
+              </div>
+            </div>
+
+            <!-- Unread Alert -->
+            <div id="unread-inquiries-alert" style="display:none; background:linear-gradient(90deg, rgba(250,3,110,0.15), rgba(156,39,176,0.15)); border:1px solid var(--pink); border-radius:10px; padding:1.2rem; margin-bottom:2rem; justify-content:space-between; align-items:center; box-shadow: 0 4px 20px rgba(250,3,110,0.15);">
+              <div style="display:flex; align-items:center; gap:1rem;">
+                <span style="font-size:1.5rem; filter: drop-shadow(0 2px 5px rgba(250,3,110,0.5));">📬</span>
+                <div>
+                  <strong style="color:#fff; display:block; font-size:1rem;">New Customer Inquiries Received!</strong>
+                  <span style="color:var(--text-dim); font-size:0.85rem;" id="unread-inquiries-text">You have customer messages awaiting response.</span>
+                </div>
+              </div>
+              <button class="btn-primary" onclick="switchTab('inquiries', document.getElementById('tab-inquiries-btn'))" style="padding:0.4rem 1.2rem; font-size:0.8rem; background:linear-gradient(135deg, #fa036e, #9c27b0); border:none; height:auto;"><span>View Messages</span></button>
+            </div>
+
+            <div class="overview-grid">
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Active Projects</span>
+                  <span>🖥️</span>
+                </div>
+                <div class="overview-card-val" id="stat-projects-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('projects', document.getElementById('tab-projects-btn'))">Manage Projects →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Case Studies</span>
+                  <span>📖</span>
+                </div>
+                <div class="overview-card-val" id="stat-cases-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('casestudies', document.getElementById('tab-casestudies-btn'))">Manage Case Studies →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Products Catalog</span>
+                  <span>📦</span>
+                </div>
+                <div class="overview-card-val" id="stat-products-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('products', document.getElementById('tab-products-btn'))">Manage Products →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Integration Services</span>
+                  <span>🛠️</span>
+                </div>
+                <div class="overview-card-val" id="stat-services-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('services', document.getElementById('tab-services-btn'))">Manage Services →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Blog Articles</span>
+                  <span>✍️</span>
+                </div>
+                <div class="overview-card-val" id="stat-insights-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('insights', document.getElementById('tab-insights-btn'))">Manage Blog Posts →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Inquiries Received</span>
+                  <span>📬</span>
+                </div>
+                <div class="overview-card-val" id="stat-inquiries-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('inquiries', document.getElementById('tab-inquiries-btn'))">View Inbox →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Job Openings</span>
+                  <span>💼</span>
+                </div>
+                <div class="overview-card-val" id="stat-careers-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('careers', document.getElementById('tab-careers-btn'))">Manage Openings →</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. PROJECTS -->
+          <div id="projects-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Hardware Projects</h2>
+                <p>Register display installation cases in the Gulf region.</p>
+              </div>
+              <button class="btn-primary" id="add-project-btn"><span>Add Project</span></button>
+            </div>
+            
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Client</th>
+                    <th>Region</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="category-manager-box">
+              <h4 style="font-family:var(--font-d); color:var(--white); font-size:1.1rem; margin-bottom:0.5rem;">Configure Custom Categories</h4>
+              <p style="font-size:0.85rem; color:var(--text-dim);">Register custom visual display sector headings to categorize case entries.</p>
+              <div class="category-list" id="category-list-container">
+                <!-- Dynamic category tags -->
+              </div>
+              <div style="display:flex; gap:0.5rem; max-width:400px; margin-top:1rem;">
+                <input type="text" id="new-category-input" placeholder="e.g. Hospitality" style="flex:1; background:rgba(255,255,255,0.02); border:1px solid var(--border); padding:0.5rem 1rem; border-radius:6px; color:#fff; outline:none;">
+                <button class="btn-primary" id="add-category-btn" style="padding:0.5rem 1.25rem;"><span>Add</span></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. CASE STUDIES -->
+          <div id="casestudies-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Technical Case Studies</h2>
+                <p>Detail engineering solutions, challenges, and display specifications.</p>
+              </div>
+              <button class="btn-primary" id="add-cs-btn" style="background:linear-gradient(135deg, #fa036e, #9c27b0);"><span>Add Case Study</span></button>
+            </div>
+            
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Challenge Preview</th>
+                    <th>Result Preview</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="cs-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 4. PRODUCTS -->
+          <div id="products-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Products Catalog</h2>
+                <p>Manage visual display products list shown in the Experience Center.</p>
+              </div>
+              <button class="btn-primary" id="add-product-btn" style="background:linear-gradient(135deg, #03a9f4, #00bcd4);"><span>Add Product</span></button>
+            </div>
+            
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Description Preview</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 5. SERVICES -->
+          <div id="services-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Integration Services</h2>
+                <p>Manage system design consultancy and deployment offerings.</p>
+              </div>
+              <button class="btn-primary" id="add-service-btn" style="background:linear-gradient(135deg, #4caf50, #8bc34a);"><span>Add Service</span></button>
+            </div>
+            
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order Num</th>
+                    <th>Icon Type</th>
+                    <th>Service Title</th>
+                    <th>Description Preview</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="services-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 6. BLOG & INSIGHTS -->
+          <div id="insights-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Blog & GCC Insights</h2>
+                <p>Publish signage articles, news, and technical briefings.</p>
+              </div>
+              <button class="btn-primary" id="add-insight-btn" style="background:linear-gradient(135deg, #ff9800, #ff5722);"><span>Add Blog Post</span></button>
+            </div>
+            
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Article Title</th>
+                    <th>Category Tag</th>
+                    <th>Date Published</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="insights-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 7. INQUIRIES -->
+          <div id="inquiries-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Customer Inquiries</h2>
+                <p>Review contact forms, RFQs, and product inquiry messages.</p>
+              </div>
+            </div>
+            
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Sender Name / Company</th>
+                    <th>Contact Info</th>
+                    <th>Message Detail</th>
+                    <th>Received Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inquiries-table-body">
+                  <!-- Dynamically populated rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 8. SITE SETTINGS -->
+          <div id="settings-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Site Settings</h2>
+                <p>Manage contact details shown in footers, WhatsApp button, and contact pages across the entire website.</p>
+              </div>
+            </div>
+
+            <!-- Contact Numbers Card -->
+            <div class="settings-card">
+              <h3>📞 Contact Numbers</h3>
+              <p>Update the telephone and mobile numbers displayed in footers and contact pages.</p>
+              <div class="settings-form-grid">
+                <div class="settings-field">
+                  <label for="settings-phone">Office Phone</label>
+                  <input type="tel" id="settings-phone" placeholder="+971 4 346 8922">
+                  <span class="field-hint">Main office landline number</span>
+                </div>
+                <div class="settings-field">
+                  <label for="settings-mobile">Mobile Number</label>
+                  <input type="tel" id="settings-mobile" placeholder="+971 56 779 2681">
+                  <span class="field-hint">Primary mobile contact</span>
+                </div>
+                <div class="settings-field">
+                  <label for="settings-email">Contact Email</label>
+                  <input type="email" id="settings-email" placeholder="sales@displayworldme.com">
+                  <span class="field-hint">Shown in footer and contact page</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- WhatsApp Settings Card -->
+            <div class="settings-card">
+              <h3>💬 WhatsApp Button</h3>
+              <p>Configure the floating WhatsApp chat button that appears on all pages.</p>
+              <div class="settings-form-grid">
+                <div class="settings-field">
+                  <label for="settings-whatsapp">WhatsApp Number</label>
+                  <input type="tel" id="settings-whatsapp" placeholder="971567792681">
+                  <span class="field-hint">Without + sign (e.g. 971567792681)</span>
+                </div>
+                <div class="settings-field full-width">
+                  <label for="settings-whatsapp-msg">Pre-filled Greeting Message</label>
+                  <textarea id="settings-whatsapp-msg" rows="3" placeholder="Hello! I'm interested in Display World's solutions."></textarea>
+                  <span class="field-hint">This message will be pre-filled when a visitor clicks the WhatsApp button</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- WhatsApp Preview -->
+            <div class="settings-card" style="text-align:center;">
+              <h3 style="justify-content:center;">👁️ Live Preview</h3>
+              <p>This is how your WhatsApp link will look:</p>
+              <div style="background:rgba(37,211,102,0.08); border:1px solid rgba(37,211,102,0.2); border-radius:12px; padding:1.25rem; display:inline-block; margin:0 auto;">
+                <a id="settings-wa-preview" href="#" target="_blank" rel="noopener noreferrer" style="color:#25d366; font-weight:700; font-size:0.95rem; text-decoration:none; display:flex; align-items:center; gap:0.5rem;">
+                  <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.202-1.362a9.927 9.927 0 0 0 4.805 1.232h.005c5.505 0 9.99-4.478 9.99-9.986C22.002 6.478 17.518 2 12.012 2z"/></svg>
+                  <span id="settings-wa-preview-text">wa.me/971567792681</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="settings-actions">
+              <button class="btn-primary" id="save-settings-btn" style="min-width:180px;"><span>💾 Save & Apply to All Pages</span></button>
+              <span class="settings-save-msg" id="settings-save-msg">✓ Settings saved successfully!</span>
+            </div>
+          </div>
+
+          <!-- 9. JOB OPENINGS -->
+          <div id="careers-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Job Openings</h2>
+                <p>Register, update, or remove active job listings displayed on the Careers section of your About page.</p>
+              </div>
+              <button class="btn-primary" id="add-job-btn"><span>➕ Add Job Position</span></button>
+            </div>
+
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Job Title</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Requirements Count</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="careers-table-body">
+                  <!-- Dynamically populated job rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- PROJECT EDIT MODAL -->
+  <div class="admin-modal" id="project-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Register Case Study</h3>
+        <button class="close-modal" id="close-modal-btn">×</button>
+      </div>
+      <form id="project-form">
+        <input type="hidden" id="field-id">
+        <div class="modal-form-grid">
+          <div class="modal-field full-width">
+            <label for="field-title">Project Title</label>
+            <input type="text" id="field-title" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-category">Category</label>
+            <select id="field-category" required style="background:#080812;">
+              <!-- Dynamic categories option list -->
+            </select>
+          </div>
+          <div class="modal-field">
+            <label for="field-client">Client</label>
+            <input type="text" id="field-client" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-year">Deployment Year</label>
+            <input type="text" id="field-year" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-location">Location / Region</label>
+            <input type="text" id="field-location" required>
+          </div>
+          <div class="modal-field full-width">
+            <label>Upload Display Image File</label>
+            <div style="display:flex; gap:1.5rem; align-items:center; background:rgba(255,255,255,0.01); border:1px dashed var(--border); padding:1rem; border-radius:8px;">
+              <input type="file" id="field-image-file" accept="image/*" style="border:none; background:none; padding:0;">
+              <img id="image-preview" src="" alt="Preview" style="max-height:60px; border-radius:6px; border:1px solid var(--border); display:none;">
+            </div>
+            <!-- Keep hidden fallback URL field -->
+            <input type="hidden" id="field-image-url">
+          </div>
+          <div class="modal-field full-width">
+            <label for="field-shortDesc">Short Description</label>
+            <input type="text" id="field-shortDesc" required>
+          </div>
+          <div class="modal-field full-width">
+            <label for="field-challenge">Integration Challenge</label>
+            <textarea id="field-challenge" rows="4" required></textarea>
+          </div>
+          <div class="modal-field full-width">
+            <label for="field-solution">Calibration Solution</label>
+            <textarea id="field-solution" rows="4" required></textarea>
+          </div>
+          
+          <!-- Specs -->
+          <div class="modal-field">
+            <label for="field-spec-system">Display System Type</label>
+            <input type="text" id="field-spec-system" placeholder="e.g. 3x3 LCD wall" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-spec-bezel">Bezel Width Profile</label>
+            <input type="text" id="field-spec-bezel" placeholder="e.g. 0.88mm Bezel" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-spec-brightness">Calibrated Brightness</label>
+            <input type="text" id="field-spec-brightness" placeholder="e.g. 700 nits" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-spec-failover">Signal Redundancy</label>
+            <input type="text" id="field-spec-failover" placeholder="e.g. Dual Loop Failover" required>
+          </div>
+          <div class="modal-field">
+            <label for="field-spec-uptime">Uptime Rating</label>
+            <input type="text" id="field-spec-uptime" placeholder="e.g. 100%" required>
+          </div>
+          <div class="modal-field" style="justify-content:center;">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-top:1.5rem;">
+              <input type="checkbox" id="field-isWide" style="margin-bottom:0; width:auto; cursor:none;">
+              <label for="field-isWide" style="cursor:none; color:var(--text-dim); font-size:0.8rem;">Display Wide Card Layout</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" id="cancel-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Save Project Case</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CASE STUDY EDIT MODAL -->
+  <div class="admin-modal" id="cs-modal">
+    <div class="modal-content" style="max-width:600px;">
+      <div class="modal-header">
+        <h3 id="cs-modal-title">Add Case Study</h3>
+        <button class="close-modal" id="close-cs-modal-btn">×</button>
+      </div>
+      <form id="cs-form">
+        <input type="hidden" id="field-cs-id">
+        <div class="modal-form-grid" style="display:flex; flex-direction:column; gap:1.2rem;">
+          <div class="modal-field" style="display:flex; flex-direction:column; gap:0.4rem;">
+            <label for="field-cs-title" style="color:var(--text); font-weight:600; font-size:0.85rem;">Case Study Title</label>
+            <input type="text" id="field-cs-title" required style="width:100%; padding:0.6rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; color:#fff; outline:none;">
+          </div>
+          <div class="modal-field" style="display:flex; flex-direction:column; gap:0.4rem;">
+            <label for="field-cs-challenge" style="color:var(--text); font-weight:600; font-size:0.85rem;">Challenge Details</label>
+            <textarea id="field-cs-challenge" rows="3" required style="width:100%; padding:0.6rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; color:#fff; outline:none; resize:none;"></textarea>
+          </div>
+          <div class="modal-field" style="display:flex; flex-direction:column; gap:0.4rem;">
+            <label for="field-cs-solution" style="color:var(--text); font-weight:600; font-size:0.85rem;">Solution Deployed</label>
+            <textarea id="field-cs-solution" rows="3" required style="width:100%; padding:0.6rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; color:#fff; outline:none; resize:none;"></textarea>
+          </div>
+          <div class="modal-field" style="display:flex; flex-direction:column; gap:0.4rem;">
+            <label for="field-cs-result" style="color:var(--text); font-weight:600; font-size:0.85rem;">Result / Uptime Impact</label>
+            <textarea id="field-cs-result" rows="2" required style="width:100%; padding:0.6rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; color:#fff; outline:none; resize:none;"></textarea>
+          </div>
+          <div class="modal-field" style="display:flex; flex-direction:column; gap:0.4rem;">
+            <label for="field-cs-logs" style="color:var(--text); font-weight:600; font-size:0.85rem;">Diagnostic Logs (One entry per line)</label>
+            <textarea id="field-cs-logs" rows="3" placeholder="e.g. [OK] Ping success&#10;[OK] Redundancy active" style="width:100%; padding:0.6rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; color:#fff; outline:none; resize:none; font-family:monospace; font-size:0.8rem;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="margin-top:1.5rem; display:flex; justify-content:flex-end; gap:1rem;">
+          <button type="button" class="btn-outline" id="cancel-cs-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Save Case Study</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRODUCT CATALOG MODAL -->
+  <div class="admin-modal" id="product-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="product-modal-title">Add New Product</h3>
+        <button class="close-modal" id="close-product-modal-btn">&times;</button>
+      </div>
+      <form id="product-form" class="modal-form-grid">
+        <input type="hidden" id="prod-id">
+        <div class="modal-field full-width">
+          <label for="prod-name">Product Name</label>
+          <input type="text" id="prod-name" required placeholder="e.g. Transparent LED Glass Film">
+        </div>
+        <div class="modal-field">
+          <label for="prod-category">Category Tab</label>
+          <select id="prod-category" required style="width:100%; background:var(--bg3); border:1px solid var(--border); padding:0.75rem 1rem; border-radius:8px; color:#fff;">
+            <option value="led">led (LED Screens)</option>
+            <option value="lcd">lcd (LCD Panels)</option>
+            <option value="transparent">transparent (Transparent Film)</option>
+            <option value="interactive">interactive (Interactive Totems)</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label for="prod-category-label">Category Display Label</label>
+          <input type="text" id="prod-category-label" required placeholder="e.g. LED Screens">
+        </div>
+        <div class="modal-field full-width">
+          <label for="prod-image">Image URL</label>
+          <input type="url" id="prod-image" required placeholder="https://images.unsplash.com/...">
+        </div>
+        <div class="modal-field full-width">
+          <label for="prod-desc">Brief Description</label>
+          <textarea id="prod-desc" required rows="3" placeholder="Brief catalog summary of this product..."></textarea>
+        </div>
+        <div class="modal-field full-width">
+          <label style="margin-bottom:0.5rem; display:block;">Specifications Checklist (Key: Value)</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+            <input type="text" id="prod-spec-1-k" placeholder="Spec 1 Key (e.g. Pixel Pitch)">
+            <input type="text" id="prod-spec-1-v" placeholder="Spec 1 Value (e.g. 0.9mm)">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+            <input type="text" id="prod-spec-2-k" placeholder="Spec 2 Key (e.g. Brightness)">
+            <input type="text" id="prod-spec-2-v" placeholder="Spec 2 Value (e.g. 800 nits)">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+            <input type="text" id="prod-spec-3-k" placeholder="Spec 3 Key (e.g. Refresh Rate)">
+            <input type="text" id="prod-spec-3-v" placeholder="Spec 3 Value (e.g. 3840 Hz)">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <input type="text" id="prod-spec-4-k" placeholder="Spec 4 Key (e.g. Power Draw)">
+            <input type="text" id="prod-spec-4-v" placeholder="Spec 4 Value (e.g. 180W / sqm)">
+          </div>
+        </div>
+        <div class="modal-footer" style="grid-column: span 2; width: 100%;">
+          <button type="button" class="btn-outline" id="cancel-product-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Save Product</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SERVICE MODAL -->
+  <div class="admin-modal" id="service-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="service-modal-title">Add Integration Service</h3>
+        <button class="close-modal" id="close-service-modal-btn">&times;</button>
+      </div>
+      <form id="service-form" class="modal-form-grid">
+        <input type="hidden" id="svc-id">
+        <div class="modal-field">
+          <label for="svc-num">Order Number</label>
+          <input type="text" id="svc-num" required placeholder="e.g. 07">
+        </div>
+        <div class="modal-field">
+          <label for="svc-icon-type">Icon Category</label>
+          <select id="svc-icon-type" required style="width:100%; background:var(--bg3); border:1px solid var(--border); padding:0.75rem 1rem; border-radius:8px; color:#fff;">
+            <option value="lcd">LCD Wall</option>
+            <option value="led">LED Screen</option>
+            <option value="kiosk">Totem/Kiosk</option>
+            <option value="cms">CMS/Software</option>
+            <option value="lighting">Architectural Lighting</option>
+            <option value="consultancy">Consulting/Strategy</option>
+          </select>
+        </div>
+        <div class="modal-field full-width">
+          <label for="svc-title">Service Title</label>
+          <input type="text" id="svc-title" required placeholder="e.g. Digital Art Façade">
+        </div>
+        <div class="modal-field full-width">
+          <label for="svc-image">Service Image URL</label>
+          <input type="url" id="svc-image" required placeholder="https://images.unsplash.com/...">
+        </div>
+        <div class="modal-field full-width">
+          <label for="svc-desc">Service Description</label>
+          <textarea id="svc-desc" required rows="4" placeholder="Detail description of integration scope..."></textarea>
+        </div>
+        <div class="modal-footer" style="grid-column: span 2; width: 100%;">
+          <button type="button" class="btn-outline" id="cancel-service-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Save Service</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- INSIGHT / BLOG MODAL -->
+  <div class="admin-modal" id="insight-modal">
+    <div class="modal-content" style="max-width: 900px;">
+      <div class="modal-header">
+        <h3 id="insight-modal-title">Publish Blog & Insight Post</h3>
+        <button class="close-modal" id="close-insight-modal-btn">&times;</button>
+      </div>
+      <form id="insight-form" class="modal-form-grid">
+        <input type="hidden" id="insight-id">
+        <div class="modal-field">
+          <label for="insight-title">Article Title</label>
+          <input type="text" id="insight-title" required placeholder="e.g. Scaling Pixels for UAE Summer Conditions">
+        </div>
+        <div class="modal-field">
+          <label for="insight-meta">Category Tag</label>
+          <input type="text" id="insight-meta" required placeholder="e.g. Engineering Guide / Case Study">
+        </div>
+        <div class="modal-field">
+          <label for="insight-image">Featured Image URL</label>
+          <input type="url" id="insight-image" required placeholder="https://images.unsplash.com/...">
+        </div>
+        <div class="modal-field">
+          <label for="insight-date">Date Published</label>
+          <input type="datetime-local" id="insight-date" required>
+        </div>
+        <div class="modal-field full-width">
+          <label for="insight-desc">Brief Summary Paragraph</label>
+          <input type="text" id="insight-desc" required placeholder="Brief single-sentence deck line summarizing this post...">
+        </div>
+        <div class="modal-field full-width">
+          <label for="insight-content">Article Content (HTML Block - supports headers, lists, embedded images etc.)</label>
+          <textarea id="insight-content" required rows="12" style="font-family: monospace; font-size: 0.9rem;" placeholder="<h2>Section Header</h2>&#10;<p>Add paragraph here...</p>&#10;<img src='https://...' alt='photo' style='width:100%; border-radius:12px; margin: 1.5rem 0;'>&#10;<ul>&#10;  <li>Key bullet point</li>&#10;</ul>"></textarea>
+        </div>
+        <div class="modal-footer" style="grid-column: span 2; width: 100%;">
+          <button type="button" class="btn-outline" id="cancel-insight-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Publish Post</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- CAREER EDIT MODAL -->
+  <div class="admin-modal" id="career-modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 id="career-modal-title">Register Job Position</h3>
+        <button class="close-modal" id="close-career-modal-btn">&times;</button>
+      </div>
+      <form id="career-form" class="modal-form-grid">
+        <input type="hidden" id="career-id">
+        <div class="modal-field">
+          <label for="career-title">Job Title</label>
+          <input type="text" id="career-title" required placeholder="e.g. Visual Systems Integration Engineer">
+        </div>
+        <div class="modal-field">
+          <label for="career-location">Location</label>
+          <input type="text" id="career-location" required placeholder="e.g. Dubai, UAE / Al Quoz, Dubai">
+        </div>
+        <div class="modal-field">
+          <label for="career-type">Job Type</label>
+          <input type="text" id="career-type" required placeholder="e.g. Full-time / Part-time / Remote">
+        </div>
+        <div class="modal-field full-width">
+          <label for="career-desc">Job Description</label>
+          <input type="text" id="career-desc" required placeholder="Brief summary of the role's primary goals...">
+        </div>
+        <div class="modal-field full-width">
+          <label for="career-requirements">Key Requirements (Enter each requirement on a new line)</label>
+          <textarea id="career-requirements" rows="6" required placeholder="Requirement line 1&#10;Requirement line 2&#10;Requirement line 3"></textarea>
+        </div>
+        <div class="modal-footer" style="grid-column: span 2; width: 100%;">
+          <button type="button" class="btn-outline" id="cancel-career-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Save Position</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <script src="projects-data.js"></script>
+  <script>
+    // Simple passkey auth setup
+    const authOverlay = document.getElementById('auth-overlay');
+    const passkeyInput = document.getElementById('passkey-input');
+    const loginBtn = document.getElementById('login-btn');
+    
+    if (sessionStorage.getItem('dw_admin_session') === 'active') {
+      authOverlay.classList.add('hidden');
+    }
+    
+    loginBtn.addEventListener('click', () => {
+      if (passkeyInput.value === 'admin123') {
+        sessionStorage.setItem('dw_admin_session', 'active');
+        authOverlay.classList.add('hidden');
+      } else {
+        alert('Incorrect passkey.');
+      }
+    });
+    
+    passkeyInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    // Connection Banner status update
+    function updateConnectionStatusBanner() {
+      const indicator = document.getElementById('conn-indicator');
+      const bannerText = document.getElementById('conn-text');
+      const mode = ProjectsStore.getMode();
+      
+      if (mode === 'firebase') {
+        indicator.style.background = '#61CE70';
+        bannerText.textContent = 'Backend Connection Mode: Firebase Firestore & Storage (Cloud)';
+      } else if (mode === 'local-api') {
+        indicator.style.background = '#61CE70';
+        bannerText.textContent = 'Backend Connection Mode: Local Node.js Express API Server (Online)';
+      } else {
+        indicator.style.background = 'var(--pink)';
+        bannerText.textContent = 'Backend Connection Mode: Local Storage Simulation (Offline)';
+      }
+    }
+
+
+
+    // Dashboard List Management
+    const tableBody = document.getElementById('admin-table-body');
+    const projectModal = document.getElementById('project-modal');
+    const projectForm = document.getElementById('project-form');
+    const modalTitle = document.getElementById('modal-title');
+    const categorySelect = document.getElementById('field-category');
+    
+    // Manage Categories elements
+    const catContainer = document.getElementById('category-list-container');
+    const newCatInput = document.getElementById('new-category-input');
+    const addCatBtn = document.getElementById('add-category-btn');
+
+    // Case Studies Elements
+    const csTableBody = document.getElementById('cs-table-body');
+    const csModal = document.getElementById('cs-modal');
+    const csForm = document.getElementById('cs-form');
+    const csModalTitle = document.getElementById('cs-modal-title');
+    const addCsBtn = document.getElementById('add-cs-btn');
+
+    // Inquiries Elements
+    const inquiriesTableBody = document.getElementById('inquiries-table-body');
+
+    // Careers Elements
+    const careersTableBody = document.getElementById('careers-table-body');
+    const careerModal = document.getElementById('career-modal');
+    const careerForm = document.getElementById('career-form');
+    const careerModalTitle = document.getElementById('career-modal-title');
+    const addJobBtn = document.getElementById('add-job-btn');
+
+    window.switchTab = function(tabName, btnEl) {
+      // Hide all tabs
+      document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+      // Deactivate all sidebar nav buttons
+      document.querySelectorAll('.admin-sidebar-nav .sidebar-nav-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Show target tab
+      document.getElementById(`${tabName}-section`).style.display = 'block';
+      
+      // If we clicked a sidebar button, make it active
+      if (btnEl) {
+        btnEl.classList.add('active');
+      } else {
+        // Fallback: activate by ID
+        const targetBtn = document.getElementById(`tab-${tabName}-btn`);
+        if (targetBtn) targetBtn.classList.add('active');
+      }
+    };
+
+    async function loadAdminDashboard() {
+      updateConnectionStatusBanner();
+      
+      // Load Categories List
+      const categories = await ProjectsStore.getCategories();
+      
+      // Render inside tag manager
+      catContainer.innerHTML = '';
+      categorySelect.innerHTML = '';
+      categories.forEach(c => {
+        const tag = document.createElement('div');
+        tag.className = 'category-tag';
+        tag.innerHTML = `
+          <span>${c}</span>
+          <button onclick="deleteCategory('${c}')">×</button>
+        `;
+        catContainer.appendChild(tag);
+        
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        categorySelect.appendChild(opt);
+      });
+      
+      // Load Projects List
+      const projects = await ProjectsStore.getAll();
+      tableBody.innerHTML = '';
+      projects.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold; color:var(--white);">${p.title}</td>
+          <td><span class="label-tag" style="margin:0;">${p.category}</span></td>
+          <td>${p.client}</td>
+          <td>${p.location}</td>
+          <td>
+            <div class="action-btn-row">
+              <button class="action-btn edit" onclick="editProject('${p.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteProject('${p.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Load Case Studies List
+      const caseStudies = await CaseStudiesStore.getAll();
+      csTableBody.innerHTML = '';
+      caseStudies.forEach(cs => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold; color:var(--white);">${cs.title}</td>
+          <td style="font-size:0.85rem; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${cs.challenge}</td>
+          <td style="font-size:0.85rem; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${cs.result}</td>
+          <td>
+            <div class="action-btn-row">
+              <button class="action-btn edit" onclick="editCaseStudy('${cs.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteCaseStudy('${cs.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        csTableBody.appendChild(row);
+      });
+
+      // Load Inquiries List
+      try {
+        const res = await fetch('/api/inquiries');
+        if (res.ok) {
+          const inquiries = await res.json();
+          inquiriesTableBody.innerHTML = '';
+          
+          // Update inquiries stat counters & alerts
+          document.getElementById('stat-inquiries-count').textContent = inquiries.length;
+          const alertBanner = document.getElementById('unread-inquiries-alert');
+          const alertText = document.getElementById('unread-inquiries-text');
+          const pingDot = document.getElementById('new-inquiry-ping');
+          const statCard = document.getElementById('stat-card-inquiries');
+          const statLabel = document.getElementById('stat-inquiries-label');
+
+          if (inquiries.length > 0) {
+            alertBanner.style.display = 'flex';
+            alertText.textContent = `You have ${inquiries.length} customer message${inquiries.length > 1 ? 's' : ''} awaiting response.`;
+            pingDot.style.display = 'block';
+            statCard.style.background = 'rgba(250, 3, 110, 0.05)';
+            statCard.style.borderColor = 'var(--pink)';
+            statLabel.style.color = 'var(--pink)';
+          } else {
+            alertBanner.style.display = 'none';
+            pingDot.style.display = 'none';
+            statCard.style.background = 'var(--bg2)';
+            statCard.style.borderColor = 'var(--border)';
+            statLabel.style.color = 'var(--text-dim)';
+          }
+
+          if (inquiries.length === 0) {
+            inquiriesTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:2rem;">No customer inquiries received yet.</td></tr>`;
+          } else {
+            inquiries.slice().reverse().forEach(inq => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td><span class="label-tag" style="margin:0; background:${inq.type === 'AMC SLA Inquiry' ? 'rgba(156,39,176,0.1)' : 'rgba(250,3,110,0.1)'}; color:${inq.type === 'AMC SLA Inquiry' ? '#e040fb' : '#fa036e'}; border-color:${inq.type === 'AMC SLA Inquiry' ? 'rgba(224,64,251,0.2)' : 'rgba(250,3,110,0.2)'}">${inq.type}</span></td>
+                <td style="font-weight:bold; color:var(--white);">${inq.name}${inq.company ? `<br><span style="font-weight:normal; font-size:0.75rem; color:var(--text-dim);">${inq.company}</span>` : ''}</td>
+                <td><a href="mailto:${inq.email}" style="color:var(--pink); text-decoration:none;">${inq.email}</a></td>
+                <td style="font-size:0.85rem; max-width:300px; white-space:normal; line-height:1.4;">${inq.subject ? `<strong>Subj: ${inq.subject}</strong><br>` : ''}${inq.message || inq.details || ''}</td>
+                <td style="font-size:0.75rem; font-family:monospace;">${new Date(inq.timestamp).toLocaleString()}</td>
+                <td>
+                  <div class="action-btn-row">
+                    <button class="action-btn delete" onclick="deleteInquiry('${inq.id}')">Delete</button>
+                  </div>
+                </td>
+              `;
+              inquiriesTableBody.appendChild(row);
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Error reading inquiries:', err);
+      }
+
+      // Load Products List
+      const products = await ProductsStore.getAll();
+      const productsTableBody = document.getElementById('products-table-body');
+      productsTableBody.innerHTML = '';
+      products.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold; color:var(--white);">${p.name}</td>
+          <td><span class="label-tag" style="margin:0;">${p.categoryLabel || p.category.toUpperCase()}</span></td>
+          <td style="font-size:0.85rem; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.desc}</td>
+          <td>
+            <div class="action-btn-row">
+              <button class="action-btn edit" onclick="editProduct('${p.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteProduct('${p.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        productsTableBody.appendChild(row);
+      });
+
+      // Load Services List
+      const services = await ServicesStore.getAll();
+      const servicesTableBody = document.getElementById('services-table-body');
+      servicesTableBody.innerHTML = '';
+      services.forEach(s => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-family:monospace; color:var(--pink);">${s.num}</td>
+          <td><span class="label-tag" style="margin:0; background:rgba(255,255,255,0.05);">${s.iconType}</span></td>
+          <td style="font-weight:bold; color:var(--white);">${s.title}</td>
+          <td style="font-size:0.85rem; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.desc}</td>
+          <td>
+            <div class="action-btn-row">
+              <button class="action-btn edit" onclick="editService('${s.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteService('${s.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        servicesTableBody.appendChild(row);
+      });
+
+      // Load Insights List
+      const insights = await InsightsStore.getAll();
+      const insightsTableBody = document.getElementById('insights-table-body');
+      insightsTableBody.innerHTML = '';
+      insights.forEach(post => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold; color:var(--white);">${post.title}</td>
+          <td><span class="label-tag" style="margin:0;">${post.meta}</span></td>
+          <td style="font-size:0.8rem; font-family:monospace;">${new Date(post.timestamp).toLocaleDateString()}</td>
+          <td>
+            <div class="action-btn-row">
+              <button class="action-btn edit" onclick="editInsight('${post.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteInsight('${post.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        insightsTableBody.appendChild(row);
+      });
+
+      // Load Careers List
+      const careers = await CareersStore.getAll();
+      careersTableBody.innerHTML = '';
+      careers.forEach(job => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight:bold; color:var(--white);">${job.title}</td>
+          <td>${job.location}</td>
+          <td><span class="label-tag" style="margin:0; background:rgba(255,255,255,0.05);">${job.type}</span></td>
+          <td style="font-size:0.85rem; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${job.desc}</td>
+          <td style="font-family:monospace;">${(job.requirements || []).length} items</td>
+          <td>
+            <div class="action-btn-row">
+              <button class="action-btn edit" onclick="editCareer('${job.id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteCareer('${job.id}')">Delete</button>
+            </div>
+          </td>
+        `;
+        careersTableBody.appendChild(row);
+      });
+
+      // Update general count stats
+      document.getElementById('stat-projects-count').textContent = projects.length;
+      document.getElementById('stat-cases-count').textContent = caseStudies.length;
+      document.getElementById('stat-products-count').textContent = products.length;
+      document.getElementById('stat-services-count').textContent = services.length;
+      document.getElementById('stat-insights-count').textContent = insights.length;
+      document.getElementById('stat-careers-count').textContent = careers.length;
+    }
+
+    // Add category handler
+    addCatBtn.addEventListener('click', async () => {
+      const val = newCatInput.value.trim();
+      if (!val) return;
+      
+      await ProjectsStore.saveCategory(val);
+      newCatInput.value = '';
+      loadAdminDashboard();
+    });
+
+    // Delete category handler
+    window.deleteCategory = async function(category) {
+      if (confirm(`Remove category "${category}" from registry selectors?`)) {
+        await ProjectsStore.deleteCategory(category);
+        loadAdminDashboard();
+      }
+    };
+
+    // File Upload Preview
+    const fileInput = document.getElementById('field-image-file');
+    const imgPreview = document.getElementById('image-preview');
+    const fieldImgUrl = document.getElementById('field-image-url');
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imgPreview.src = e.target.result;
+          imgPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Modal Triggers for Projects
+    document.getElementById('add-project-btn').addEventListener('click', () => {
+      projectForm.reset();
+      document.getElementById('field-id').value = '';
+      imgPreview.style.display = 'none';
+      imgPreview.src = '';
+      fieldImgUrl.value = '';
+      modalTitle.textContent = 'Register New Case Study';
+      projectModal.classList.add('active');
+    });
+
+    function closeModal() {
+      projectModal.classList.remove('active');
+    }
+    
+    document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+    document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
+
+    // Edit case study details
+    window.editProject = async function(id) {
+      const p = await ProjectsStore.getById(id);
+      if (!p) return;
+      
+      document.getElementById('field-id').value = p.id;
+      document.getElementById('field-title').value = p.title;
+      document.getElementById('field-category').value = p.category;
+      document.getElementById('field-client').value = p.client;
+      document.getElementById('field-year').value = p.year;
+      document.getElementById('field-location').value = p.location;
+      fieldImgUrl.value = p.image;
+      
+      if (p.image) {
+        imgPreview.src = p.image;
+        imgPreview.style.display = 'block';
+      } else {
+        imgPreview.style.display = 'none';
+      }
+      
+      document.getElementById('field-shortDesc').value = p.shortDesc;
+      document.getElementById('field-challenge').value = p.challenge;
+      document.getElementById('field-solution').value = p.solution;
+      
+      document.getElementById('field-spec-system').value = p.specs.system || '';
+      document.getElementById('field-spec-bezel').value = p.specs.bezel || '';
+      document.getElementById('field-spec-brightness').value = p.specs.brightness || '';
+      document.getElementById('field-spec-failover').value = p.specs.failover || '';
+      document.getElementById('field-spec-uptime').value = p.specs.uptime || '';
+      document.getElementById('field-isWide').checked = !!p.isWide;
+      
+      modalTitle.textContent = 'Edit Case Study';
+      projectModal.classList.add('active');
+    };
+
+    // Delete case
+    window.deleteProject = async function(id) {
+      if (confirm('Are you sure you want to delete this case study registry?')) {
+        await ProjectsStore.delete(id);
+        loadAdminDashboard();
+      }
+    };
+
+    // Form submission save for Projects
+    projectForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const file = fileInput.files[0];
+      let imageUrl = fieldImgUrl.value;
+      
+      if (file) {
+        imageUrl = await ProjectsStore.uploadImage(file);
+      }
+      
+      if (!imageUrl) {
+        imageUrl = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80";
+      }
+      
+      const id = document.getElementById('field-id').value || 'id_' + Date.now();
+      const project = {
+        id: id,
+        title: document.getElementById('field-title').value,
+        category: document.getElementById('field-category').value,
+        client: document.getElementById('field-client').value,
+        year: document.getElementById('field-year').value,
+        location: document.getElementById('field-location').value,
+        image: imageUrl,
+        shortDesc: document.getElementById('field-shortDesc').value,
+        challenge: document.getElementById('field-challenge').value,
+        solution: document.getElementById('field-solution').value,
+        specs: {
+          system: document.getElementById('field-spec-system').value,
+          bezel: document.getElementById('field-spec-bezel').value,
+          brightness: document.getElementById('field-spec-brightness').value,
+          failover: document.getElementById('field-spec-failover').value,
+          uptime: document.getElementById('field-spec-uptime').value
+        },
+        isWide: document.getElementById('field-isWide').checked
+      };
+      
+      await ProjectsStore.save(project);
+      closeModal();
+      loadAdminDashboard();
+    });
+
+    // Modal Triggers for Case Studies
+    addCsBtn.addEventListener('click', () => {
+      csForm.reset();
+      document.getElementById('field-cs-id').value = '';
+      csModalTitle.textContent = 'Add Technical Case Study';
+      csModal.classList.add('active');
+    });
+
+    function closeCsModal() {
+      csModal.classList.remove('active');
+    }
+
+    document.getElementById('close-cs-modal-btn').addEventListener('click', closeCsModal);
+    document.getElementById('cancel-cs-modal-btn').addEventListener('click', closeCsModal);
+
+    window.editCaseStudy = async function(id) {
+      const list = await CaseStudiesStore.getAll();
+      const cs = list.find(item => item.id === id);
+      if (!cs) return;
+
+      document.getElementById('field-cs-id').value = cs.id;
+      document.getElementById('field-cs-title').value = cs.title;
+      document.getElementById('field-cs-challenge').value = cs.challenge;
+      document.getElementById('field-cs-solution').value = cs.solution;
+      document.getElementById('field-cs-result').value = cs.result;
+      document.getElementById('field-cs-logs').value = cs.logs || '';
+
+      csModalTitle.textContent = 'Edit Technical Case Study';
+      csModal.classList.add('active');
+    };
+
+    window.deleteCaseStudy = async function(id) {
+      if (confirm('Are you sure you want to delete this case study?')) {
+        await CaseStudiesStore.delete(id);
+        loadAdminDashboard();
+      }
+    };
+
+    csForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('field-cs-id').value || 'cs_' + Date.now();
+      const csObj = {
+        id: id,
+        title: document.getElementById('field-cs-title').value,
+        challenge: document.getElementById('field-cs-challenge').value,
+        solution: document.getElementById('field-cs-solution').value,
+        result: document.getElementById('field-cs-result').value,
+        logs: document.getElementById('field-cs-logs').value
+      };
+
+      await CaseStudiesStore.save(csObj);
+      closeCsModal();
+      loadAdminDashboard();
+    });
+
+    // ==========================================
+    // PRODUCTS CRUD MECHANICS
+    // ==========================================
+    const productModal = document.getElementById('product-modal');
+    const productForm = document.getElementById('product-form');
+    const addProductBtn = document.getElementById('add-product-btn');
+
+    addProductBtn.addEventListener('click', () => {
+      productForm.reset();
+      document.getElementById('prod-id').value = '';
+      document.getElementById('product-modal-title').textContent = 'Add New Product';
+      productModal.classList.add('active');
+    });
+
+    function closeProductModal() {
+      productModal.classList.remove('active');
+    }
+    document.getElementById('close-product-modal-btn').addEventListener('click', closeProductModal);
+    document.getElementById('cancel-product-modal-btn').addEventListener('click', closeProductModal);
+
+    window.editProduct = async function(id) {
+      const list = await ProductsStore.getAll();
+      const p = list.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('prod-id').value = p.id;
+      document.getElementById('prod-name').value = p.name;
+      document.getElementById('prod-category').value = p.category;
+      document.getElementById('prod-category-label').value = p.categoryLabel || '';
+      document.getElementById('prod-image').value = p.image;
+      document.getElementById('prod-desc').value = p.desc;
+
+      // Extract specs (up to 4 specs)
+      const specKeys = Object.keys(p.specs || {});
+      const specVals = Object.values(p.specs || {});
+      
+      document.getElementById('prod-spec-1-k').value = specKeys[0] || '';
+      document.getElementById('prod-spec-1-v').value = specVals[0] || '';
+      document.getElementById('prod-spec-2-k').value = specKeys[1] || '';
+      document.getElementById('prod-spec-2-v').value = specVals[1] || '';
+      document.getElementById('prod-spec-3-k').value = specKeys[2] || '';
+      document.getElementById('prod-spec-3-v').value = specVals[2] || '';
+      document.getElementById('prod-spec-4-k').value = specKeys[3] || '';
+      document.getElementById('prod-spec-4-v').value = specVals[3] || '';
+
+      document.getElementById('product-modal-title').textContent = 'Edit Product';
+      productModal.classList.add('active');
+    };
+
+    window.deleteProduct = async function(id) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        await ProductsStore.delete(id);
+        loadAdminDashboard();
+      }
+    };
+
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('prod-id').value || 'prod_' + Date.now();
+      
+      // Build specs object from inputs
+      const specs = {};
+      for (let i = 1; i <= 4; i++) {
+        const k = document.getElementById(`prod-spec-${i}-k`).value.trim();
+        const v = document.getElementById(`prod-spec-${i}-v`).value.trim();
+        if (k && v) {
+          specs[k] = v;
+        }
+      }
+
+      const prodObj = {
+        id: id,
+        name: document.getElementById('prod-name').value,
+        category: document.getElementById('prod-category').value,
+        categoryLabel: document.getElementById('prod-category-label').value,
+        image: document.getElementById('prod-image').value,
+        desc: document.getElementById('prod-desc').value,
+        specs: specs
+      };
+
+      await ProductsStore.save(prodObj);
+      closeProductModal();
+      loadAdminDashboard();
+    });
+
+    // ==========================================
+    // SERVICES CRUD MECHANICS
+    // ==========================================
+    const serviceModal = document.getElementById('service-modal');
+    const serviceForm = document.getElementById('service-form');
+    const addServiceBtn = document.getElementById('add-service-btn');
+
+    addServiceBtn.addEventListener('click', () => {
+      serviceForm.reset();
+      document.getElementById('svc-id').value = '';
+      document.getElementById('service-modal-title').textContent = 'Add Integration Service';
+      serviceModal.classList.add('active');
+    });
+
+    function closeServiceModal() {
+      serviceModal.classList.remove('active');
+    }
+    document.getElementById('close-service-modal-btn').addEventListener('click', closeServiceModal);
+    document.getElementById('cancel-service-modal-btn').addEventListener('click', closeServiceModal);
+
+    window.editService = async function(id) {
+      const list = await ServicesStore.getAll();
+      const s = list.find(item => item.id === id);
+      if (!s) return;
+
+      document.getElementById('svc-id').value = s.id;
+      document.getElementById('svc-num').value = s.num;
+      document.getElementById('svc-icon-type').value = s.iconType;
+      document.getElementById('svc-title').value = s.title;
+      document.getElementById('svc-image').value = s.image || '';
+      document.getElementById('svc-desc').value = s.desc;
+
+      document.getElementById('service-modal-title').textContent = 'Edit Integration Service';
+      serviceModal.classList.add('active');
+    };
+
+    window.deleteService = async function(id) {
+      if (confirm('Are you sure you want to delete this service?')) {
+        await ServicesStore.delete(id);
+        loadAdminDashboard();
+      }
+    };
+
+    serviceForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('svc-id').value || 'svc_' + Date.now();
+      
+      const svcObj = {
+        id: id,
+        num: document.getElementById('svc-num').value,
+        iconType: document.getElementById('svc-icon-type').value,
+        title: document.getElementById('svc-title').value,
+        image: document.getElementById('svc-image').value,
+        desc: document.getElementById('svc-desc').value
+      };
+
+      await ServicesStore.save(svcObj);
+      closeServiceModal();
+      loadAdminDashboard();
+    });
+
+    // ==========================================
+    // INSIGHTS/BLOG CRUD MECHANICS
+    // ==========================================
+    const insightModal = document.getElementById('insight-modal');
+    const insightForm = document.getElementById('insight-form');
+    const addInsightBtn = document.getElementById('add-insight-btn');
+
+    addInsightBtn.addEventListener('click', () => {
+      insightForm.reset();
+      document.getElementById('insight-id').value = '';
+      // Set default published timestamp as now
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('insight-date').value = now.toISOString().slice(0, 16);
+      document.getElementById('insight-modal-title').textContent = 'Publish Blog & Insight Post';
+      insightModal.classList.add('active');
+    });
+
+    function closeInsightModal() {
+      insightModal.classList.remove('active');
+    }
+    document.getElementById('close-insight-modal-btn').addEventListener('click', closeInsightModal);
+    document.getElementById('cancel-insight-modal-btn').addEventListener('click', closeInsightModal);
+
+    window.editInsight = async function(id) {
+      const list = await InsightsStore.getAll();
+      const post = list.find(item => item.id === id);
+      if (!post) return;
+
+      document.getElementById('insight-id').value = post.id;
+      document.getElementById('insight-title').value = post.title;
+      document.getElementById('insight-meta').value = post.meta;
+      document.getElementById('insight-image').value = post.image;
+      
+      const postDate = new Date(post.timestamp);
+      postDate.setMinutes(postDate.getMinutes() - postDate.getTimezoneOffset());
+      document.getElementById('insight-date').value = postDate.toISOString().slice(0, 16);
+      
+      document.getElementById('insight-desc').value = post.desc;
+      document.getElementById('insight-content').value = post.content;
+
+      document.getElementById('insight-modal-title').textContent = 'Edit Blog & Insight Post';
+      insightModal.classList.add('active');
+    };
+
+    window.deleteInsight = async function(id) {
+      if (confirm('Are you sure you want to delete this blog post?')) {
+        await InsightsStore.delete(id);
+        loadAdminDashboard();
+      }
+    };
+
+    insightForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('insight-id').value || 'post_' + Date.now();
+      
+      const postObj = {
+        id: id,
+        title: document.getElementById('insight-title').value,
+        meta: document.getElementById('insight-meta').value,
+        image: document.getElementById('insight-image').value,
+        timestamp: new Date(document.getElementById('insight-date').value).toISOString(),
+        desc: document.getElementById('insight-desc').value,
+        content: document.getElementById('insight-content').value
+      };
+
+      await InsightsStore.save(postObj);
+      closeInsightModal();
+      loadAdminDashboard();
+    });
+
+    // Delete customer inquiries handler
+    window.deleteInquiry = async function(id) {
+      if (confirm('Are you sure you want to delete this customer inquiry entry?')) {
+        try {
+          const res = await fetch(`/api/inquiries/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            loadAdminDashboard();
+          }
+        } catch(err) {
+          console.error('Failed to delete inquiry:', err);
+        }
+      }
+    };
+
+    // Reset Defaults
+    document.getElementById('reset-btn').addEventListener('click', async () => {
+      if (confirm('Are you sure you want to reset all registry files to factory defaults? This will erase custom entries.')) {
+        await ProjectsStore.reset();
+        await CaseStudiesStore.reset();
+        await ProductsStore.reset();
+        await ServicesStore.reset();
+        await InsightsStore.reset();
+        await CareersStore.reset();
+        loadAdminDashboard();
+      }
+    });
+
+    // ==========================================
+    // CAREERS CRUD MECHANICS
+    // ==========================================
+    function closeCareerModal() {
+      careerModal.classList.remove('active');
+      careerForm.reset();
+      document.getElementById('career-id').value = '';
+    }
+
+    addJobBtn.addEventListener('click', () => {
+      careerForm.reset();
+      document.getElementById('career-id').value = '';
+      careerModalTitle.textContent = 'Register Job Position';
+      careerModal.classList.add('active');
+    });
+
+    document.getElementById('close-career-modal-btn').addEventListener('click', closeCareerModal);
+    document.getElementById('cancel-career-modal-btn').addEventListener('click', closeCareerModal);
+
+    window.editCareer = async function(id) {
+      const jobs = await CareersStore.getAll();
+      const job = jobs.find(item => item.id === id);
+      if (job) {
+        document.getElementById('career-id').value = job.id;
+        document.getElementById('career-title').value = job.title;
+        document.getElementById('career-location').value = job.location;
+        document.getElementById('career-type').value = job.type;
+        document.getElementById('career-desc').value = job.desc;
+        document.getElementById('career-requirements').value = (job.requirements || []).join('\n');
+        
+        careerModalTitle.textContent = 'Edit Job Position';
+        careerModal.classList.add('active');
+      }
+    };
+
+    window.deleteCareer = async function(id) {
+      if (confirm('Are you sure you want to delete this job position opening?')) {
+        await CareersStore.delete(id);
+        loadAdminDashboard();
+      }
+    };
+
+    careerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('career-id').value || 'job_' + Date.now();
+      
+      const reqsText = document.getElementById('career-requirements').value;
+      const requirements = reqsText.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+
+      const jobObj = {
+        id: id,
+        title: document.getElementById('career-title').value,
+        location: document.getElementById('career-location').value,
+        type: document.getElementById('career-type').value,
+        desc: document.getElementById('career-desc').value,
+        requirements: requirements
+      };
+
+      await CareersStore.save(jobObj);
+      closeCareerModal();
+      loadAdminDashboard();
+    });
+
+    // ==========================================
+    // SITE SETTINGS LOGIC
+    // ==========================================
+    const settingsPhone = document.getElementById('settings-phone');
+    const settingsMobile = document.getElementById('settings-mobile');
+    const settingsEmail = document.getElementById('settings-email');
+    const settingsWhatsapp = document.getElementById('settings-whatsapp');
+    const settingsWhatsappMsg = document.getElementById('settings-whatsapp-msg');
+    const settingsWaPreview = document.getElementById('settings-wa-preview');
+    const settingsWaPreviewText = document.getElementById('settings-wa-preview-text');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    const settingsSaveMsg = document.getElementById('settings-save-msg');
+
+    function updateWaPreview() {
+      const num = settingsWhatsapp.value || '971567792681';
+      const msg = settingsWhatsappMsg.value || '';
+      const url = `https://wa.me/${num}${msg ? '?text=' + encodeURIComponent(msg) : ''}`;
+      settingsWaPreview.href = url;
+      settingsWaPreviewText.textContent = `wa.me/${num}`;
+    }
+
+    settingsWhatsapp.addEventListener('input', updateWaPreview);
+    settingsWhatsappMsg.addEventListener('input', updateWaPreview);
+
+    async function loadSiteSettings() {
+      try {
+        const res = await fetch('/api/site-settings');
+        const s = await res.json();
+        settingsPhone.value = s.phone || '';
+        settingsMobile.value = s.mobile || '';
+        settingsEmail.value = s.email || '';
+        settingsWhatsapp.value = s.whatsapp || '';
+        settingsWhatsappMsg.value = s.whatsappMessage || '';
+        updateWaPreview();
+      } catch (err) {
+        console.error('Failed to load site settings:', err);
+      }
+    }
+
+    saveSettingsBtn.addEventListener('click', async () => {
+      saveSettingsBtn.disabled = true;
+      saveSettingsBtn.querySelector('span').textContent = '⏳ Saving...';
+      try {
+        const res = await fetch('/api/site-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: settingsPhone.value,
+            mobile: settingsMobile.value,
+            email: settingsEmail.value,
+            whatsapp: settingsWhatsapp.value,
+            whatsappMessage: settingsWhatsappMsg.value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          settingsSaveMsg.classList.add('visible');
+          setTimeout(() => settingsSaveMsg.classList.remove('visible'), 3000);
+        }
+      } catch (err) {
+        console.error('Failed to save settings:', err);
+        alert('Failed to save settings. Check console.');
+      }
+      saveSettingsBtn.disabled = false;
+      saveSettingsBtn.querySelector('span').textContent = '💾 Save & Apply to All Pages';
+    });
+
+    // Load settings on dashboard init
+    loadSiteSettings();
+
+    loadAdminDashboard();
+    console.log("Diagnostic: initial active elements:", Array.from(document.querySelectorAll('.active')).map(el => el.id || el.className));
+  </script>
+  <script src="index.js"></script>
+</body>
+</html>

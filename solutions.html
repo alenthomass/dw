@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Signage Solutions for Industries — Custom visual solutions for Retail, Hospitality, Healthcare, Education, and Corporate sectors by Display World.">
+  <title>Solutions | Display World</title>
+  <link rel="icon" href="https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png" sizes="32x32">
+  <link rel="stylesheet" href="index.css">
+  <style>
+    .services-visual-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .svc-visual-card {
+      position: relative;
+      height: 280px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      cursor: pointer;
+    }
+    .svc-visual-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      filter: brightness(0.4) contrast(1.1);
+      transition: transform 0.6s ease;
+    }
+    .svc-visual-card:hover .svc-visual-bg {
+      transform: scale(1.08);
+      filter: brightness(0.55) contrast(1.1);
+    }
+    .svc-visual-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.3) 60%, rgba(10, 10, 12, 0) 100%);
+      z-index: 2;
+    }
+    .svc-visual-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .svc-visual-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .svc-visual-num {
+      font-family: monospace;
+      font-size: 1rem;
+      color: var(--pink);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .svc-visual-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(250, 3, 110, 0.15);
+      border: 1px solid rgba(250, 3, 110, 0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pink);
+    }
+    .svc-visual-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .svc-visual-card h3 {
+      font-family: var(--font-d);
+      font-size: 1.4rem;
+      color: #ffffff !important;
+      margin: 0;
+    }
+    .svc-visual-card p {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.75);
+      margin: 0;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+    .svc-visual-card:hover p {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 0.25rem;
+    }
+    .svc-visual-card:hover {
+      border-color: rgba(250, 3, 110, 0.5);
+      box-shadow: 0 10px 30px rgba(250, 3, 110, 0.15);
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav scrolled" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="solutions.html" class="nav-link active">Solutions</a></li>
+        <li><a href="portfolio.html" class="nav-link">Projects</a></li>
+        <li><a href="innovation.html" class="nav-link">Innovation</a></li>
+        <li><a href="insights.html" class="nav-link">Insights</a></li>
+        <li><a href="about.html" class="nav-link">Company</a></li>
+        <li><a href="contact.html" class="nav-link">Let's Talk</a></li>
+        <li><a href="help-center.html" class="nav-link nav-cta">Help Center</a></li>
+      </ul>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="explore.html" class="nav-link">Explore</a>
+    <a href="solutions.html" class="nav-link active">Solutions</a>
+    <a href="portfolio.html" class="nav-link">Projects</a>
+    <a href="innovation.html" class="nav-link">Innovation</a>
+    <a href="insights.html" class="nav-link">Insights</a>
+    <a href="about.html" class="nav-link">Company</a>
+    <a href="contact.html" class="nav-link">Let's Talk</a>
+    <a href="help-center.html" class="nav-link">Help Center</a>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="admin-hero section-dark">
+    <div class="container">
+      <span class="label-tag">Vertical Solutions</span>
+      <h1 class="section-title">Tailored Display <br><span class="accent-text">Industries</span></h1>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem;">We supply custom digital display layouts engineered to fit the unique requirements and communication goals of five key sectors.</p>
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <a href="#services-visual-container" class="btn-primary"><span>Explore Integration Services</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDUSTRY EXPANSION TABS -->
+  <section class="section">
+    <div class="container">
+      
+      <!-- Tabs buttons -->
+      <div class="industries-tabs">
+        <button class="industry-tab-btn active" onclick="switchIndustry('retail', this)">Retail & Stores</button>
+        <button class="industry-tab-btn" onclick="switchIndustry('hospitality', this)">Hospitality</button>
+        <button class="industry-tab-btn" onclick="switchIndustry('healthcare', this)">Healthcare</button>
+        <button class="industry-tab-btn" onclick="switchIndustry('education', this)">Education</button>
+        <button class="industry-tab-btn" onclick="switchIndustry('corporate', this)">Corporate Office</button>
+      </div>
+
+      <!-- Retail Panel -->
+      <div class="industry-panel active" id="panel-retail">
+        <div class="industry-img-box">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" alt="Retail Signage Display" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80';">
+        </div>
+        <div class="industry-info-box">
+          <h2>Retail & Malls</h2>
+          <p>Maximize visual footfall and brand engagement. Our double-sided storefront screens and interactive mapping totems guide shoppers while displaying bright, dynamic campaigns that fight natural window glare.</p>
+          <ul class="industry-features">
+            <li>High-brightness double-sided storefront LCD screens</li>
+            <li>Interactive wayfinding directories and kiosks</li>
+            <li>Dynamic video walls for product launch backdrops</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Hospitality Panel -->
+      <div class="industry-panel" id="panel-hospitality">
+        <div class="industry-img-box">
+          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" alt="Hospitality Welcome LEDs">
+        </div>
+        <div class="industry-info-box">
+          <h2>Hospitality & Hotels</h2>
+          <p>Create a luxurious lobby first impression. Integrate fine-pitch architectural LED columns, digital check-in counters, and conference digital banners to coordinate guest flow seamlessly.</p>
+          <ul class="industry-features">
+            <li>Curved flexible LED column wraps for custom architecture</li>
+            <li>Digital signage door plates showing real-time event status</li>
+            <li>Check-in front counter dynamic backdrop LEDs</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Healthcare Panel -->
+      <div class="industry-panel" id="panel-healthcare">
+        <div class="industry-img-box">
+          <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" alt="Healthcare Signage Directories">
+        </div>
+        <div class="industry-info-box">
+          <h2>Healthcare & Clinics</h2>
+          <p>Reduce waiting anxiety and improve patient navigation. Interactive touch directories assist clinic navigation, while waiting area displays sync live queuing data with health awareness video feeds.</p>
+          <ul class="industry-features">
+            <li>Patient queue display panels synced with clinic booking software</li>
+            <li>Anti-shatter interactive directories for sanitization zones</li>
+            <li>Digital notice boards showing emergency room statuses</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Education Panel -->
+      <div class="industry-panel" id="panel-education">
+        <div class="industry-img-box">
+          <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80" alt="Education Lecture Hall Screen">
+        </div>
+        <div class="industry-info-box">
+          <h2>Education & Campus</h2>
+          <p>Deliver immersive teaching and coordinate campus information. Interactive digital lecture boards, outdoor campus notice pillars, and emergency alerts integrate under a unified network control matrix.</p>
+          <ul class="industry-features">
+            <li>Super-sized boardroom interactive displays for classrooms</li>
+            <li>Weatherproof outdoor information totems for campus paths</li>
+            <li>Emergency network notification system overrides</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Corporate Panel -->
+      <div class="industry-panel" id="panel-corporate">
+        <div class="industry-img-box">
+          <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80" alt="Corporate Boardroom Screen">
+        </div>
+        <div class="industry-info-box">
+          <h2>Corporate Offices</h2>
+          <p>Empower team collaboration and corporate identity. High-resolution boardroom video wall screens combine with check-in kiosks and smart room booking tablets to create a modern workspace.</p>
+          <ul class="industry-features">
+            <li>Fine-pitch modular boardroom LED walls</li>
+            <li>Interactive reservation display screens for conference rooms</li>
+            <li>Internal KPI dashboard grids for lobby reception areas</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section section-dark" id="services-visual-container" style="border-top: 1px solid var(--border); scroll-margin-top: 100px;">
+    <div class="container">
+      <span class="label-tag">AV Systems Integration</span>
+      <h2 class="section-title">Professional Systems <br><span class="accent-text">Integration Services</span></h2>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem; margin-bottom: 3rem;">Display World provides full turn-key AV hardware engineering, mounting layouts, CMS programming, and maintenance SLAs across the Middle East.</p>
+      
+      <div class="services-visual-grid">
+        <!-- Rendered dynamically from ServicesStore -->
+      </div>
+    </div>
+  </section>
+
+          <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Col 1: Logo & Brief -->
+        <div class="footer-col">
+          <div class="footer-logo-wrap">
+            <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+          </div>
+          <p class="footer-brief">Visionary digital signage company in the Gulf. We design, calibrate, and integrate premium LED, LCD, and interactive touch systems for corporate, retail, and aviation hubs.</p>
+          <div class="footer-socials">
+            <a href="#" class="social-link" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+            <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+          </div>
+        </div>
+        <!-- Col 2: Navigation Links -->
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="explore.html">Explore</a></li>
+            <li><a href="explore.html#products-grid-container">Products</a></li>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="portfolio.html">Projects</a></li>
+            <li><a href="innovation.html">Innovation</a></li>
+          </ul>
+        </div>
+        <!-- Col 3: Resources Links -->
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="solutions.html#services-visual-container">Services</a></li>
+            <li><a href="insights.html">Insights</a></li>
+            <li><a href="about.html">Company</a></li>
+            <li><a href="contact.html">Let's Talk</a></li>
+            <li><a href="help-center.html">Help Center</a></li>
+          </ul>
+        </div>
+        <!-- Col 4: Dubai HQ Contacts -->
+        <div class="footer-col">
+          <h4>Dubai HQ</h4>
+          <div class="footer-contact-item">
+            <strong>Address</strong>
+            Al Quoz Industrial Area 3, Dubai, UAE
+          </div>
+          <div class="footer-contact-item">
+            <strong>Contacts</strong>
+            <a href="tel:+97143468922" style="display:block; margin-bottom:0.25rem; font-size:0.8rem; text-decoration:none; color:inherit;">Tel: +971 4 346 8922</a>
+            <a href="tel:+971567792681" style="display:block; font-size:0.8rem; text-decoration:none; color:inherit;">Mob: +971 56 779 2681</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Email Support</strong>
+            <a href="mailto:support@displayworldme.com" style="font-size:0.8rem; text-decoration:none; color:inherit;">support@displayworldme.com</a>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 Display World. All rights reserved. <a href="admin.html" style="margin-left:0.5rem; color:var(--text-dim); text-decoration:none; font-size:0.75rem; vertical-align: middle;">[Admin Access]</a></p>
+        <div class="footer-policy-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function switchIndustry(industryId, btnEl) {
+      // Hide all panels
+      document.querySelectorAll('.industry-panel').forEach(p => p.classList.remove('active'));
+      // Deactivate all tabs
+      document.querySelectorAll('.industry-tab-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Show target panel
+      document.getElementById(`panel-${industryId}`).classList.add('active');
+      // Activate target tab
+      if (btnEl) {
+        btnEl.classList.add('active');
+      }
+    }
+  </script>
+
+  <script src="projects-data.js"></script>
+  <script>
+    const SVG_ICONS = {
+      lcd: `<svg viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/></svg>`,
+      led: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>`,
+      kiosk: `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 16H5V6h14v12z"/></svg>`,
+      cms: `<svg viewBox="0 0 24 24"><path d="M4 6h18V4H4c-1.1 0-2 .9-2 2v11H0v3h14v-3H4V6zm19 2h-6c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-4v-7h4v7z"/></svg>`,
+      lighting: `<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`,
+      consultancy: `<svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>`
+    };
+
+    async function renderServices() {
+      const section = document.getElementById('services-visual-container');
+      if (!section) return;
+      const container = section.querySelector('.services-visual-grid');
+      if (!container) return;
+      
+      const list = await ServicesStore.getAll();
+      container.innerHTML = '';
+      
+      list.forEach((s, idx) => {
+        const card = document.createElement('div');
+        card.className = 'svc-visual-card reveal';
+        const iconSvg = SVG_ICONS[s.iconType] || SVG_ICONS.consultancy;
+        
+        // Fallback default image if none specified
+        const bgImg = s.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
+        
+        card.innerHTML = `
+          <img class="svc-visual-bg" src="${bgImg}" alt="${s.title}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';">
+          <div class="svc-visual-overlay"></div>
+          <div class="svc-visual-content">
+            <div class="svc-visual-badge-row">
+              <span class="svc-visual-num">${s.num || String(idx + 1).padStart(2, '0')}</span>
+              <div class="svc-visual-icon">${iconSvg}</div>
+            </div>
+            <h3>${s.title}</h3>
+            <p>${s.desc}</p>
+          </div>
+        `;
+        
+        // Clicking service redirects to contact with a query
+        card.onclick = () => {
+          window.location.href = `contact.html?inquiry=${encodeURIComponent('Service: ' + s.title)}`;
+        };
+        
+        container.appendChild(card);
+      });
+      
+      if (window.initScrollReveal) {
+        window.initScrollReveal();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderServices();
+    });
+  </script>
+  <script src="index.js"></script>
+
+  <!-- FLOATING WIDGETS -->
+  <div class="floating-widgets">
+    <!-- WhatsApp Floating Link -->
+    <a href="https://wa.me/971567792681" target="_blank" rel="noopener" class="float-whatsapp" aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12.012 2C6.5 2 2.006 6.5 2.006 12c0 1.755.459 3.468 1.332 4.977L2 22l5.17-1.356c1.455.792 3.09 1.21 4.773 1.21 5.511 0 10.005-4.5 10.005-10S17.523 2 12.012 2zm.006 18c-1.534 0-3.04-.413-4.356-1.197l-.313-.186-3.238.85.864-3.153-.205-.326C3.99 14.73 3.5 13.064 3.5 11.334c0-4.707 3.827-8.534 8.518-8.534 4.69 0 8.518 3.827 8.518 8.534 0 4.707-3.827 8.534-8.518 8.534zm4.845-6.57c-.266-.134-1.572-.777-1.816-.865-.244-.088-.423-.134-.601.134-.178.266-.69.865-.845 1.04-.155.178-.31.2-.577.067-.266-.134-1.127-.415-2.147-1.326-.79-.706-1.327-1.578-1.482-1.845-.155-.266-.016-.41.117-.543.12-.12.266-.31.4-.466.134-.155.178-.266.266-.444.088-.178.044-.333-.022-.466-.067-.133-.6-1.443-.822-1.976-.217-.523-.456-.453-.623-.46-.16-.007-.344-.007-.527-.007-.184 0-.483.068-.737.34-.253.272-.966.945-.966 2.304 0 1.36.988 2.673 1.127 2.859.139.186 1.944 2.97 4.71 4.16.658.283 1.173.452 1.574.58.66.21 1.26.18 1.734.11.53-.08 1.571-.643 1.794-1.264.222-.62.222-1.155.155-1.264-.067-.11-.244-.177-.51-.31z"/></svg>
+    </a>
+    <!-- Scroll To Top Button -->
+    <button id="scroll-top" class="float-scroll-top" aria-label="Scroll to Top">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+    </button>
+  </div>
+
+</body>
+</html>

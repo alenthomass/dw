@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "title": "Airport Flight Information Displays",
+    "category": "Aviation",
+    "shortDesc": "24/7 mission-critical FIDS systems, baggage claim displays, and airport wayfinding installations.",
+    "image": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80",
+    "client": "Dubai Airports Authority",
+    "year": "2025",
+    "location": "Terminal 3, Dubai, UAE",
+    "challenge": "Dubai Airports needed a flight schedule screen matrix with zero possibility of signal blackouts or delay sync lags. The system had to replace aging legacy screens and integrate into the main ATC flight scheduling database feed, maintaining 24/7 operations in high-heat passenger terminal environments.",
+    "solution": "We deployed a custom 3x3 LCD video wall array using 0.88mm ultra-narrow bezel screens. To guarantee 24/7 runtime, we integrated dual-redundant NovaStar controller lines configured for instant signal loop failover. An active Noctua pressure-fan ventilation grid was constructed within the mount brackets to prevent screen panel yellowing.",
+    "specs": {
+      "system": "3x3 LCD Array",
+      "bezel": "0.88mm Bezel",
+      "brightness": "700 nits",
+      "uptime": "100%",
+      "failover": "Aviation Dual Loop"
+    },
+    "isWide": true
+  },
+  {
+    "id": "2",
+    "title": "Luxury Mall Facades",
+    "category": "Retail",
+    "shortDesc": "Ultra-high brightness window displays and curved LED pillars for flagship luxury retail stores.",
+    "image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
+    "client": "Emaar Retail Group",
+    "year": "2025",
+    "location": "The Dubai Mall, UAE",
+    "challenge": "The flagship retail store front faced directly into a sunlit glass atrium. Standard panels suffered from massive solar glare reflection, fading colors, and severe thermal load. The client also requested curved screen integration around the load-bearing pillars of the entrance.",
+    "solution": "We installed custom-engineered 3500-nit high-brightness shopfront displays calibrated to the D65 video standard. For the entrance, we mapped flexible curved LED panels seamlessly around the main structural columns using magnetic mount modules. A secondary brightness sensor was integrated to automatically dim the screens at night.",
+    "specs": {
+      "system": "Curved LED Pillars",
+      "bezel": "Seamless Bezels",
+      "brightness": "3500 nits",
+      "uptime": "99.98%",
+      "failover": "Auto-brightness dimmer"
+    },
+    "isWide": false
+  },
+  {
+    "id": "3",
+    "title": "Enterprise Command Centers",
+    "category": "Corporate",
+    "shortDesc": "0.88mm ultra-narrow bezel LCD video walls with dynamic feed management for operation hubs.",
+    "image": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+    "client": "Global Logistics Corp",
+    "year": "2024",
+    "location": "Al Quoz Operations Center, Dubai",
+    "challenge": "The control center coordinates logistics and truck dispatch feeds in real-time. The engineering team needed an expansive, bezel-free canvas that could receive over 20 concurrent network camera feeds without frame drops, scaling distortion, or system crashes.",
+    "solution": "We engineered a massive ultra-narrow bezel LCD wall with a high-performance multi-channel matrix processor. The processor uses fiber-optic feeds to scale camera streams on the fly. The screens were color-calibrated to keep detail contrast high under artificial office light levels.",
+    "specs": {
+      "system": "Control Command Wall",
+      "bezel": "0.88mm Bezel",
+      "brightness": "500 nits",
+      "uptime": "99.99%",
+      "failover": "Redundant Matrix Processor"
+    },
+    "isWide": false
+  },
+  {
+    "id": "4",
+    "title": "Smart City Digital Landmarks",
+    "category": "Outdoor LED",
+    "shortDesc": "Weatherproof IP65-rated outdoor billboard totems and giant building facade mesh LEDs.",
+    "image": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80",
+    "client": "Municipal Tech Authority",
+    "year": "2026",
+    "location": "Sheikh Zayed Road, Dubai",
+    "challenge": "Outdoor displays in Dubai face extreme environment loads, with ambient temperatures reaching 50°C in summer, high UV radiation, and seasonal sandstorms. Standard panels overheat, leading to thermal expansion cracks and pixel failure.",
+    "solution": "We deployed heavy-duty IP65 waterproof outdoor totems featuring custom-fabricated copper cooling pipes and double-chamber air conditioning. The panels utilize high-durability gold wire LEDs with integrated UV blocking filters to maintain screen color lifespan under severe direct sun exposure.",
+    "specs": {
+      "system": "IP65 Mesh & Totems",
+      "bezel": "Modular Seamless",
+      "brightness": "6000 nits",
+      "uptime": "99.95%",
+      "failover": "Double A/C Cabinets"
+    },
+    "isWide": true
+  }
+]

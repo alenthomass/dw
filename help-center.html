@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Help Center & AMC Support — Access Annual Maintenance Contracts (AMC) SLA tiers, log support tickets, and download Display World catalogs.">
+  <title>Help Center | Display World</title>
+  <link rel="icon" href="https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png" sizes="32x32">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav scrolled" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+        <li><a href="portfolio.html" class="nav-link">Projects</a></li>
+        <li><a href="innovation.html" class="nav-link">Innovation</a></li>
+        <li><a href="insights.html" class="nav-link">Insights</a></li>
+        <li><a href="about.html" class="nav-link">Company</a></li>
+        <li><a href="contact.html" class="nav-link">Let's Talk</a></li>
+        <li><a href="help-center.html" class="nav-link active nav-cta">Help Center</a></li>
+      </ul>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="explore.html" class="nav-link">Explore</a>
+    <a href="solutions.html" class="nav-link">Solutions</a>
+    <a href="portfolio.html" class="nav-link">Projects</a>
+    <a href="innovation.html" class="nav-link">Innovation</a>
+    <a href="insights.html" class="nav-link">Insights</a>
+    <a href="about.html" class="nav-link">Company</a>
+    <a href="contact.html" class="nav-link">Let's Talk</a>
+    <a href="help-center.html" class="nav-link active">Help Center</a>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="admin-hero section-dark">
+    <div class="container">
+      <span class="label-tag">Technical Operations</span>
+      <h1 class="section-title">Maintenance & <br><span class="accent-text">AMC Services</span></h1>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem;">Keep your displays performing flawlessly. Review our Annual Maintenance Contract (AMC) support options, request technical services, or access product manuals below.</p>
+    </div>
+  </section>
+
+  <!-- AMC SERVICE TIERS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header" style="text-align: center;">
+        <span class="label-tag">Uptime Contracts</span>
+        <h2 class="section-title">Support SLAs</h2>
+      </div>
+
+      <div class="amc-grid">
+        
+        <!-- Tier 1 -->
+        <div class="amc-card reveal">
+          <h3>Bronze Support</h3>
+          <div class="amc-response">8-Hour Response</div>
+          <ul class="amc-list">
+            <li>Remote diagnostics support</li>
+            <li>Bi-annual on-site visits</li>
+            <li>Email ticketing queue</li>
+            <li>Business hours helpline</li>
+          </ul>
+          <a href="#amc-form-section" class="btn-outline btn-full"><span>Enquire Bronze</span></a>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="amc-card recommended reveal">
+          <span class="amc-badge">Recommended</span>
+          <h3>Silver Support</h3>
+          <div class="amc-response">4-Hour Response</div>
+          <ul class="amc-list">
+            <li>On-site engineer dispatch</li>
+            <li>Quarterly preventive tuneups</li>
+            <li>Parts replacement cover</li>
+            <li>Telephone hotdesk support</li>
+          </ul>
+          <a href="#amc-form-section" class="btn-primary btn-full"><span>Enquire Silver</span></a>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="amc-card reveal">
+          <h3>Gold SLA Support</h3>
+          <div class="amc-response">2-Hour response (24/7)</div>
+          <ul class="amc-list">
+            <li>24/7 emergency dispatch</li>
+            <li>Monthly preventive visits</li>
+            <li>Active screen telemetry checks</li>
+            <li>Hot-spare parts storage</li>
+          </ul>
+          <a href="#amc-form-section" class="btn-outline btn-full"><span>Enquire Gold</span></a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS VAULT -->
+  <section class="section section-dark">
+    <div class="container">
+      <span class="label-tag">Resource Vault</span>
+      <h2 class="section-title">Brochures & <br><span class="accent-text">Specifications</span></h2>
+      <p style="max-width: 600px; color: var(--text-dim); margin-bottom: 3rem;">Download Display World's digital catalogs, engineering profiles, and hardware specification datasheets.</p>
+      
+      <div class="downloads-vault">
+        
+        <!-- File 1 -->
+        <div class="download-item reveal">
+          <div class="download-info">
+            <h4>Corporate Profile</h4>
+            <span>PDF Catalog — 4.2 MB</span>
+          </div>
+          <button class="dl-btn" onclick="triggerDownload('Corporate_Profile', this)" aria-label="Download Profile">↓</button>
+        </div>
+
+        <!-- File 2 -->
+        <div class="download-item reveal">
+          <div class="download-info">
+            <h4>Fine-Pitch LED Catalog</h4>
+            <span>PDF Specifications — 6.8 MB</span>
+          </div>
+          <button class="dl-btn" onclick="triggerDownload('Fine_Pitch_LED', this)" aria-label="Download LED specifications">↓</button>
+        </div>
+
+        <!-- File 3 -->
+        <div class="download-item reveal">
+          <div class="download-info">
+            <h4>Storefront Display Sheets</h4>
+            <span>PDF Specsheet — 3.1 MB</span>
+          </div>
+          <button class="dl-btn" onclick="triggerDownload('Storefront_LCD', this)" aria-label="Download LCD specifications">↓</button>
+        </div>
+
+        <!-- File 4 -->
+        <div class="download-item reveal">
+          <div class="download-info">
+            <h4>CMS Software Manual</h4>
+            <span>PDF Guidebook — 5.5 MB</span>
+          </div>
+          <button class="dl-btn" onclick="triggerDownload('CMS_User_Guide', this)" aria-label="Download CMS guide">↓</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- AMC SERVICE TICKET FORM -->
+  <section class="section" id="amc-form-section">
+    <div class="container" style="max-width:700px;">
+      <div class="contact-card" style="padding:3rem;">
+        <h3 style="font-family:var(--font-d); font-size:1.75rem; color:var(--white); margin-bottom:1rem; text-align:center;">Request AMC / Support Quote</h3>
+        <p style="text-align:center; font-size:0.85rem; color:var(--text-dim); margin-bottom:2.5rem;">Select your desired SLA tier and input details to receive a customized service quote proposal.</p>
+        
+        <form id="amc-inquiry-form" onsubmit="submitAmcForm(event)">
+          <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+            <div class="form-group">
+              <label style="color:var(--text); font-weight:600; margin-bottom:0.5rem; display:block; font-size:0.85rem;">Your Name</label>
+              <input type="text" required style="width:100%; padding:0.8rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; color:var(--white);">
+            </div>
+            <div class="form-group">
+              <label style="color:var(--text); font-weight:600; margin-bottom:0.5rem; display:block; font-size:0.85rem;">Company Name</label>
+              <input type="text" required style="width:100%; padding:0.8rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; color:var(--white);">
+            </div>
+          </div>
+          <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+            <div class="form-group">
+              <label style="color:var(--text); font-weight:600; margin-bottom:0.5rem; display:block; font-size:0.85rem;">Corporate Email</label>
+              <input type="email" required style="width:100%; padding:0.8rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; color:var(--white);">
+            </div>
+            <div class="form-group">
+              <label style="color:var(--text); font-weight:600; margin-bottom:0.5rem; display:block; font-size:0.85rem;">SLA Tier Plan</label>
+              <select style="width:100%; padding:0.8rem; background:var(--bg2); border:1px solid var(--border); border-radius:8px; color:var(--white);">
+                <option value="silver">Silver Support Plan (Recommended)</option>
+                <option value="bronze">Bronze Support Plan</option>
+                <option value="gold">Gold SLA Support Plan</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:2rem;">
+            <label style="color:var(--text); font-weight:600; margin-bottom:0.5rem; display:block; font-size:0.85rem;">Visual Displays System Details</label>
+            <textarea placeholder="e.g. 5x3 LED Wall, Indoor lobby, P1.5 pitch panels" style="width:100%; padding:0.8rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; color:var(--white); height:120px; resize:none;"></textarea>
+          </div>
+          <button type="submit" class="btn-primary btn-full"><span>Submit SLA Inquiry</span></button>
+        </form>
+
+        <div id="amc-success-msg" style="display:none; text-align:center; padding:1rem; border:1px solid var(--pink); border-radius:10px; color:var(--white); background:rgba(250,3,110,0.05);">
+          <strong style="display:block; font-size:1.15rem; color:var(--pink); margin-bottom:0.5rem;">Request Registered Successfully!</strong>
+          <span style="font-size:0.85rem;">Our operations manager will coordinate with your engineering team within 2 hours.</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+          <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Col 1: Logo & Brief -->
+        <div class="footer-col">
+          <div class="footer-logo-wrap">
+            <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+          </div>
+          <p class="footer-brief">Visionary digital signage company in the Gulf. We design, calibrate, and integrate premium LED, LCD, and interactive touch systems for corporate, retail, and aviation hubs.</p>
+          <div class="footer-socials">
+            <a href="#" class="social-link" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+            <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+          </div>
+        </div>
+        <!-- Col 2: Navigation Links -->
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="explore.html">Explore</a></li>
+            <li><a href="explore.html#products-grid-container">Products</a></li>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="portfolio.html">Projects</a></li>
+            <li><a href="innovation.html">Innovation</a></li>
+          </ul>
+        </div>
+        <!-- Col 3: Resources Links -->
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="solutions.html#services-visual-container">Services</a></li>
+            <li><a href="insights.html">Insights</a></li>
+            <li><a href="about.html">Company</a></li>
+            <li><a href="contact.html">Let's Talk</a></li>
+            <li><a href="help-center.html">Help Center</a></li>
+          </ul>
+        </div>
+        <!-- Col 4: Dubai HQ Contacts -->
+        <div class="footer-col">
+          <h4>Dubai HQ</h4>
+          <div class="footer-contact-item">
+            <strong>Address</strong>
+            Al Quoz Industrial Area 3, Dubai, UAE
+          </div>
+          <div class="footer-contact-item">
+            <strong>Contacts</strong>
+            <a href="tel:+97143468922" style="display:block; margin-bottom:0.25rem; font-size:0.8rem; text-decoration:none; color:inherit;">Tel: +971 4 346 8922</a>
+            <a href="tel:+971567792681" style="display:block; font-size:0.8rem; text-decoration:none; color:inherit;">Mob: +971 56 779 2681</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Email Support</strong>
+            <a href="mailto:support@displayworldme.com" style="font-size:0.8rem; text-decoration:none; color:inherit;">support@displayworldme.com</a>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 Display World. All rights reserved. <a href="admin.html" style="margin-left:0.5rem; color:var(--text-dim); text-decoration:none; font-size:0.75rem; vertical-align: middle;">[Admin Access]</a></p>
+        <div class="footer-policy-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function triggerDownload(fileName, btnElement) {
+      const originalText = btnElement.textContent;
+      btnElement.disabled = true;
+      btnElement.textContent = '…';
+      btnElement.style.background = 'rgba(250, 3, 110, 0.4)';
+      
+      setTimeout(() => {
+        btnElement.textContent = '✓';
+        btnElement.style.background = 'var(--green)';
+        
+        // Virtual trigger download file save
+        const dummyContent = `Display World specifications sheet download: ${fileName}`;
+        const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(dummyContent);
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", `displayworld_${fileName.toLowerCase()}.txt`);
+        document.body.appendChild(dlAnchor);
+        dlAnchor.click();
+        dlAnchor.remove();
+        
+        setTimeout(() => {
+          btnElement.disabled = false;
+          btnElement.textContent = '↓';
+          btnElement.style.background = '';
+        }, 1500);
+      }, 1200);
+    }
+
+    async function submitAmcForm(e) {
+      e.preventDefault();
+      
+      const form = document.getElementById('amc-inquiry-form');
+      const inputs = form.querySelectorAll('input');
+      const name = inputs[0] ? inputs[0].value : '';
+      const company = inputs[1] ? inputs[1].value : '';
+      const email = inputs[2] ? inputs[2].value : '';
+      const plan = form.querySelector('select') ? form.querySelector('select').value : '';
+      const details = form.querySelector('textarea') ? form.querySelector('textarea').value : '';
+
+      try {
+        await fetch('/api/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'AMC SLA Inquiry',
+            name,
+            company,
+            email,
+            plan,
+            details
+          })
+        });
+      } catch(err) {
+        console.error('Failed to submit AMC inquiry:', err);
+      }
+
+      document.getElementById('amc-inquiry-form').style.display = 'none';
+      document.getElementById('amc-success-msg').style.display = 'block';
+    }
+  </script>
+
+  <script src="index.js"></script>
+
+  <!-- FLOATING WIDGETS -->
+  <div class="floating-widgets">
+    <!-- WhatsApp Floating Link -->
+    <a href="https://wa.me/971567792681" target="_blank" rel="noopener" class="float-whatsapp" aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12.012 2C6.5 2 2.006 6.5 2.006 12c0 1.755.459 3.468 1.332 4.977L2 22l5.17-1.356c1.455.792 3.09 1.21 4.773 1.21 5.511 0 10.005-4.5 10.005-10S17.523 2 12.012 2zm.006 18c-1.534 0-3.04-.413-4.356-1.197l-.313-.186-3.238.85.864-3.153-.205-.326C3.99 14.73 3.5 13.064 3.5 11.334c0-4.707 3.827-8.534 8.518-8.534 4.69 0 8.518 3.827 8.518 8.534 0 4.707-3.827 8.534-8.518 8.534zm4.845-6.57c-.266-.134-1.572-.777-1.816-.865-.244-.088-.423-.134-.601.134-.178.266-.69.865-.845 1.04-.155.178-.31.2-.577.067-.266-.134-1.127-.415-2.147-1.326-.79-.706-1.327-1.578-1.482-1.845-.155-.266-.016-.41.117-.543.12-.12.266-.31.4-.466.134-.155.178-.266.266-.444.088-.178.044-.333-.022-.466-.067-.133-.6-1.443-.822-1.976-.217-.523-.456-.453-.623-.46-.16-.007-.344-.007-.527-.007-.184 0-.483.068-.737.34-.253.272-.966.945-.966 2.304 0 1.36.988 2.673 1.127 2.859.139.186 1.944 2.97 4.71 4.16.658.283 1.173.452 1.574.58.66.21 1.26.18 1.734.11.53-.08 1.571-.643 1.794-1.264.222-.62.222-1.155.155-1.264-.067-.11-.244-.177-.51-.31z"/></svg>
+    </a>
+    <!-- Scroll To Top Button -->
+    <button id="scroll-top" class="float-scroll-top" aria-label="Scroll to Top">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+    </button>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Experience Center and Signage Technology — Display World's interactive simulator and technologies breakdown including LED, LCD, COB, and CMS systems.">
+  <title>Explore | Display World</title>
+  <link rel="icon" href="https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png" sizes="32x32">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav scrolled" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link active">Explore</a></li>
+        <li><a href="solutions.html" class="nav-link">Solutions</a></li>
+        <li><a href="portfolio.html" class="nav-link">Projects</a></li>
+        <li><a href="innovation.html" class="nav-link">Innovation</a></li>
+        <li><a href="insights.html" class="nav-link">Insights</a></li>
+        <li><a href="about.html" class="nav-link">Company</a></li>
+        <li><a href="contact.html" class="nav-link">Let's Talk</a></li>
+        <li><a href="help-center.html" class="nav-link nav-cta">Help Center</a></li>
+      </ul>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="explore.html" class="nav-link active">Explore</a>
+    <a href="solutions.html" class="nav-link">Solutions</a>
+    <a href="portfolio.html" class="nav-link">Projects</a>
+    <a href="innovation.html" class="nav-link">Innovation</a>
+    <a href="insights.html" class="nav-link">Insights</a>
+    <a href="about.html" class="nav-link">Company</a>
+    <a href="contact.html" class="nav-link">Let's Talk</a>
+    <a href="help-center.html" class="nav-link">Help Center</a>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="admin-hero section-dark">
+    <div class="container">
+      <span class="label-tag">Experience Center</span>
+      <h1 class="section-title">Interactive Virtual <br><span class="accent-text">Simulator</span></h1>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem;">Configure displays, adjust sizes, select installation backdrops, and view real-time telemetry specs for brightness, pixel resolution, and power loads.</p>
+    </div>
+  </section>
+
+  <!-- SIMULATOR LAYOUT -->
+  <section class="section">
+    <div class="container">
+      <div class="simulator-layout">
+        
+        <!-- Canvas view -->
+        <div class="scene-canvas" id="canvas-container">
+          <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80" alt="Corporate Lobby Scene" class="scene-backdrop" id="canvas-bg">
+          <div class="virtual-screen" id="virtual-led-screen">
+            <div class="virtual-screen-hud" id="screen-hud">
+              <div id="hud-res">0 x 0 Pixels</div>
+              <div id="hud-dims">0.0m x 0.0m</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls view -->
+        <div class="simulator-controls">
+          <div class="control-group">
+            <label>Select Installation Backdrop</label>
+            <div class="scene-selectors">
+              <button class="scene-btn active" onclick="changeScene('lobby', 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', this)">Corporate Lobby</button>
+              <button class="scene-btn" onclick="changeScene('store', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80', this)">Retail Storefront</button>
+              <button class="scene-btn" onclick="changeScene('control', 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80', this)">Command Center</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label style="display:flex; justify-content:space-between;">
+              <span>Width (Meters)</span>
+              <span id="val-width">4.0m</span>
+            </label>
+            <input type="range" id="slider-width" min="1.5" max="8.0" step="0.5" value="4.0" oninput="updateSimulator()">
+          </div>
+
+          <div class="control-group">
+            <label style="display:flex; justify-content:space-between;">
+              <span>Height (Meters)</span>
+              <span id="val-height">2.5m</span>
+            </label>
+            <input type="range" id="slider-height" min="1.0" max="5.0" step="0.5" value="2.5" oninput="updateSimulator()">
+          </div>
+
+          <div class="control-group">
+            <label>Pixel Pitch (Pitch resolution)</label>
+            <div class="scene-selectors" id="pitch-buttons-wrap">
+              <button class="scene-btn active" onclick="setPitch(1.2, this)">P1.2 Fine</button>
+              <button class="scene-btn" onclick="setPitch(1.5, this)">P1.5 Standard</button>
+              <button class="scene-btn" onclick="setPitch(1.8, this)">P1.8 Corporate</button>
+              <button class="scene-btn" onclick="setPitch(2.5, this)">P2.5 Retail</button>
+              <button class="scene-btn" onclick="setPitch(4.0, this)">P4.0 Outdoor</button>
+            </div>
+          </div>
+
+          <div class="telemetry-board">
+            <div class="telemetry-item">
+              <span>Resolutions</span>
+              <strong id="tel-res">3333 x 2083 px</strong>
+            </div>
+            <div class="telemetry-item">
+              <span>Nits Brightness</span>
+              <strong id="tel-nits">1000 nits</strong>
+            </div>
+            <div class="telemetry-item">
+              <span>Average Power Load</span>
+              <strong id="tel-power">1.8 kW</strong>
+            </div>
+            <div class="telemetry-item">
+              <span>Cabinet Grid</span>
+              <strong id="tel-cabinets">8 x 5 Panels</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS CATALOG SECTION -->
+  <section class="section" id="products-grid-container" style="scroll-margin-top: 100px;">
+    <div class="container">
+      <span class="label-tag">Hardware Catalog</span>
+      <h2 class="section-title">Explore Our Flagship <br><span class="accent-text">Products Catalog</span></h2>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem; margin-bottom: 2.5rem;">Browse our commercial LED and LCD configurations, select categories to filter systems, and inspect hardware spec sheets.</p>
+      
+      <!-- Filter Tabs -->
+      <div class="products-filter-section" style="margin-bottom: 2.5rem;">
+        <div class="filter-tabs" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="filter-btn active" data-filter="all">All Systems</button>
+          <button class="filter-btn" data-filter="led">LED Screens</button>
+          <button class="filter-btn" data-filter="lcd">LCD Panels</button>
+          <button class="filter-btn" data-filter="transparent">Transparent Film</button>
+          <button class="filter-btn" data-filter="interactive">Interactive Totems</button>
+        </div>
+      </div>
+
+      <div class="products-grid">
+        <!-- Products populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SPEC DRAWER BACKDROP -->
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+
+  <!-- SLIDE-OUT SPEC DRAWER -->
+  <div class="product-drawer" id="product-drawer">
+    <div class="drawer-header">
+      <h3 id="dr-title">Product Details</h3>
+      <button class="close-drawer-btn" onclick="closeDrawer()">×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-section">
+        <h4>Product Family</h4>
+        <span class="label-tag" id="dr-cat" style="display:inline-block; margin-bottom:1rem;">Category</span>
+        <p id="dr-desc" style="font-size:0.9rem; line-height:1.6; color:var(--text-dim);"></p>
+      </div>
+      <div class="drawer-section">
+        <h4>Hardware Specifications</h4>
+        <table class="spec-table" id="dr-specs-table">
+          <!-- Populated dynamically based on clicked product -->
+        </table>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-outline btn-full" id="dr-download-btn"><span>Download PDF Specs</span></button>
+      <button class="btn-primary btn-full" id="dr-inquire-btn"><span>Request Quote</span></button>
+    </div>
+  </div>
+
+  <!-- TECHNOLOGY OVERVIEW SECTION -->
+  <section class="section section-dark">
+    <div class="container">
+      <span class="label-tag">Our Technologies</span>
+      <h2 class="section-title">Signage Technology <br><span class="accent-text">Matrix</span></h2>
+      <p style="max-width:600px; color:var(--text-dim);">Display World engineers custom visual hardware solutions, selecting screen substrates according to environmental parameters.</p>
+      
+      <div class="tech-matrix">
+        <div class="tech-card reveal">
+          <h3>LED (Direct-View)</h3>
+          <p>Seamless, modular self-emissive diodes offering high nits, saturated color profiles, and complete scale flexibility for public lobbies and facades.</p>
+        </div>
+        <div class="tech-card reveal">
+          <h3>LCD Display Panels</h3>
+          <p>High-density backlit liquid crystal displays suitable for storefront windows, digital boards, and ultra-narrow bezel control terminal walls.</p>
+        </div>
+        <div class="tech-card reveal">
+          <h3>COB (Chip-on-Board)</h3>
+          <p>Advanced microLED packaging encapsulating the pixel array under a dust/moisture protective epoxy seal. Offers extreme durability and pixel-black contrast.</p>
+        </div>
+        <div class="tech-card reveal">
+          <h3>CMS Control Systems</h3>
+          <p>Synchronized local and cloud-based content control software featuring signal redundancy and live scheduling dashboards.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+          <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Col 1: Logo & Brief -->
+        <div class="footer-col">
+          <div class="footer-logo-wrap">
+            <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+          </div>
+          <p class="footer-brief">Visionary digital signage company in the Gulf. We design, calibrate, and integrate premium LED, LCD, and interactive touch systems for corporate, retail, and aviation hubs.</p>
+          <div class="footer-socials">
+            <a href="#" class="social-link" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+            <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+          </div>
+        </div>
+        <!-- Col 2: Navigation Links -->
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="explore.html">Explore</a></li>
+            <li><a href="explore.html#products-grid-container">Products</a></li>
+            <li><a href="solutions.html">Solutions</a></li>
+            <li><a href="portfolio.html">Projects</a></li>
+            <li><a href="innovation.html">Innovation</a></li>
+          </ul>
+        </div>
+        <!-- Col 3: Resources Links -->
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="solutions.html#services-visual-container">Services</a></li>
+            <li><a href="insights.html">Insights</a></li>
+            <li><a href="about.html">Company</a></li>
+            <li><a href="contact.html">Let's Talk</a></li>
+            <li><a href="help-center.html">Help Center</a></li>
+          </ul>
+        </div>
+        <!-- Col 4: Dubai HQ Contacts -->
+        <div class="footer-col">
+          <h4>Dubai HQ</h4>
+          <div class="footer-contact-item">
+            <strong>Address</strong>
+            Al Quoz Industrial Area 3, Dubai, UAE
+          </div>
+          <div class="footer-contact-item">
+            <strong>Contacts</strong>
+            <a href="tel:+97143468922" style="display:block; margin-bottom:0.25rem; font-size:0.8rem; text-decoration:none; color:inherit;">Tel: +971 4 346 8922</a>
+            <a href="tel:+971567792681" style="display:block; font-size:0.8rem; text-decoration:none; color:inherit;">Mob: +971 56 779 2681</a>
+          </div>
+          <div class="footer-contact-item">
+            <strong>Email Support</strong>
+            <a href="mailto:support@displayworldme.com" style="font-size:0.8rem; text-decoration:none; color:inherit;">support@displayworldme.com</a>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 Display World. All rights reserved. <a href="admin.html" style="margin-left:0.5rem; color:var(--text-dim); text-decoration:none; font-size:0.75rem; vertical-align: middle;">[Admin Access]</a></p>
+        <div class="footer-policy-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let activeScene = 'lobby';
+    let activePitch = 1.2;
+
+    function changeScene(sceneId, imgUrl, btnEl) {
+      activeScene = sceneId;
+      document.getElementById('canvas-bg').src = imgUrl;
+      
+      // Update scene selector buttons
+      if (btnEl) {
+        btnEl.parentNode.querySelectorAll('.scene-btn').forEach(btn => btn.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+
+      updateSimulator();
+    }
+
+    function setPitch(pitchValue, btnEl) {
+      activePitch = pitchValue;
+      
+      // Update pitch selector buttons
+      if (btnEl) {
+        document.getElementById('pitch-buttons-wrap').querySelectorAll('.scene-btn').forEach(btn => btn.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+
+      updateSimulator();
+    }
+
+    function updateSimulator() {
+      const widthVal = parseFloat(document.getElementById('slider-width').value);
+      const heightVal = parseFloat(document.getElementById('slider-height').value);
+
+      document.getElementById('val-width').textContent = `${widthVal.toFixed(1)}m`;
+      document.getElementById('val-height').textContent = `${heightVal.toFixed(1)}m`;
+
+      // Update screen aspect size on layout canvas
+      const screenEl = document.getElementById('virtual-led-screen');
+      
+      // Max width in canvas is ~80%, scale base on max dimensions
+      const maxW = 8.0;
+      const maxH = 5.0;
+      
+      const widthPercentage = (widthVal / maxW) * 75; // max 75%
+      const heightPercentage = (heightVal / maxH) * 75; // max 75%
+
+      screenEl.style.width = `${widthPercentage}%`;
+      screenEl.style.height = `${heightPercentage}%`;
+
+      // Telemetry Calculations
+      const pixelsX = Math.round((widthVal * 1000) / activePitch);
+      const pixelsY = Math.round((heightVal * 1000) / activePitch);
+
+      document.getElementById('hud-res').textContent = `${pixelsX} x ${pixelsY} Pixels`;
+      document.getElementById('hud-dims').textContent = `${widthVal.toFixed(1)}m x ${heightVal.toFixed(1)}m`;
+
+      document.getElementById('tel-res').textContent = `${pixelsX} x ${pixelsY} px`;
+
+      // Nits based on scene context
+      let nits = 1000;
+      if (activeScene === 'store') nits = 3000; // Storefront displays are brighter
+      if (activeScene === 'control') nits = 600; // Control rooms are dimmer to prevent eye strain
+      document.getElementById('tel-nits').textContent = `${nits} nits`;
+
+      // Power draw calculation based on display area (sqm)
+      const area = widthVal * heightVal;
+      // standard cabinet base calculations: Avg 180W per sqm, high brightness outdoor can go up to 300W.
+      const multiplier = activeScene === 'store' ? 0.28 : 0.18;
+      const powerKw = (area * multiplier).toFixed(1);
+      document.getElementById('tel-power').textContent = `${powerKw} kW`;
+
+      // Cabinet count grid (assuming standard cabinet of 500mm x 500mm = 0.5m x 0.5m)
+      const cabinetsX = Math.round(widthVal / 0.5);
+      const cabinetsY = Math.round(heightVal / 0.5);
+      document.getElementById('tel-cabinets').textContent = `${cabinetsX} x ${cabinetsY} Panels`;
+    }
+
+    // Initialize layout dimensions on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSimulator();
+      renderProducts();
+    });
+
+    // ==========================================
+    // PRODUCTS CATALOG LOGIC
+    // ==========================================
+    let activeFilter = 'all';
+    let productsList = [];
+
+    async function renderProducts() {
+      const section = document.getElementById('products-grid-container');
+      if (!section) return;
+      const container = section.querySelector('.products-grid');
+      if (!container) return;
+
+      container.innerHTML = '';
+      productsList = await ProductsStore.getAll();
+
+      const filtered = activeFilter === 'all'
+        ? productsList
+        : productsList.filter(p => p.category === activeFilter);
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card reveal';
+        card.innerHTML = `
+          <div class="product-image-box">
+            <span class="product-cat-tag">${p.categoryLabel || p.category.toUpperCase()}</span>
+            <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80';">
+          </div>
+          <div class="product-info-box">
+            <h3>${p.name}</h3>
+            <p>${p.desc}</p>
+            <div class="product-card-footer">
+              <button class="btn-outline" onclick="openDrawer('${p.id}')" style="padding: 6px 16px; font-size: 0.75rem;">View Specs</button>
+              <a href="contact.html?inquiry=${encodeURIComponent(p.name)}" class="btn-primary" style="padding: 6px 16px; font-size: 0.75rem; text-decoration:none; display:inline-flex; align-items:center;">
+                <span>Inquire</span>
+              </a>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      
+      // Re-trigger scroll reveal bindings
+      if (window.initScrollReveal) {
+        window.initScrollReveal();
+      }
+    }
+
+    // Filter Navigation Click Events
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.getAttribute('data-filter');
+        renderProducts();
+      });
+    });
+
+    // Drawer Mechanics
+    const drawer = document.getElementById('product-drawer');
+    const backdrop = document.getElementById('drawer-backdrop');
+    const downloadBtn = document.getElementById('dr-download-btn');
+    let activeProduct = null;
+
+    window.openDrawer = function(id) {
+      const p = productsList.find(item => item.id === id);
+      if (!p) return;
+
+      activeProduct = p;
+      document.getElementById('dr-title').textContent = p.name;
+      document.getElementById('dr-cat').textContent = p.categoryLabel || p.category.toUpperCase();
+      document.getElementById('dr-desc').textContent = p.desc;
+
+      const table = document.getElementById('dr-specs-table');
+      table.innerHTML = '';
+      for (const [key, val] of Object.entries(p.specs || {})) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="label-col">${key}</td>
+          <td class="value-col">${val}</td>
+        `;
+        table.appendChild(row);
+      }
+
+      // Configure Inquire link inside drawer
+      document.getElementById('dr-inquire-btn').onclick = () => {
+        window.location.href = `contact.html?inquiry=${encodeURIComponent(p.name)}`;
+      };
+
+      // Reset download button
+      downloadBtn.innerHTML = '<span>Download PDF Specs</span>';
+      downloadBtn.disabled = false;
+
+      drawer.classList.add('open');
+      backdrop.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Lock background scroll
+    };
+
+    window.closeDrawer = function() {
+      drawer.classList.remove('open');
+      backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
+    // Simulated Spec Download
+    downloadBtn.addEventListener('click', () => {
+      if (!activeProduct) return;
+      
+      downloadBtn.disabled = true;
+      downloadBtn.innerHTML = '<span style="display:inline-flex; align-items:center; gap:0.5rem;"><svg class="pulse" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>Compiling Spec Sheet PDF...</span>';
+      
+      setTimeout(() => {
+        downloadBtn.innerHTML = '<span>✓ Download Complete</span>';
+        
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(activeProduct, null, 2));
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", `${activeProduct.name.toLowerCase().replace(/\s+/g, '_')}_specs.json`);
+        document.body.appendChild(dlAnchor);
+        dlAnchor.click();
+        dlAnchor.remove();
+      }, 1500);
+    });
+  </script>
+  <script src="projects-data.js"></script>
+  <script src="index.js"></script>
+
+  <!-- FLOATING WIDGETS -->
+  <div class="floating-widgets">
+    <!-- WhatsApp Floating Link -->
+    <a href="https://wa.me/971567792681" target="_blank" rel="noopener" class="float-whatsapp" aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12.012 2C6.5 2 2.006 6.5 2.006 12c0 1.755.459 3.468 1.332 4.977L2 22l5.17-1.356c1.455.792 3.09 1.21 4.773 1.21 5.511 0 10.005-4.5 10.005-10S17.523 2 12.012 2zm.006 18c-1.534 0-3.04-.413-4.356-1.197l-.313-.186-3.238.85.864-3.153-.205-.326C3.99 14.73 3.5 13.064 3.5 11.334c0-4.707 3.827-8.534 8.518-8.534 4.69 0 8.518 3.827 8.518 8.534 0 4.707-3.827 8.534-8.518 8.534zm4.845-6.57c-.266-.134-1.572-.777-1.816-.865-.244-.088-.423-.134-.601.134-.178.266-.69.865-.845 1.04-.155.178-.31.2-.577.067-.266-.134-1.127-.415-2.147-1.326-.79-.706-1.327-1.578-1.482-1.845-.155-.266-.016-.41.117-.543.12-.12.266-.31.4-.466.134-.155.178-.266.266-.444.088-.178.044-.333-.022-.466-.067-.133-.6-1.443-.822-1.976-.217-.523-.456-.453-.623-.46-.16-.007-.344-.007-.527-.007-.184 0-.483.068-.737.34-.253.272-.966.945-.966 2.304 0 1.36.988 2.673 1.127 2.859.139.186 1.944 2.97 4.71 4.16.658.283 1.173.452 1.574.58.66.21 1.26.18 1.734.11.53-.08 1.571-.643 1.794-1.264.222-.62.222-1.155.155-1.264-.067-.11-.244-.177-.51-.31z"/></svg>
+    </a>
+    <!-- Scroll To Top Button -->
+    <button id="scroll-top" class="float-scroll-top" aria-label="Scroll to Top">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+    </button>
+  </div>
+
+</body>
+</html>
