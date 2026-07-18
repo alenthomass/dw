@@ -1424,3 +1424,162 @@ class CareersDataStore {
 }
 
 const CareersStore = new CareersDataStore();
+
+class InquiriesDataStore {
+  constructor() {
+    this.localKey = 'dw_inquiries';
+  }
+
+  async getAll() {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        const snap = await db.collection('inquiries').get();
+        const list = [];
+        snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
+        return list;
+      } catch (err) {
+        console.error("Firestore read error:", err);
+      }
+    }
+    if (backendMode === 'local-api') {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/inquiries`);
+        if (res.ok) return await res.json();
+      } catch (err) {
+        console.error("Local API read error:", err);
+      }
+    }
+    return JSON.parse(localStorage.getItem(this.localKey)) || [];
+  }
+
+  async save(inq) {
+    await detectBackend();
+    if (!inq.id) inq.id = 'inq_' + Date.now();
+    if (!inq.timestamp) inq.timestamp = new Date().toISOString();
+
+    if (backendMode === 'firebase' && db) {
+      try {
+        await db.collection('inquiries').doc(inq.id).set(inq);
+        return true;
+      } catch (err) {
+        console.error("Firestore save error:", err);
+      }
+    }
+
+    if (backendMode === 'local-api') {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/inquiries`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(inq)
+        });
+        if (res.ok) return true;
+      } catch (err) {
+        console.error("Local API save error:", err);
+      }
+    }
+
+    const list = JSON.parse(localStorage.getItem(this.localKey)) || [];
+    list.push(inq);
+    localStorage.setItem(this.localKey, JSON.stringify(list));
+    return true;
+  }
+
+  async delete(id) {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        await db.collection('inquiries').doc(id).delete();
+        return true;
+      } catch (err) {
+        console.error("Firestore delete error:", err);
+      }
+    }
+    if (backendMode === 'local-api') {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/inquiries/${id}`, { method: 'DELETE' });
+        if (res.ok) return true;
+      } catch (err) {
+        console.error("Local API delete error:", err);
+      }
+    }
+    const list = JSON.parse(localStorage.getItem(this.localKey)) || [];
+    const filtered = list.filter(i => i.id !== id);
+    localStorage.setItem(this.localKey, JSON.stringify(filtered));
+    return true;
+  }
+}
+
+const InquiriesStore = new InquiriesDataStore();
+
+class SettingsDataStore {
+  constructor() {
+    this.localKey = 'dw_settings';
+    this.initLocalDefaults();
+  }
+
+  initLocalDefaults() {
+    const localData = localStorage.getItem(this.localKey);
+    if (!localData) {
+      localStorage.setItem(this.localKey, JSON.stringify({
+        phone: '+97143468922',
+        mobile: '+971567792681',
+        email: 'sales@displayworldme.com',
+        whatsapp: '971567792681',
+        whatsappMessage: "Hello! I'm interested in Display World's solutions."
+      }));
+    }
+  }
+
+  async get() {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        const doc = await db.collection('settings').doc('site').get();
+        if (doc.exists) {
+          return doc.data();
+        }
+      } catch (err) {
+        console.error("Firestore settings read error:", err);
+      }
+    }
+    if (backendMode === 'local-api') {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/site-settings`);
+        if (res.ok) return await res.json();
+      } catch (err) {
+        console.error("Local API settings read error:", err);
+      }
+    }
+    return JSON.parse(localStorage.getItem(this.localKey)) || {};
+  }
+
+  async save(s) {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        await db.collection('settings').doc('site').set(s);
+        return true;
+      } catch (err) {
+        console.error("Firestore settings save error:", err);
+      }
+    }
+    if (backendMode === 'local-api') {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/site-settings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(s)
+        });
+        if (res.ok) return true;
+      } catch (err) {
+        console.error("Local API settings save error:", err);
+      }
+    }
+    localStorage.setItem(this.localKey, JSON.stringify(s));
+    return true;
+  }
+}
+
+const SettingsStore = new SettingsDataStore();

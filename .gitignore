@@ -4,8 +4,14 @@ uploads/
 *.log
 .DS_Store
 .gemini/
-server.js
-package.json
-package-lock.json
-*.json
 
+# Ignore local json database files
+site-settings.json
+careers.json
+categories.json
+casestudies.json
+inquiries.json
+products.json
+services.json
+insights.json
+projects.json

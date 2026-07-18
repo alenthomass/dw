@@ -321,18 +321,18 @@
       const details = form.querySelector('textarea') ? form.querySelector('textarea').value : '';
 
       try {
-        await fetch('/api/inquiries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        if (typeof InquiriesStore !== 'undefined') {
+          await InquiriesStore.save({
             type: 'AMC SLA Inquiry',
             name,
             company,
             email,
             plan,
             details
-          })
-        });
+          });
+        } else {
+          console.error('InquiriesStore is undefined');
+        }
       } catch(err) {
         console.error('Failed to submit AMC inquiry:', err);
       }
@@ -342,6 +342,7 @@
     }
   </script>
 
+  <script src="projects-data.js"></script>
   <script src="index.js"></script>
 
   <!-- FLOATING WIDGETS -->
