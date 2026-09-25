@@ -1525,7 +1525,7 @@ class SettingsDataStore {
     if (localData) {
       try { settings = JSON.parse(localData); } catch(e){}
     }
-    if (!settings || settings.phone === '+97143468922' || settings.mobile === '+971567792681' || settings.email === 'sales@displayworldme.com') {
+    if (!settings || settings.whatsapp === '971567792681' || settings.phone === '+97143468922' || settings.mobile === '+971567792681' || settings.email === 'sales@displayworldme.com') {
       const newDefaults = {
         phone: '+971508411925',
         mobile: '+971508411925',
@@ -1545,7 +1545,36 @@ class SettingsDataStore {
       try {
         const doc = await db.collection('settings').doc('site').get();
         if (doc.exists) {
-          return doc.data();
+          const data = doc.data();
+          let needsUpdate = false;
+          if (data.whatsapp === '971567792681' || !data.whatsapp) {
+            data.whatsapp = '971508411925';
+            needsUpdate = true;
+          }
+          if (data.phone === '+97143468922' || !data.phone) {
+            data.phone = '+971508411925';
+            needsUpdate = true;
+          }
+          if (data.mobile === '+971567792681' || !data.mobile) {
+            data.mobile = '+971508411925';
+            needsUpdate = true;
+          }
+          if (data.email === 'sales@displayworldme.com' || !data.email) {
+            data.email = 'salessupport@displayworldme.com';
+            needsUpdate = true;
+          }
+          if (!data.supportEmail) {
+            data.supportEmail = 'support@displayworldme.com';
+            needsUpdate = true;
+          }
+          if (!data.address || data.address.includes('Al Quoz')) {
+            data.address = 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
+            needsUpdate = true;
+          }
+          if (needsUpdate) {
+            db.collection('settings').doc('site').set(data).catch(() => {});
+          }
+          return data;
         }
       } catch (err) {
         console.error("Firestore settings read error:", err);
@@ -1559,7 +1588,14 @@ class SettingsDataStore {
         console.error("Local API settings read error:", err);
       }
     }
-    return JSON.parse(localStorage.getItem(this.localKey)) || {};
+    const local = JSON.parse(localStorage.getItem(this.localKey)) || {};
+    if (local.whatsapp === '971567792681' || !local.whatsapp) local.whatsapp = '971508411925';
+    if (local.phone === '+97143468922' || !local.phone) local.phone = '+971508411925';
+    if (local.mobile === '+971567792681' || !local.mobile) local.mobile = '+971508411925';
+    if (local.email === 'sales@displayworldme.com' || !local.email) local.email = 'salessupport@displayworldme.com';
+    if (!local.supportEmail) local.supportEmail = 'support@displayworldme.com';
+    if (!local.address || local.address.includes('Al Quoz')) local.address = 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
+    return local;
   }
 
   async save(s) {

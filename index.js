@@ -290,7 +290,9 @@ async function initDynamicFooter() {
     const phoneFormatted = '+971 50 841 1925';
     const salesEmail = s.email || 'salessupport@displayworldme.com';
     const supportEmail = s.supportEmail || 'support@displayworldme.com';
-    const waNum = s.whatsapp || '971508411925';
+    let waNum = s.whatsapp ? String(s.whatsapp).replace(/\D/g, '') : '971508411925';
+    if (waNum === '971567792681' || !waNum) waNum = '971508411925';
+    const waMessage = s.whatsappMessage || "Hello! I'm interested in Display World's solutions.";
 
     // 1. Update phone links
     document.querySelectorAll('a[href^="tel:"]').forEach(el => {
@@ -326,7 +328,7 @@ async function initDynamicFooter() {
     // 3. Update WhatsApp float link
     const waFloats = document.querySelectorAll('.float-whatsapp');
     waFloats.forEach(waFloat => {
-      waFloat.href = `https://wa.me/${waNum}?text=${encodeURIComponent(s.whatsappMessage || '')}`;
+      waFloat.href = `https://wa.me/${waNum}?text=${encodeURIComponent(waMessage)}`;
     });
 
     // 4. Update address
