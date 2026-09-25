@@ -1018,15 +1018,16 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 
 /* ═══════════ FLOATING WIDGETS ═══════════ */
 .floating-widgets {
-  position: fixed;
+  position: fixed !important;
   bottom: 2rem;
-  left: 2rem;
   right: 2rem;
+  left: auto !important;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column-reverse;
   align-items: center;
+  gap: 0.75rem;
   pointer-events: none;
-  z-index: 1001;
+  z-index: 99999 !important;
 }
 
 .float-whatsapp {
@@ -1037,8 +1038,8 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
   border-radius: 50%;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5);
   cursor: pointer;
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   background: #25D366;
   color: #fff;
   transition: transform 0.3s var(--ease), box-shadow 0.3s;
@@ -1047,6 +1048,17 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 .float-whatsapp:hover {
   transform: scale(1.1) translateY(-4px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 768px) {
+  .floating-widgets {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+  .float-whatsapp {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 .float-scroll-top {
