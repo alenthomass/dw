@@ -48,7 +48,7 @@ const DEFAULT_PROJECTS = [
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
     client: "Global Logistics Corp",
     year: "2024",
-    location: "Al Quoz Operations Center, Dubai",
+    location: "Dubai Operations Center, Dubai",
     challenge: "The control center coordinates logistics and truck dispatch feeds in real-time. The engineering team needed an expansive, bezel-free canvas that could receive over 20 concurrent network camera feeds without frame drops, scaling distortion, or system crashes.",
     solution: "We engineered a massive ultra-narrow bezel LCD wall with a high-performance multi-channel matrix processor. The processor uses fiber-optic feeds to scale camera streams on the fly. The screens were color-calibrated to keep detail contrast high under artificial office light levels.",
     specs: {
@@ -1275,7 +1275,7 @@ const DEFAULT_CAREERS = [
   {
     id: "job_3",
     title: "AMC Operations Technician",
-    location: "Al Quoz, Dubai",
+    location: "Dubai Investment Park, Dubai",
     type: "Full-time",
     desc: "Perform scheduled preventive maintenance checks, lead on-site repair operations, and swap out modules for our Annual Maintenance Contract clients.",
     requirements: [
@@ -1532,7 +1532,8 @@ class SettingsDataStore {
         email: 'salessupport@displayworldme.com',
         supportEmail: 'support@displayworldme.com',
         whatsapp: '971508411925',
-        whatsappMessage: "Hello! I'm interested in Display World's solutions."
+        whatsappMessage: "Hello! I'm interested in Display World's solutions.",
+        address: "Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE"
       };
       localStorage.setItem(this.localKey, JSON.stringify(newDefaults));
     }

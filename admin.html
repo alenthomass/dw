@@ -1019,6 +1019,11 @@
                   <input type="email" id="settings-support-email" placeholder="support@displayworldme.com">
                   <span class="field-hint">General inquiries & support</span>
                 </div>
+                <div class="settings-field full-width" style="grid-column: 1 / -1;">
+                  <label for="settings-address">Office Address</label>
+                  <input type="text" id="settings-address" placeholder="Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE">
+                  <span class="field-hint">Physical headquarters address shown in footers</span>
+                </div>
               </div>
             </div>
 
@@ -1383,7 +1388,7 @@
         </div>
         <div class="modal-field">
           <label for="career-location">Location</label>
-          <input type="text" id="career-location" required placeholder="e.g. Dubai, UAE / Al Quoz, Dubai">
+          <input type="text" id="career-location" required placeholder="e.g. Dubai, UAE / Dubai Investment Park, Dubai">
         </div>
         <div class="modal-field">
           <label for="career-type">Job Type</label>
@@ -2217,6 +2222,7 @@
     const settingsPhone = document.getElementById('settings-phone');
     const settingsEmail = document.getElementById('settings-email');
     const settingsSupportEmail = document.getElementById('settings-support-email');
+    const settingsAddress = document.getElementById('settings-address');
     const settingsWhatsapp = document.getElementById('settings-whatsapp');
     const settingsWhatsappMsg = document.getElementById('settings-whatsapp-msg');
     const settingsWaPreview = document.getElementById('settings-wa-preview');
@@ -2244,6 +2250,9 @@
           if (settingsSupportEmail) {
             settingsSupportEmail.value = s.supportEmail || 'support@displayworldme.com';
           }
+          if (settingsAddress) {
+            settingsAddress.value = s.address || 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
+          }
           settingsWhatsapp.value = s.whatsapp || '971508411925';
           settingsWhatsappMsg.value = s.whatsappMessage || "Hello! I'm interested in Display World's solutions.";
           updateWaPreview();
@@ -2263,6 +2272,7 @@
             mobile: settingsPhone.value || '+971508411925',
             email: settingsEmail.value || 'salessupport@displayworldme.com',
             supportEmail: settingsSupportEmail ? settingsSupportEmail.value : 'support@displayworldme.com',
+            address: settingsAddress ? settingsAddress.value : 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE',
             whatsapp: settingsWhatsapp.value || '971508411925',
             whatsappMessage: settingsWhatsappMsg.value
           });

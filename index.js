@@ -328,6 +328,14 @@ async function initDynamicFooter() {
     waFloats.forEach(waFloat => {
       waFloat.href = `https://wa.me/${waNum}?text=${encodeURIComponent(s.whatsappMessage || '')}`;
     });
+
+    // 4. Update address
+    const addr = s.address || 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
+    document.querySelectorAll('.footer-contact-item').forEach(el => {
+      if (el.innerHTML.includes('Address')) {
+        el.innerHTML = `<strong>Address</strong>\n            ${addr}`;
+      }
+    });
   } catch (err) {
     console.error('Failed to init dynamic footer:', err);
   }
