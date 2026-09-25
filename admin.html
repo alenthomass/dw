@@ -1005,19 +1005,19 @@
               <p>Update the telephone and mobile numbers displayed in footers and contact pages.</p>
               <div class="settings-form-grid">
                 <div class="settings-field">
-                  <label for="settings-phone">Office Phone</label>
-                  <input type="tel" id="settings-phone" placeholder="+971 4 346 8922">
-                  <span class="field-hint">Main office landline number</span>
+                  <label for="settings-phone">Phone Number</label>
+                  <input type="tel" id="settings-phone" placeholder="+971 50 841 1925">
+                  <span class="field-hint">Primary direct phone number</span>
                 </div>
                 <div class="settings-field">
-                  <label for="settings-mobile">Mobile Number</label>
-                  <input type="tel" id="settings-mobile" placeholder="+971 56 779 2681">
-                  <span class="field-hint">Primary mobile contact</span>
+                  <label for="settings-email">Sales Support Email</label>
+                  <input type="email" id="settings-email" placeholder="salessupport@displayworldme.com">
+                  <span class="field-hint">Sales & client proposals</span>
                 </div>
                 <div class="settings-field">
-                  <label for="settings-email">Contact Email</label>
-                  <input type="email" id="settings-email" placeholder="sales@displayworldme.com">
-                  <span class="field-hint">Shown in footer and contact page</span>
+                  <label for="settings-support-email">Technical Support Email</label>
+                  <input type="email" id="settings-support-email" placeholder="support@displayworldme.com">
+                  <span class="field-hint">General inquiries & support</span>
                 </div>
               </div>
             </div>
@@ -1029,8 +1029,8 @@
               <div class="settings-form-grid">
                 <div class="settings-field">
                   <label for="settings-whatsapp">WhatsApp Number</label>
-                  <input type="tel" id="settings-whatsapp" placeholder="971567792681">
-                  <span class="field-hint">Without + sign (e.g. 971567792681)</span>
+                  <input type="tel" id="settings-whatsapp" placeholder="971508411925">
+                  <span class="field-hint">Without + sign (e.g. 971508411925)</span>
                 </div>
                 <div class="settings-field full-width">
                   <label for="settings-whatsapp-msg">Pre-filled Greeting Message</label>
@@ -1047,7 +1047,7 @@
               <div style="background:rgba(37,211,102,0.08); border:1px solid rgba(37,211,102,0.2); border-radius:12px; padding:1.25rem; display:inline-block; margin:0 auto;">
                 <a id="settings-wa-preview" href="#" target="_blank" rel="noopener noreferrer" style="color:#25d366; font-weight:700; font-size:0.95rem; text-decoration:none; display:flex; align-items:center; gap:0.5rem;">
                   <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.202-1.362a9.927 9.927 0 0 0 4.805 1.232h.005c5.505 0 9.99-4.478 9.99-9.986C22.002 6.478 17.518 2 12.012 2z"/></svg>
-                  <span id="settings-wa-preview-text">wa.me/971567792681</span>
+                  <span id="settings-wa-preview-text">wa.me/971508411925</span>
                 </a>
               </div>
             </div>
@@ -2215,8 +2215,8 @@
     // SITE SETTINGS LOGIC
     // ==========================================
     const settingsPhone = document.getElementById('settings-phone');
-    const settingsMobile = document.getElementById('settings-mobile');
     const settingsEmail = document.getElementById('settings-email');
+    const settingsSupportEmail = document.getElementById('settings-support-email');
     const settingsWhatsapp = document.getElementById('settings-whatsapp');
     const settingsWhatsappMsg = document.getElementById('settings-whatsapp-msg');
     const settingsWaPreview = document.getElementById('settings-wa-preview');
@@ -2225,7 +2225,7 @@
     const settingsSaveMsg = document.getElementById('settings-save-msg');
 
     function updateWaPreview() {
-      const num = settingsWhatsapp.value || '971567792681';
+      const num = settingsWhatsapp.value || '971508411925';
       const msg = settingsWhatsappMsg.value || '';
       const url = `https://wa.me/${num}${msg ? '?text=' + encodeURIComponent(msg) : ''}`;
       settingsWaPreview.href = url;
@@ -2239,11 +2239,13 @@
       try {
         if (typeof SettingsStore !== 'undefined') {
           const s = await SettingsStore.get();
-          settingsPhone.value = s.phone || '';
-          settingsMobile.value = s.mobile || '';
-          settingsEmail.value = s.email || '';
-          settingsWhatsapp.value = s.whatsapp || '';
-          settingsWhatsappMsg.value = s.whatsappMessage || '';
+          settingsPhone.value = s.phone || '+971508411925';
+          settingsEmail.value = s.email || 'salessupport@displayworldme.com';
+          if (settingsSupportEmail) {
+            settingsSupportEmail.value = s.supportEmail || 'support@displayworldme.com';
+          }
+          settingsWhatsapp.value = s.whatsapp || '971508411925';
+          settingsWhatsappMsg.value = s.whatsappMessage || "Hello! I'm interested in Display World's solutions.";
           updateWaPreview();
         }
       } catch (err) {
@@ -2257,10 +2259,11 @@
       try {
         if (typeof SettingsStore !== 'undefined') {
           const success = await SettingsStore.save({
-            phone: settingsPhone.value,
-            mobile: settingsMobile.value,
-            email: settingsEmail.value,
-            whatsapp: settingsWhatsapp.value,
+            phone: settingsPhone.value || '+971508411925',
+            mobile: settingsPhone.value || '+971508411925',
+            email: settingsEmail.value || 'salessupport@displayworldme.com',
+            supportEmail: settingsSupportEmail ? settingsSupportEmail.value : 'support@displayworldme.com',
+            whatsapp: settingsWhatsapp.value || '971508411925',
             whatsappMessage: settingsWhatsappMsg.value
           });
           if (success) {

@@ -1521,14 +1521,20 @@ class SettingsDataStore {
 
   initLocalDefaults() {
     const localData = localStorage.getItem(this.localKey);
-    if (!localData) {
-      localStorage.setItem(this.localKey, JSON.stringify({
-        phone: '+97143468922',
-        mobile: '+971567792681',
-        email: 'sales@displayworldme.com',
-        whatsapp: '971567792681',
+    let settings = null;
+    if (localData) {
+      try { settings = JSON.parse(localData); } catch(e){}
+    }
+    if (!settings || settings.phone === '+97143468922' || settings.mobile === '+971567792681' || settings.email === 'sales@displayworldme.com') {
+      const newDefaults = {
+        phone: '+971508411925',
+        mobile: '+971508411925',
+        email: 'salessupport@displayworldme.com',
+        supportEmail: 'support@displayworldme.com',
+        whatsapp: '971508411925',
         whatsappMessage: "Hello! I'm interested in Display World's solutions."
-      }));
+      };
+      localStorage.setItem(this.localKey, JSON.stringify(newDefaults));
     }
   }
 

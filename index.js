@@ -286,34 +286,47 @@ async function initDynamicFooter() {
   try {
     const s = await SettingsStore.get();
     if (!s) return;
+    const phoneNum = s.phone || '+971508411925';
+    const phoneFormatted = '+971 50 841 1925';
+    const salesEmail = s.email || 'salessupport@displayworldme.com';
+    const supportEmail = s.supportEmail || 'support@displayworldme.com';
+    const waNum = s.whatsapp || '971508411925';
 
     // 1. Update phone links
     document.querySelectorAll('a[href^="tel:"]').forEach(el => {
       const href = el.getAttribute('href') || '';
       const text = el.textContent || '';
       
-      if (href.includes('43468922') || text.includes('4 346 8922')) {
-        el.href = `tel:${s.phone}`;
-        el.textContent = s.phone;
-      } else if (href.includes('567792681') || text.includes('56 779 2681')) {
-        el.href = `tel:${s.mobile}`;
-        el.textContent = s.mobile;
+      if (href.includes('43468922') || text.includes('4 346 8922') || 
+          href.includes('567792681') || text.includes('56 779 2681') ||
+          href.includes('508411925') || text.includes('50 841 1925')) {
+        el.href = `tel:${phoneNum}`;
+        if (text.includes('Call')) {
+          el.textContent = `Call ${phoneFormatted}`;
+        } else if (text.includes('Tel:') || text.includes('Mob:') || text.includes('Phone:')) {
+          el.textContent = `Phone: ${phoneFormatted}`;
+        } else {
+          el.textContent = phoneFormatted;
+        }
       }
     });
 
     // 2. Update email links
     document.querySelectorAll('a[href^="mailto:"]').forEach(el => {
       const href = el.getAttribute('href') || '';
-      if (href.includes('sales@displayworldme.com') || href.includes('support@displayworldme.com')) {
-        el.href = `mailto:${s.email}`;
-        el.textContent = s.email;
+      if (href.includes('salessupport@displayworldme.com') || href.includes('sales@displayworldme.com')) {
+        el.href = `mailto:${salesEmail}`;
+        el.textContent = salesEmail;
+      } else if (href.includes('support@displayworldme.com')) {
+        el.href = `mailto:${supportEmail}`;
+        el.textContent = supportEmail;
       }
     });
 
     // 3. Update WhatsApp float link
     const waFloats = document.querySelectorAll('.float-whatsapp');
     waFloats.forEach(waFloat => {
-      waFloat.href = `https://wa.me/${s.whatsapp}?text=${encodeURIComponent(s.whatsappMessage || '')}`;
+      waFloat.href = `https://wa.me/${waNum}?text=${encodeURIComponent(s.whatsappMessage || '')}`;
     });
   } catch (err) {
     console.error('Failed to init dynamic footer:', err);
