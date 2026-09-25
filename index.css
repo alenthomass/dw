@@ -1054,12 +1054,11 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 .floating-widgets {
   position: fixed !important;
   bottom: 2rem;
-  right: 2rem;
-  left: auto !important;
+  left: 2rem !important;
+  right: 2rem !important;
   display: flex;
-  flex-direction: column-reverse;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
   pointer-events: none;
   z-index: 99999 !important;
 }
@@ -1087,7 +1086,8 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 @media (max-width: 768px) {
   .floating-widgets {
     bottom: 1.5rem;
-    right: 1.5rem;
+    left: 1.5rem !important;
+    right: 1.5rem !important;
   }
   .float-whatsapp {
     width: 50px;
