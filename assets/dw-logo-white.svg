@@ -1,23 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 52" width="260" height="52" fill="none">
-  <!-- Hexagon Isometric Icon (DW Monogram) -->
-  <g transform="translate(4, 2)" fill="#ffffff">
-    <!-- Outer d-loop / Left Hex Edge -->
-    <path d="M 22 2 L 26 2 L 26 14 L 32 17.5 L 32 23 L 26 19.5 L 26 31 L 18 36 L 4 28 L 4 19 L 18 27 L 22 24.5 Z"/>
-    <path d="M 4 19 L 18 11 L 22 13.5 L 8 21.5 Z" opacity="0.85"/>
-    
-    <!-- Middle Ribbon (w first stem) -->
-    <path d="M 30 11 L 34 8.5 L 42 13 L 42 22 L 30 29 L 26 26.5 L 36 20.5 L 36 14.5 L 30 11 Z" opacity="0.9"/>
-    
-    <!-- Inner / Base Ribbon (w second stem) -->
-    <path d="M 22 36 L 36 28 L 40 30.5 L 22 41 L 12 35 L 14 31.5 Z" opacity="0.8"/>
-    <path d="M 42 25 L 46 22.5 L 46 32 L 26 43.5 L 22 41 L 42 29.5 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 54" width="280" height="54" fill="none">
+  <defs>
+    <linearGradient id="hzw-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff007f"/>
+      <stop offset="100%" stop-color="#fa036e"/>
+    </linearGradient>
+    <linearGradient id="hzw-purple-mid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#7928ca"/>
+    </linearGradient>
+    <linearGradient id="hzw-purple-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#6b21a8"/>
+    </linearGradient>
+    <linearGradient id="hzw-ribbon" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fa036e"/>
+      <stop offset="50%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#7928ca"/>
+    </linearGradient>
+  </defs>
+
+  <!-- DW Mark (Left) -->
+  <g transform="translate(0, 0) scale(0.55)">
+    <path fill-rule="evenodd" fill="url(#hzw-pink)" d="
+      M 50 10
+      L 53.5 12
+      L 53.5 54
+      L 50 56
+      L 50 74
+      L 47.5 75.4
+      L 17.1 57.8
+      L 17.1 29
+      L 50 10 Z
+      
+      M 26.6 34.5
+      L 43 25
+      L 43 47.9
+      L 26.6 57.4 Z
+    "/>
+    <path fill="url(#hzw-purple-mid)" d="
+      M 58.5 14.9
+      L 68 20.4
+      L 68 58
+      L 58.5 52.5 Z
+    "/>
+    <path fill="url(#hzw-purple-dark)" d="
+      M 73 23.3
+      L 82.9 29
+      L 82.9 67
+      L 50 86
+      L 50 76.5
+      L 73 63.2
+      L 73 23.3 Z
+    "/>
+    <path fill="url(#hzw-ribbon)" d="
+      M 50 76.5
+      L 50 86
+      L 39 79.6
+      L 39 70.1 Z
+    "/>
   </g>
 
   <!-- Typography -->
-  <g transform="translate(60, 0)">
-    <!-- DISPLAY WORLD -->
-    <text x="0" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Outfit', 'Space Grotesk', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="20" letter-spacing="1.2" fill="#ffffff">DISPLAY WORLD</text>
-    <!-- LET'S DO IT. -->
-    <text x="2" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Space Grotesk', 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="8.5" fill="rgba(255,255,255,0.75)" letter-spacing="4.5">LET'S DO IT.</text>
+  <g transform="translate(56, 0)">
+    <text x="0" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Montserrat', 'Space Grotesk', 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="21" letter-spacing="1">
+      <tspan fill="#ffffff">DISPLAY </tspan>
+      <tspan fill="#fa036e">WORLD</tspan>
+    </text>
+    <text x="2" y="44" font-family="-apple-system, BlinkMacSystemFont, 'Space Grotesk', 'Outfit', sans-serif" font-weight="700" font-size="8.5" fill="rgba(255,255,255,0.75)" letter-spacing="4.8">LET'S DO IT.</text>
   </g>
 </svg>

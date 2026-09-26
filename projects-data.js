@@ -1662,6 +1662,14 @@ class SiteImagesDataStore {
         description: "Small icon displayed in browser tabs, bookmark bars, and mobile shortcuts.",
         url: "assets/dw-favicon.svg"
       },
+      logo_stacked: {
+        key: "logo_stacked",
+        category: "branding",
+        page: "Social & Media / Centered",
+        title: "Centered Stacked Logo",
+        description: "Centered vertical logo lockup with DW monogram above DISPLAY WORLD typography.",
+        url: "assets/dw-logo-stacked.svg"
+      },
       home_about_main: {
         key: "home_about_main",
         category: "home",

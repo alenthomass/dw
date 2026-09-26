@@ -149,14 +149,9 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 }
 
 .nav-logo img {
-  height: 30px;
+  height: 32px;
   width: auto;
-  transition: filter 0.4s ease;
-  filter: brightness(0) invert(1);
-}
-
-[data-theme="light"] .nav-logo img {
-  filter: brightness(0) !important;
+  display: block;
 }
 
 .nav-links {
