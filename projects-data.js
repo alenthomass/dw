@@ -1626,3 +1626,328 @@ class SettingsDataStore {
 }
 
 const SettingsStore = new SettingsDataStore();
+
+/* =========================================================================
+   SITE IMAGES DATA STORE
+   Centralized management of all static site images, logos, banners & backdrops
+   ========================================================================= */
+class SiteImagesDataStore {
+  constructor() {
+    this.localKey = 'dw_site_images';
+  }
+
+  getDefaults() {
+    return {
+      logo_header: {
+        key: "logo_header",
+        category: "branding",
+        page: "All Pages (Header)",
+        title: "Navbar Brand Logo",
+        description: "Horizontal logo displayed in the top navigation bar across all pages.",
+        url: "https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png"
+      },
+      logo_footer: {
+        key: "logo_footer",
+        category: "branding",
+        page: "All Pages (Footer)",
+        title: "Footer Brand Logo",
+        description: "Logo displayed in the footer branding section across all pages.",
+        url: "https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png"
+      },
+      site_favicon: {
+        key: "site_favicon",
+        category: "branding",
+        page: "Browser Tab",
+        title: "Website Favicon",
+        description: "Small icon displayed in browser tabs, bookmark bars, and mobile shortcuts.",
+        url: "https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png"
+      },
+      home_about_main: {
+        key: "home_about_main",
+        category: "home",
+        page: "index.html",
+        title: "Home: About Showcase Photo",
+        description: "Main primary photo in the About Display World section on the homepage.",
+        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+      },
+      home_about_float: {
+        key: "home_about_float",
+        category: "home",
+        page: "index.html",
+        title: "Home: Tech Calibration Badge",
+        description: "Floating secondary image showing calibration metrics on the homepage.",
+        url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80"
+      },
+      about_story_main: {
+        key: "about_story_main",
+        category: "about",
+        page: "about.html",
+        title: "About: Company Story Photo",
+        description: "Primary high-resolution installation photo on the full About Us page.",
+        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+      },
+      about_story_float: {
+        key: "about_story_float",
+        category: "about",
+        page: "about.html",
+        title: "About: Calibration Badge",
+        description: "Floating secondary accent image in the story section on the About Us page.",
+        url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80"
+      },
+      explore_bg_lobby: {
+        key: "explore_bg_lobby",
+        category: "explore",
+        page: "explore.html",
+        title: "Simulator: Corporate Lobby Backdrop",
+        description: "3D virtual simulator environment backdrop for the Corporate Lobby preset.",
+        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80"
+      },
+      explore_bg_retail: {
+        key: "explore_bg_retail",
+        category: "explore",
+        page: "explore.html",
+        title: "Simulator: Retail Storefront Backdrop",
+        description: "3D virtual simulator environment backdrop for the Retail Storefront preset.",
+        url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80"
+      },
+      explore_bg_control: {
+        key: "explore_bg_control",
+        category: "explore",
+        page: "explore.html",
+        title: "Simulator: Command Center Backdrop",
+        description: "3D virtual simulator environment backdrop for the Command Center preset.",
+        url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80"
+      },
+      innov_oled: {
+        key: "innov_oled",
+        category: "innovation",
+        page: "innovation.html",
+        title: "Innovation: Transparent OLED Display",
+        description: "Card visual showcasing Transparent OLED Glass Media technology.",
+        url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
+      },
+      innov_cob: {
+        key: "innov_cob",
+        category: "innovation",
+        page: "innovation.html",
+        title: "Innovation: MicroLED COB P0.9",
+        description: "Card visual showcasing Chip-on-Board sub-millimeter MicroLED panels.",
+        url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
+      },
+      innov_holo: {
+        key: "innov_holo",
+        category: "innovation",
+        page: "innovation.html",
+        title: "Innovation: Holographic LED Fan",
+        description: "Card visual showcasing 3D airborne Holographic LED Fan arrays.",
+        url: "https://images.unsplash.com/photo-1548345680-f5475ea5df84?auto=format&fit=crop&w=800&q=80"
+      },
+      innov_kinetic: {
+        key: "innov_kinetic",
+        category: "innovation",
+        page: "innovation.html",
+        title: "Innovation: Dynamic Kinetic Walls",
+        description: "Card visual showcasing motor-actuated Kinetic LED screen modules.",
+        url: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=800&q=80"
+      },
+      sol_retail: {
+        key: "sol_retail",
+        category: "solutions",
+        page: "solutions.html",
+        title: "Solutions: Retail & Malls",
+        description: "Feature display image in the Retail & Malls interactive industry panel.",
+        url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80"
+      },
+      sol_hospitality: {
+        key: "sol_hospitality",
+        category: "solutions",
+        page: "solutions.html",
+        title: "Solutions: Hospitality & Hotels",
+        description: "Feature display image in the Hospitality & Hotels interactive industry panel.",
+        url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+      },
+      sol_healthcare: {
+        key: "sol_healthcare",
+        category: "solutions",
+        page: "solutions.html",
+        title: "Solutions: Healthcare & Clinics",
+        description: "Feature display image in the Healthcare & Clinics interactive industry panel.",
+        url: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80"
+      },
+      sol_education: {
+        key: "sol_education",
+        category: "solutions",
+        page: "solutions.html",
+        title: "Solutions: Education & Campus",
+        description: "Feature display image in the Education & Campus interactive industry panel.",
+        url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
+      },
+      sol_corporate: {
+        key: "sol_corporate",
+        category: "solutions",
+        page: "solutions.html",
+        title: "Solutions: Corporate Offices",
+        description: "Feature display image in the Corporate Offices interactive industry panel.",
+        url: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80"
+      }
+    };
+  }
+
+  async getAll() {
+    await detectBackend();
+    const defaults = this.getDefaults();
+    const defaultUrls = {};
+    Object.keys(defaults).forEach(k => {
+      defaultUrls[k] = defaults[k].url;
+    });
+
+    let storedUrls = {};
+    if (backendMode === 'firebase' && db) {
+      try {
+        const doc = await db.collection('settings').doc('images').get();
+        if (doc.exists) {
+          storedUrls = doc.data() || {};
+        }
+      } catch (err) {
+        console.error("Firestore site images read error:", err);
+      }
+    }
+
+    if (Object.keys(storedUrls).length === 0) {
+      try {
+        const local = localStorage.getItem(this.localKey);
+        if (local) {
+          storedUrls = JSON.parse(local) || {};
+        }
+      } catch (e) {
+        console.error("Local site images read error:", e);
+      }
+    }
+
+    return Object.assign({}, defaultUrls, storedUrls);
+  }
+
+  async getItems() {
+    const urls = await this.getAll();
+    const defaults = this.getDefaults();
+    const items = [];
+
+    Object.keys(defaults).forEach(key => {
+      const def = defaults[key];
+      items.push({
+        key: def.key,
+        category: def.category,
+        page: def.page,
+        title: def.title,
+        description: def.description,
+        defaultUrl: def.url,
+        url: urls[key] || def.url,
+        isCustom: Boolean(urls[key] && urls[key] !== def.url)
+      });
+    });
+
+    // Check for any extra custom keys
+    Object.keys(urls).forEach(k => {
+      if (!defaults[k]) {
+        items.push({
+          key: k,
+          category: "custom",
+          page: "Custom Element",
+          title: k,
+          description: `Custom image override for [data-img-key="${k}"]`,
+          defaultUrl: "",
+          url: urls[k],
+          isCustom: true
+        });
+      }
+    });
+
+    return items;
+  }
+
+  async get(key) {
+    const all = await this.getAll();
+    return all[key] || (this.getDefaults()[key] ? this.getDefaults()[key].url : '');
+  }
+
+  async save(imagesMap) {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        await db.collection('settings').doc('images').set(imagesMap);
+      } catch (err) {
+        console.error("Firestore site images save error:", err);
+      }
+    }
+    localStorage.setItem(this.localKey, JSON.stringify(imagesMap));
+    return true;
+  }
+
+  async reset(key) {
+    const all = await this.getAll();
+    const defaults = this.getDefaults();
+    if (defaults[key]) {
+      all[key] = defaults[key].url;
+    } else {
+      delete all[key];
+    }
+    return await this.save(all);
+  }
+
+  async resetAll() {
+    const defaults = this.getDefaults();
+    const cleanMap = {};
+    Object.keys(defaults).forEach(k => {
+      cleanMap[k] = defaults[k].url;
+    });
+    return await this.save(cleanMap);
+  }
+
+  async uploadImage(file) {
+    await detectBackend();
+    if (backendMode === 'firebase' && storage) {
+      try {
+        const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const ref = storage.ref().child(`site-images/${Date.now()}_${cleanName}`);
+        const snap = await ref.put(file);
+        return await snap.ref.getDownloadURL();
+      } catch (err) {
+        console.error("Firebase Storage site-images upload error:", err);
+      }
+    }
+
+    if (backendMode === 'local-api') {
+      try {
+        const base64Data = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+        const res = await fetch(`${apiBaseUrl}/api/upload`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: file.name, data: base64Data })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          return `${apiBaseUrl}${json.url}`;
+        }
+      } catch (err) {
+        console.error("Local API upload error:", err);
+      }
+    }
+
+    // Base64 Data URL fallback
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+const SiteImagesStore = new SiteImagesDataStore();
+if (typeof window !== 'undefined') {
+  window.SettingsStore = SettingsStore;
+  window.SiteImagesStore = SiteImagesStore;
+}

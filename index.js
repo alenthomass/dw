@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initContactForm();
   initFloatingWidgets();
   initDynamicFooter();
+  initDynamicImages();
 });
 
 /* ═══════════════════════════════════════
@@ -342,3 +343,75 @@ async function initDynamicFooter() {
     console.error('Failed to init dynamic footer:', err);
   }
 }
+
+/* ═══════════════════════════════════════
+   DYNAMIC SITE IMAGES INJECTION
+   ═══════════════════════════════════════ */
+async function initDynamicImages() {
+  if (typeof SiteImagesStore === 'undefined') return;
+  try {
+    const imagesMap = await SiteImagesStore.getAll();
+    if (!imagesMap) return;
+
+    // 1. Update elements with explicit [data-img-key]
+    document.querySelectorAll('[data-img-key]').forEach(el => {
+      const key = el.getAttribute('data-img-key');
+      if (imagesMap[key]) {
+        if (el.tagName.toLowerCase() === 'img') {
+          el.src = imagesMap[key];
+        } else if (el.tagName.toLowerCase() === 'link') {
+          el.href = imagesMap[key];
+        } else {
+          el.style.backgroundImage = `url("${imagesMap[key]}")`;
+        }
+      }
+    });
+
+    // 2. Favicon update
+    if (imagesMap.site_favicon) {
+      document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(link => {
+        link.href = imagesMap.site_favicon;
+      });
+    }
+
+    // 3. Fallback selector mappings for brand logos
+    if (imagesMap.logo_header) {
+      document.querySelectorAll('header .nav-brand img, .nav-logo img, .navbar-brand img, .nav-brand a img').forEach(img => {
+        if (!img.hasAttribute('data-img-key')) img.src = imagesMap.logo_header;
+      });
+    }
+    if (imagesMap.logo_footer) {
+      document.querySelectorAll('footer .footer-logo img, .footer-col .footer-logo img').forEach(img => {
+        if (!img.hasAttribute('data-img-key')) img.src = imagesMap.logo_footer;
+      });
+    }
+
+    // 4. Explore Virtual Simulator Scene backdrops
+    const canvasBg = document.getElementById('canvas-bg');
+    if (canvasBg && imagesMap.explore_bg_lobby) {
+      if (!canvasBg.hasAttribute('data-scene-switched')) {
+        canvasBg.src = imagesMap.explore_bg_lobby;
+      }
+    }
+    document.querySelectorAll('.scene-btn').forEach(btn => {
+      const text = btn.textContent.toLowerCase();
+      if (text.includes('lobby') && imagesMap.explore_bg_lobby) {
+        btn.setAttribute('onclick', `changeScene('lobby', '${imagesMap.explore_bg_lobby}', this)`);
+      } else if (text.includes('store') && imagesMap.explore_bg_retail) {
+        btn.setAttribute('onclick', `changeScene('store', '${imagesMap.explore_bg_retail}', this)`);
+      } else if (text.includes('command') || text.includes('control')) {
+        if (imagesMap.explore_bg_control) {
+          btn.setAttribute('onclick', `changeScene('control', '${imagesMap.explore_bg_control}', this)`);
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error('Failed to init dynamic images:', err);
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.initDynamicImages = initDynamicImages;
+}
+

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Display World Admin Panel. Manage digital signage project cases.">
   <title>Admin Panel | Display World</title>
-  <link rel="icon" href="https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png" sizes="32x32">
-  <link rel="stylesheet" href="index.css">
+  <link rel="icon" href="https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png" sizes="32x32" data-img-key="site_favicon">
+  <link rel="stylesheet" href="index.css?v=6">
   
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -606,6 +606,301 @@
       background: #ffffff;
       border-color: rgba(0,0,0,0.08);
     }
+
+    /* Site Images Management Styles */
+    .images-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+    }
+    .images-search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+    .images-search-box input {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem 0.75rem 2.4rem;
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .images-search-box input:focus {
+      border-color: var(--pink);
+    }
+    .images-search-box .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    .images-filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .img-pill-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 0.45rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .img-pill-btn:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .img-pill-btn.active {
+      background: rgba(250, 3, 110, 0.15);
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+    .site-images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    @media(max-width: 480px) {
+      .site-images-grid { grid-template-columns: 1fr; }
+    }
+    .site-img-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .site-img-card:hover {
+      border-color: rgba(250, 3, 110, 0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    }
+    .site-img-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .site-img-meta {
+      flex: 1;
+    }
+    .site-img-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+      font-family: var(--font-d);
+    }
+    .site-img-desc {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+    .site-img-badges {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .img-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .img-badge.page {
+      background: rgba(0, 188, 212, 0.12);
+      color: #00bcd4;
+      border: 1px solid rgba(0, 188, 212, 0.3);
+    }
+    .img-badge.category {
+      background: rgba(156, 39, 176, 0.12);
+      color: #ba68c8;
+      border: 1px solid rgba(156, 39, 176, 0.3);
+    }
+    .img-badge.custom {
+      background: rgba(250, 3, 110, 0.12);
+      color: var(--pink);
+      border: 1px solid rgba(250, 3, 110, 0.3);
+    }
+    .img-badge.default {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .site-img-preview-frame {
+      width: 100%;
+      height: 180px;
+      background: radial-gradient(circle at center, #171827 0%, #0a0b12 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      cursor: zoom-in;
+    }
+    .site-img-preview-frame img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    .site-img-preview-frame:hover img {
+      transform: scale(1.05);
+    }
+    .site-img-zoom-hint {
+      position: absolute;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .site-img-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .site-img-url-wrap {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .site-img-url-input {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 0.82rem;
+      outline: none;
+      font-family: monospace;
+      transition: border-color 0.2s;
+    }
+    .site-img-url-input:focus {
+      border-color: var(--pink);
+    }
+    .site-img-btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .site-img-btn {
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--white);
+    }
+    .site-img-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .site-img-btn.upload-btn {
+      background: linear-gradient(135deg, rgba(250, 3, 110, 0.15), rgba(156, 39, 176, 0.15));
+      border-color: rgba(250, 3, 110, 0.3);
+      color: #ff6090;
+    }
+    .site-img-btn.upload-btn:hover {
+      background: linear-gradient(135deg, rgba(250, 3, 110, 0.25), rgba(156, 39, 176, 0.25));
+      border-color: var(--pink);
+      color: #fff;
+    }
+    .site-img-btn.reset-btn {
+      color: var(--text-dim);
+    }
+    .site-img-btn.reset-btn:hover {
+      color: #ff9800;
+      border-color: rgba(255, 152, 0, 0.4);
+    }
+    .site-img-upload-status {
+      font-size: 0.75rem;
+      color: var(--pink);
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .site-img-upload-status.active {
+      display: flex;
+    }
+    .site-images-footer-bar {
+      position: sticky;
+      bottom: 1.5rem;
+      background: rgba(14, 15, 23, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 100;
+      margin-top: 2rem;
+    }
+    [data-theme="light"] .images-toolbar,
+    [data-theme="light"] .site-img-card {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    [data-theme="light"] .site-img-preview-frame {
+      background: #f1f3f7;
+      border-color: rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .images-search-box input,
+    [data-theme="light"] .site-img-url-input {
+      background: #f8f9fa;
+      color: #0a0a12;
+      border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .site-images-footer-bar {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0,0,0,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
   </style>
 </head>
 <body>
@@ -627,7 +922,7 @@
   <nav class="nav scrolled" id="navbar">
     <div class="container nav-inner">
       <a href="index.html" class="nav-logo">
-        <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo">
+        <img src="https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png" alt="Display World Logo" data-img-key="logo_header">
       </a>
       <ul class="nav-links">
         <li><a href="index.html" class="nav-link">Home</a></li>
@@ -726,6 +1021,10 @@
               <span class="nav-item-icon">⚙️</span>
               <span class="nav-item-text">Site Settings</span>
             </button>
+            <button class="sidebar-nav-btn" id="tab-images-btn" onclick="switchTab('images', this)">
+              <span class="nav-item-icon">🖼️</span>
+              <span class="nav-item-text">Site Images</span>
+            </button>
           </nav>
         </aside>
 
@@ -809,6 +1108,14 @@
                 </div>
                 <div class="overview-card-val" id="stat-careers-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('careers', document.getElementById('tab-careers-btn'))">Manage Openings →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
+                  <span>Site Media & Graphics</span>
+                  <span>🖼️</span>
+                </div>
+                <div class="overview-card-val" id="stat-images-count">19</div>
+                <div class="overview-card-cta" onclick="switchTab('images', document.getElementById('tab-images-btn'))">Manage All Site Images →</div>
               </div>
             </div>
           </div>
@@ -1060,6 +1367,78 @@
             <div class="settings-actions">
               <button class="btn-primary" id="save-settings-btn" style="min-width:180px;"><span>💾 Save & Apply to All Pages</span></button>
               <span class="settings-save-msg" id="settings-save-msg">✓ Settings saved successfully!</span>
+            </div>
+          </div>
+
+          <!-- 10. SITE-WIDE IMAGES -->
+          <div id="images-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Site-Wide Image Management</h2>
+                <p>Curate, replace, or upload every static graphic across the website (Logos, Homepage, About, Simulator, Innovation & Solutions).</p>
+              </div>
+              <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+                <button class="btn-secondary" id="reset-all-images-btn" style="border:1px solid rgba(255,255,255,0.15); color:var(--text-dim); background:transparent; padding:0.65rem 1.25rem; border-radius:10px; cursor:pointer; font-weight:600; font-size:0.85rem; transition:all 0.2s;">
+                  <span>↺ Reset All Defaults</span>
+                </button>
+                <button class="btn-primary" id="save-all-images-btn" style="min-width:180px;">
+                  <span>💾 Save All Site Images</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Toolbar & Category Filtering -->
+            <div class="images-toolbar">
+              <div class="images-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="img-search-input" placeholder="Search by image name, key, page, or category...">
+              </div>
+              <div class="images-filter-pills" id="img-filter-pills">
+                <button class="img-pill-btn active" data-cat="all">All Images (<span id="count-all">19</span>)</button>
+                <button class="img-pill-btn" data-cat="branding">Branding & Favicon</button>
+                <button class="img-pill-btn" data-cat="home">Home Page</button>
+                <button class="img-pill-btn" data-cat="about">About Page</button>
+                <button class="img-pill-btn" data-cat="explore">Virtual Simulator</button>
+                <button class="img-pill-btn" data-cat="innovation">Innovation</button>
+                <button class="img-pill-btn" data-cat="solutions">Solutions</button>
+                <button class="img-pill-btn" data-cat="custom">Custom Overrides</button>
+              </div>
+            </div>
+
+            <!-- Status Save Alert -->
+            <div id="images-save-banner" style="display:none; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.3); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.5rem; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:0.75rem; color:#25d366; font-weight:600; font-size:0.9rem;">
+                <span>✓</span>
+                <span id="images-save-text">Site images successfully saved and synced across all pages!</span>
+              </div>
+            </div>
+
+            <!-- Images Cards Grid -->
+            <div class="site-images-grid" id="site-images-grid">
+              <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- Sticky Bottom Action Bar -->
+            <div class="site-images-footer-bar">
+              <div>
+                <strong style="color:var(--white); font-size:0.95rem; display:block;">Live Media Management</strong>
+                <span style="font-size:0.8rem; color:var(--text-dim);">Changes will immediately reflect across all website pages on save.</span>
+              </div>
+              <div style="display:flex; gap:1.25rem; align-items:center;">
+                <span class="settings-save-msg" id="images-bottom-save-msg">✓ All images saved successfully!</span>
+                <button class="btn-primary" id="save-all-images-bottom-btn" style="min-width:180px;">
+                  <span>💾 Save All Site Images</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Preview Modal / Lightbox -->
+          <div id="img-lightbox-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:999999; align-items:center; justify-content:center; padding:2rem;">
+            <div style="max-width:90vw; max-height:90vh; display:flex; flex-direction:column; align-items:center; position:relative;">
+              <button id="close-lightbox-btn" style="position:absolute; top:-3rem; right:0; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:1.5rem; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">&times;</button>
+              <img id="lightbox-img" src="" alt="Full preview" style="max-width:85vw; max-height:80vh; object-fit:contain; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.15);">
+              <div id="lightbox-caption" style="margin-top:1rem; color:#fff; font-size:0.95rem; font-weight:600; text-align:center;"></div>
             </div>
           </div>
 
@@ -1411,7 +1790,7 @@
   </div>
 
 
-  <script src="projects-data.js"></script>
+  <script src="projects-data.js?v=6"></script>
   <script>
     // Simple passkey auth setup
     const authOverlay = document.getElementById('auth-overlay');
@@ -2292,12 +2671,327 @@
       saveSettingsBtn.querySelector('span').textContent = '💾 Save & Apply to All Pages';
     });
 
+    // ==========================================
+    // SITE-WIDE IMAGES MANAGEMENT
+    // ==========================================
+    let siteImagesItems = [];
+    let currentImgCategory = 'all';
+    let currentImgSearch = '';
+
+    const siteImagesGrid = document.getElementById('site-images-grid');
+    const imgSearchInput = document.getElementById('img-search-input');
+    const imgFilterPills = document.getElementById('img-filter-pills');
+    const saveAllImagesBtn = document.getElementById('save-all-images-btn');
+    const saveAllImagesBottomBtn = document.getElementById('save-all-images-bottom-btn');
+    const resetAllImagesBtn = document.getElementById('reset-all-images-btn');
+    const imagesSaveBanner = document.getElementById('images-save-banner');
+    const imagesBottomSaveMsg = document.getElementById('images-bottom-save-msg');
+    const statImagesCount = document.getElementById('stat-images-count');
+    const countAllSpan = document.getElementById('count-all');
+
+    // Lightbox modal elements
+    const imgLightboxModal = document.getElementById('img-lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+
+    if (closeLightboxBtn) {
+      closeLightboxBtn.addEventListener('click', () => {
+        imgLightboxModal.style.display = 'none';
+      });
+      imgLightboxModal.addEventListener('click', (e) => {
+        if (e.target === imgLightboxModal) imgLightboxModal.style.display = 'none';
+      });
+    }
+
+    function openLightbox(url, title) {
+      if (!lightboxImg || !imgLightboxModal) return;
+      lightboxImg.src = url;
+      lightboxCaption.textContent = title || 'Image Preview';
+      imgLightboxModal.style.display = 'flex';
+    }
+
+    async function loadSiteImages() {
+      if (typeof SiteImagesStore === 'undefined') return;
+      try {
+        siteImagesItems = await SiteImagesStore.getItems();
+        if (statImagesCount) statImagesCount.textContent = siteImagesItems.length;
+        if (countAllSpan) countAllSpan.textContent = siteImagesItems.length;
+        renderSiteImages();
+      } catch (err) {
+        console.error('Failed to load site images:', err);
+      }
+    }
+
+    function renderSiteImages() {
+      if (!siteImagesGrid) return;
+
+      const filtered = siteImagesItems.filter(item => {
+        const matchesCategory = (currentImgCategory === 'all') || (item.category === currentImgCategory);
+        const q = currentImgSearch.toLowerCase().trim();
+        const matchesSearch = !q ||
+          item.title.toLowerCase().includes(q) ||
+          item.key.toLowerCase().includes(q) ||
+          item.page.toLowerCase().includes(q) ||
+          (item.description && item.description.toLowerCase().includes(q));
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        siteImagesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-dim); background: var(--bg2); border-radius: 16px; border: 1px dashed var(--border);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+            <h3 style="color: var(--white); margin-bottom: 0.5rem;">No Images Match Your Filter</h3>
+            <p style="font-size: 0.85rem;">Try changing your search term or select another category above.</p>
+          </div>
+        `;
+        return;
+      }
+
+      siteImagesGrid.innerHTML = filtered.map(item => {
+        const isCustom = item.url !== item.defaultUrl;
+        return `
+          <div class="site-img-card" id="card-${item.key}" data-key="${item.key}">
+            <div class="site-img-header">
+              <div class="site-img-meta">
+                <div class="site-img-title">${item.title}</div>
+                <div class="site-img-desc">${item.description}</div>
+                <div class="site-img-badges">
+                  <span class="img-badge page">📄 ${item.page}</span>
+                  <span class="img-badge category">🏷️ ${item.category}</span>
+                  <span class="img-badge ${isCustom ? 'custom' : 'default'}" id="status-badge-${item.key}">
+                    ${isCustom ? '★ Customized' : '● Default'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Frame -->
+            <div class="site-img-preview-frame" onclick="openLightbox(document.getElementById('input-${item.key}').value, '${item.title.replace(/'/g, "\\'")}')" title="Click to view enlarged image">
+              <img id="preview-${item.key}" src="${item.url}" alt="${item.title}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80';">
+              <div class="site-img-zoom-hint">🔍 Zoom</div>
+            </div>
+
+            <!-- Inputs & Controls -->
+            <div class="site-img-inputs">
+              <div class="site-img-url-wrap">
+                <input type="text" class="site-img-url-input" id="input-${item.key}" value="${item.url}" placeholder="https://..." oninput="updateImageCardPreview('${item.key}')">
+              </div>
+
+              <!-- Upload & Action Buttons -->
+              <div class="site-img-btn-group">
+                <input type="file" id="file-${item.key}" accept="image/*" style="display:none" onchange="handleImageFileUpload('${item.key}', this.files[0])">
+                
+                <button type="button" class="site-img-btn upload-btn" onclick="document.getElementById('file-${item.key}').click()">
+                  <span>📁 Upload Image</span>
+                </button>
+
+                <button type="button" class="site-img-btn reset-btn" onclick="resetSingleImage('${item.key}')" title="Restore default image">
+                  <span>↺ Default</span>
+                </button>
+
+                <button type="button" class="site-img-btn" onclick="copyImageUrl('${item.key}')" title="Copy URL to clipboard">
+                  <span>📋 Copy</span>
+                </button>
+
+                <button type="button" class="site-img-btn" onclick="saveSingleImage('${item.key}')" style="margin-left:auto; background:rgba(250,3,110,0.1); border-color:rgba(250,3,110,0.3); color:var(--pink);">
+                  <span>💾 Save</span>
+                </button>
+              </div>
+
+              <div class="site-img-upload-status" id="upload-status-${item.key}">
+                <span>⏳</span> <span>Uploading image to cloud storage...</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.updateImageCardPreview = function(key) {
+      const input = document.getElementById(`input-${key}`);
+      const preview = document.getElementById(`preview-${key}`);
+      const statusBadge = document.getElementById(`status-badge-${key}`);
+      if (!input || !preview) return;
+      const val = input.value.trim();
+      preview.src = val || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80';
+      
+      const item = siteImagesItems.find(i => i.key === key);
+      if (item && statusBadge) {
+        const isCustom = val !== item.defaultUrl;
+        statusBadge.className = `img-badge ${isCustom ? 'custom' : 'default'}`;
+        statusBadge.textContent = isCustom ? '★ Customized' : '● Default';
+      }
+    };
+
+    window.handleImageFileUpload = async function(key, file) {
+      if (!file || typeof SiteImagesStore === 'undefined') return;
+      const statusEl = document.getElementById(`upload-status-${key}`);
+      const input = document.getElementById(`input-${key}`);
+      if (statusEl) statusEl.classList.add('active');
+
+      try {
+        const uploadedUrl = await SiteImagesStore.uploadImage(file);
+        if (uploadedUrl && input) {
+          input.value = uploadedUrl;
+          updateImageCardPreview(key);
+          await saveSingleImage(key);
+        }
+      } catch (err) {
+        console.error('File upload failed for', key, err);
+        alert('Upload failed: ' + (err.message || 'Unknown error'));
+      } finally {
+        if (statusEl) statusEl.classList.remove('active');
+      }
+    };
+
+    window.resetSingleImage = async function(key) {
+      if (typeof SiteImagesStore === 'undefined') return;
+      const item = siteImagesItems.find(i => i.key === key);
+      if (!item) return;
+      const input = document.getElementById(`input-${key}`);
+      if (input) {
+        input.value = item.defaultUrl;
+        updateImageCardPreview(key);
+      }
+      await saveSingleImage(key);
+    };
+
+    window.copyImageUrl = function(key) {
+      const input = document.getElementById(`input-${key}`);
+      if (!input) return;
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert('Image URL copied to clipboard!');
+      }).catch(() => {
+        input.select();
+        document.execCommand('copy');
+        alert('Image URL copied to clipboard!');
+      });
+    };
+
+    window.saveSingleImage = async function(key) {
+      if (typeof SiteImagesStore === 'undefined') return;
+      const input = document.getElementById(`input-${key}`);
+      if (!input) return;
+      
+      const all = await SiteImagesStore.getAll();
+      all[key] = input.value.trim();
+      await SiteImagesStore.save(all);
+
+      // Update in-memory item
+      const item = siteImagesItems.find(i => i.key === key);
+      if (item) {
+        item.url = all[key];
+        item.isCustom = Boolean(item.url && item.url !== item.defaultUrl);
+      }
+
+      showImagesSavedNotification(`Image "${item ? item.title : key}" saved successfully!`);
+      if (typeof initDynamicImages === 'function') initDynamicImages();
+    };
+
+    async function saveAllSiteImages() {
+      if (typeof SiteImagesStore === 'undefined') return;
+      if (saveAllImagesBtn) {
+        saveAllImagesBtn.disabled = true;
+        saveAllImagesBtn.querySelector('span').textContent = '⏳ Saving All Images...';
+      }
+      if (saveAllImagesBottomBtn) {
+        saveAllImagesBottomBtn.disabled = true;
+        saveAllImagesBottomBtn.querySelector('span').textContent = '⏳ Saving...';
+      }
+
+      try {
+        const all = await SiteImagesStore.getAll();
+        siteImagesItems.forEach(item => {
+          const input = document.getElementById(`input-${item.key}`);
+          if (input) {
+            all[item.key] = input.value.trim();
+            item.url = all[item.key];
+            item.isCustom = Boolean(item.url && item.url !== item.defaultUrl);
+          }
+        });
+
+        await SiteImagesStore.save(all);
+        showImagesSavedNotification('All site images saved and applied across all pages!');
+        renderSiteImages();
+        if (typeof initDynamicImages === 'function') initDynamicImages();
+      } catch (err) {
+        console.error('Failed to save all images:', err);
+        alert('Failed to save images. Check console.');
+      } finally {
+        if (saveAllImagesBtn) {
+          saveAllImagesBtn.disabled = false;
+          saveAllImagesBtn.querySelector('span').textContent = '💾 Save All Site Images';
+        }
+        if (saveAllImagesBottomBtn) {
+          saveAllImagesBottomBtn.disabled = false;
+          saveAllImagesBottomBtn.querySelector('span').textContent = '💾 Save All Site Images';
+        }
+      }
+    }
+
+    async function resetAllSiteImagesToDefaults() {
+      if (typeof SiteImagesStore === 'undefined') return;
+      if (!confirm('Are you sure you want to reset all site images to their factory defaults? Any custom uploads will be replaced with original default visuals.')) {
+        return;
+      }
+
+      try {
+        await SiteImagesStore.resetAll();
+        await loadSiteImages();
+        showImagesSavedNotification('All site images have been reset to factory defaults!');
+        if (typeof initDynamicImages === 'function') initDynamicImages();
+      } catch (err) {
+        console.error('Failed to reset images:', err);
+      }
+    }
+
+    function showImagesSavedNotification(msg) {
+      if (imagesSaveBanner) {
+        const text = document.getElementById('images-save-text');
+        if (text) text.textContent = msg || 'Site images saved successfully!';
+        imagesSaveBanner.style.display = 'flex';
+        setTimeout(() => { imagesSaveBanner.style.display = 'none'; }, 4000);
+      }
+      if (imagesBottomSaveMsg) {
+        imagesBottomSaveMsg.textContent = '✓ ' + (msg || 'Saved successfully!');
+        imagesBottomSaveMsg.classList.add('visible');
+        setTimeout(() => { imagesBottomSaveMsg.classList.remove('visible'); }, 4000);
+      }
+    }
+
+    // Attach listeners
+    if (saveAllImagesBtn) saveAllImagesBtn.addEventListener('click', saveAllSiteImages);
+    if (saveAllImagesBottomBtn) saveAllImagesBottomBtn.addEventListener('click', saveAllSiteImages);
+    if (resetAllImagesBtn) resetAllImagesBtn.addEventListener('click', resetAllSiteImagesToDefaults);
+
+    if (imgSearchInput) {
+      imgSearchInput.addEventListener('input', (e) => {
+        currentImgSearch = e.target.value;
+        renderSiteImages();
+      });
+    }
+
+    if (imgFilterPills) {
+      imgFilterPills.querySelectorAll('.img-pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          imgFilterPills.querySelectorAll('.img-pill-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentImgCategory = btn.dataset.cat || 'all';
+          renderSiteImages();
+        });
+      });
+    }
+
+    // Load site images on init
+    loadSiteImages();
+
     // Load settings on dashboard init
     loadSiteSettings();
 
     loadAdminDashboard();
     console.log("Diagnostic: initial active elements:", Array.from(document.querySelectorAll('.active')).map(el => el.id || el.className));
   </script>
-  <script src="index.js"></script>
+  <script src="index.js?v=6"></script>
 </body>
 </html>
