@@ -157,6 +157,10 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
   display: block;
 }
 
+[data-theme="light"] .nav-logo img {
+  content: url('assets/dw-logo-dark.svg');
+}
+
 .nav-links {
   display: flex;
   align-items: center;

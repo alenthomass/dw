@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 54" width="280" height="54" fill="none">
+  <defs>
+    <linearGradient id="hzd-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff007f"/>
+      <stop offset="100%" stop-color="#fa036e"/>
+    </linearGradient>
+    <linearGradient id="hzd-purple-mid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#7928ca"/>
+    </linearGradient>
+    <linearGradient id="hzd-purple-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#6b21a8"/>
+    </linearGradient>
+    <linearGradient id="hzd-ribbon" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fa036e"/>
+      <stop offset="50%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#7928ca"/>
+    </linearGradient>
+  </defs>
+
+  <!-- DW Mark (Left) -->
+  <g transform="translate(0, 0) scale(0.55)">
+    <path fill-rule="evenodd" fill="url(#hzd-pink)" d="
+      M 50 10
+      L 53.5 12
+      L 53.5 54
+      L 50 56
+      L 50 74
+      L 47.5 75.4
+      L 17.1 57.8
+      L 17.1 29
+      L 50 10 Z
+      
+      M 26.6 34.5
+      L 43 25
+      L 43 47.9
+      L 26.6 57.4 Z
+    "/>
+    <path fill="url(#hzd-purple-mid)" d="
+      M 58.5 14.9
+      L 68 20.4
+      L 68 58
+      L 58.5 52.5 Z
+    "/>
+    <path fill="url(#hzd-purple-dark)" d="
+      M 73 23.3
+      L 82.9 29
+      L 82.9 67
+      L 50 86
+      L 50 76.5
+      L 73 63.2
+      L 73 23.3 Z
+    "/>
+    <path fill="url(#hzd-ribbon)" d="
+      M 50 76.5
+      L 50 86
+      L 39 79.6
+      L 39 70.1 Z
+    "/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(56, 0)">
+    <text x="0" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Montserrat', 'Space Grotesk', 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="21" letter-spacing="1">
+      <tspan fill="#000000">DISPLAY </tspan>
+      <tspan fill="#fa036e">WORLD</tspan>
+    </text>
+    <text x="2" y="44" font-family="-apple-system, BlinkMacSystemFont, 'Space Grotesk', 'Outfit', sans-serif" font-weight="700" font-size="8.5" fill="rgba(0,0,0,0.7)" letter-spacing="4.8">LET'S DO IT.</text>
+  </g>
+</svg>

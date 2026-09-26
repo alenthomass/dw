@@ -23,12 +23,23 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ═══════════════════════════════════════
    THEME TOGGLE
    ═══════════════════════════════════════ */
+function updateLogoForTheme(theme) {
+  const targetSrc = theme === 'light' ? 'assets/dw-logo-dark.svg' : 'assets/dw-logo-white.svg';
+  document.querySelectorAll('.nav-logo img, [data-img-key="logo_header"]').forEach(img => {
+    const currentSrc = img.getAttribute('src') || '';
+    if (currentSrc.includes('dw-logo-white.svg') || currentSrc.includes('dw-logo-dark.svg')) {
+      img.src = targetSrc;
+    }
+  });
+}
+
 function initThemeToggle() {
   const toggleBtn = document.getElementById('theme-toggle');
   
   // Apply saved theme on load
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
+  updateLogoForTheme(savedTheme);
 
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -36,6 +47,7 @@ function initThemeToggle() {
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
+      updateLogoForTheme(newTheme);
     });
   }
 }
@@ -364,12 +376,18 @@ async function initDynamicImages() {
       imagesMap.site_favicon = 'assets/dw-favicon.svg';
     }
 
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
     // 1. Update elements with explicit [data-img-key]
     document.querySelectorAll('[data-img-key]').forEach(el => {
       const key = el.getAttribute('data-img-key');
       if (imagesMap[key]) {
         if (el.tagName.toLowerCase() === 'img') {
-          el.src = imagesMap[key];
+          if (key === 'logo_header' && (imagesMap[key] === 'assets/dw-logo-white.svg' || imagesMap[key] === 'assets/dw-logo-dark.svg')) {
+            el.src = currentTheme === 'light' ? 'assets/dw-logo-dark.svg' : 'assets/dw-logo-white.svg';
+          } else {
+            el.src = imagesMap[key];
+          }
         } else if (el.tagName.toLowerCase() === 'link') {
           el.href = imagesMap[key];
         } else {
@@ -388,7 +406,13 @@ async function initDynamicImages() {
     // 3. Fallback selector mappings for brand logos
     if (imagesMap.logo_header) {
       document.querySelectorAll('header .nav-brand img, .nav-logo img, .navbar-brand img, .nav-brand a img').forEach(img => {
-        if (!img.hasAttribute('data-img-key')) img.src = imagesMap.logo_header;
+        if (!img.hasAttribute('data-img-key')) {
+          if (imagesMap.logo_header === 'assets/dw-logo-white.svg' || imagesMap.logo_header === 'assets/dw-logo-dark.svg') {
+            img.src = currentTheme === 'light' ? 'assets/dw-logo-dark.svg' : 'assets/dw-logo-white.svg';
+          } else {
+            img.src = imagesMap.logo_header;
+          }
+        }
       });
     }
     if (imagesMap.logo_footer) {
