@@ -353,6 +353,17 @@ async function initDynamicImages() {
     const imagesMap = await SiteImagesStore.getAll();
     if (!imagesMap) return;
 
+    // Auto-heal legacy broken third-party links
+    if (imagesMap.logo_header && imagesMap.logo_header.includes('displayworldme.com')) {
+      imagesMap.logo_header = 'assets/dw-logo-white.svg';
+    }
+    if (imagesMap.logo_footer && imagesMap.logo_footer.includes('displayworldme.com')) {
+      imagesMap.logo_footer = 'assets/dw-logo.svg';
+    }
+    if (imagesMap.site_favicon && imagesMap.site_favicon.includes('displayworldme.com')) {
+      imagesMap.site_favicon = 'assets/dw-favicon.svg';
+    }
+
     // 1. Update elements with explicit [data-img-key]
     document.querySelectorAll('[data-img-key]').forEach(el => {
       const key = el.getAttribute('data-img-key');

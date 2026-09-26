@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 52" width="260" height="52" fill="none">
+  <defs>
+    <linearGradient id="dw-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff2a85"/>
+      <stop offset="100%" stop-color="#fa036e"/>
+    </linearGradient>
+    <linearGradient id="dw-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#7928ca"/>
+    </linearGradient>
+    <linearGradient id="dw-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff007f"/>
+      <stop offset="50%" stop-color="#d91b9a"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hexagon Isometric Icon (DW Monogram) -->
+  <g transform="translate(4, 2)">
+    <!-- Outer d-loop / Left Hex Edge -->
+    <path d="M 22 2 L 26 2 L 26 14 L 32 17.5 L 32 23 L 26 19.5 L 26 31 L 18 36 L 4 28 L 4 19 L 18 27 L 22 24.5 Z" fill="url(#dw-pink)"/>
+    <path d="M 4 19 L 18 11 L 22 13.5 L 8 21.5 Z" fill="#ff4d9d"/>
+    
+    <!-- Middle Ribbon (w first stem) -->
+    <path d="M 30 11 L 34 8.5 L 42 13 L 42 22 L 30 29 L 26 26.5 L 36 20.5 L 36 14.5 L 30 11 Z" fill="url(#dw-purple)"/>
+    
+    <!-- Inner / Base Ribbon (w second stem) -->
+    <path d="M 22 36 L 36 28 L 40 30.5 L 22 41 L 12 35 L 14 31.5 Z" fill="#9333ea"/>
+    <path d="M 42 25 L 46 22.5 L 46 32 L 26 43.5 L 22 41 L 42 29.5 Z" fill="url(#dw-mark-grad)"/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(60, 0)">
+    <!-- DISPLAY WORLD -->
+    <text x="0" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Outfit', 'Space Grotesk', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="20" letter-spacing="1.2">
+      <tspan fill="#ffffff">DISPLAY </tspan>
+      <tspan fill="#fa036e">WORLD</tspan>
+    </text>
+    <!-- LET'S DO IT. -->
+    <text x="2" y="42" font-family="-apple-system, BlinkMacSystemFont, 'Space Grotesk', 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="8.5" fill="rgba(255,255,255,0.7)" letter-spacing="4.5">LET'S DO IT.</text>
+  </g>
+</svg>

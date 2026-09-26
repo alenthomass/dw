@@ -1644,7 +1644,7 @@ class SiteImagesDataStore {
         page: "All Pages (Header)",
         title: "Navbar Brand Logo",
         description: "Horizontal logo displayed in the top navigation bar across all pages.",
-        url: "https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png"
+        url: "assets/dw-logo-white.svg"
       },
       logo_footer: {
         key: "logo_footer",
@@ -1652,7 +1652,7 @@ class SiteImagesDataStore {
         page: "All Pages (Footer)",
         title: "Footer Brand Logo",
         description: "Logo displayed in the footer branding section across all pages.",
-        url: "https://displayworldme.com/wp-content/uploads/2023/06/DW-HOR_LOGO.png"
+        url: "assets/dw-logo.svg"
       },
       site_favicon: {
         key: "site_favicon",
@@ -1660,7 +1660,7 @@ class SiteImagesDataStore {
         page: "Browser Tab",
         title: "Website Favicon",
         description: "Small icon displayed in browser tabs, bookmark bars, and mobile shortcuts.",
-        url: "https://displayworldme.com/wp-content/uploads/2023/06/DW-FAV-ICON-150x150.png"
+        url: "assets/dw-favicon.svg"
       },
       home_about_main: {
         key: "home_about_main",
@@ -1822,6 +1822,17 @@ class SiteImagesDataStore {
       } catch (e) {
         console.error("Local site images read error:", e);
       }
+    }
+
+    // Automatic migration/healing for logos from broken/unreachable third-party server:
+    if (!storedUrls.logo_header || storedUrls.logo_header.includes('displayworldme.com')) {
+      storedUrls.logo_header = defaultUrls.logo_header;
+    }
+    if (!storedUrls.logo_footer || storedUrls.logo_footer.includes('displayworldme.com')) {
+      storedUrls.logo_footer = defaultUrls.logo_footer;
+    }
+    if (!storedUrls.site_favicon || storedUrls.site_favicon.includes('displayworldme.com')) {
+      storedUrls.site_favicon = defaultUrls.site_favicon;
     }
 
     return Object.assign({}, defaultUrls, storedUrls);
