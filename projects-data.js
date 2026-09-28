@@ -1571,6 +1571,10 @@ class SettingsDataStore {
             data.address = 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
             needsUpdate = true;
           }
+          if (!data.instagram) {
+            data.instagram = 'https://www.instagram.com/displayworld.ae/';
+            needsUpdate = true;
+          }
           if (needsUpdate) {
             db.collection('settings').doc('site').set(data).catch(() => {});
           }
@@ -1595,6 +1599,7 @@ class SettingsDataStore {
     if (local.email === 'sales@displayworldme.com' || !local.email) local.email = 'salessupport@displayworldme.com';
     if (!local.supportEmail) local.supportEmail = 'support@displayworldme.com';
     if (!local.address || local.address.includes('Al Quoz')) local.address = 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
+    if (!local.instagram) local.instagram = 'https://www.instagram.com/displayworld.ae/';
     return local;
   }
 

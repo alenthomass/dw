@@ -351,6 +351,14 @@ async function initDynamicFooter() {
         el.innerHTML = `<strong>Address</strong>\n            ${addr}`;
       }
     });
+
+    // 5. Update Instagram social links
+    const igUrl = s.instagram || 'https://www.instagram.com/displayworld.ae/';
+    document.querySelectorAll('a[aria-label="Instagram"]').forEach(el => {
+      el.href = igUrl;
+      el.target = '_blank';
+      el.rel = 'noopener noreferrer';
+    });
   } catch (err) {
     console.error('Failed to init dynamic footer:', err);
   }
