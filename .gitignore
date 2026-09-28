@@ -7,7 +7,6 @@ uploads/
 server.js
 package.json
 package-lock.json
-vercel.json
 
 # Ignore local json database files
 site-settings.json

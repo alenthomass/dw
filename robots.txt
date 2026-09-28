@@ -1,4 +1,4 @@
-# Robots.txt for Display World (https://alenthomass.github.io/dw/)
+# Robots.txt for Display World (https://displayworldme.com/)
 # Commercial LED Video Walls & Turnkey Digital Signage — Dubai, UAE
 
 User-agent: *
@@ -54,7 +54,7 @@ Disallow: /portal.html
 Disallow: /admin.html
 
 # Machine-readable knowledge bases for LLMs:
-# https://alenthomass.github.io/dw/llms.txt
-# https://alenthomass.github.io/dw/llms-full.txt
+# https://displayworldme.com/llms.txt
+# https://displayworldme.com/llms-full.txt
 
-Sitemap: https://alenthomass.github.io/dw/sitemap.xml
+Sitemap: https://displayworldme.com/sitemap.xml
