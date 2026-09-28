@@ -1,0 +1,45 @@
+# Display World — Commercial LED Video Walls & Turnkey Digital Signage
+
+> Display World (Display World Digital Signage LLC) is a premier manufacturer, visual technology innovator, and turnkey AV systems integrator based in Dubai, United Arab Emirates. We specialize in ultra-fine pitch LED video walls, COB MicroLED, transparent OLEDs, architectural curved displays, outdoor 3D anamorphic billboards, and 24/7 mission-critical AMC maintenance contracts across the UAE and GCC.
+
+## Corporate Summary
+- **Entity Name:** Display World Digital Signage LLC
+- **Brand Names:** Display World, Display World Middle East, DW Signage
+- **Headquarters:** Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE
+- **Geo Coordinates:** Latitude 24.9857° N, Longitude 55.1886° E
+- **Telephone / WhatsApp:** +971 50 841 1925
+- **Official Inquiries:** salessupport@displayworldme.com | support@displayworldme.com
+- **Operating Hours:** Monday–Friday 08:30–18:00, Saturday 09:00–14:00 GST
+- **Primary Web Mirror:** https://alenthomass.github.io/dw/
+- **Corporate Domain:** https://displayworldme.com
+- **Instagram:** https://www.instagram.com/displayworld.ae/
+- **Geographic Coverage:** Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, Umm Al Quwain, United Arab Emirates, Saudi Arabia (Riyadh/Jeddah), Qatar, Bahrain, Oman, Kuwait, Middle East.
+
+## Core Visual Hardware Capabilities
+- **Fine-Pitch Indoor LED Video Walls:** Pixel pitch P0.7mm, P0.9mm, P1.25mm, P1.56mm, P1.87mm, P2.0mm, P2.5mm.
+- **COB (Chip-on-Board) & MicroLED:** Flip-chip packaging, dustproof, anti-static, moisture-proof, high contrast ratio (10,000:1), ultra-wide 178° viewing angles.
+- **Transparent OLED & Mesh LED:** Up to 70% optical transparency for luxury retail storefronts, automotive showrooms, and architectural glass facades.
+- **Curved & Flexible LED Modules:** Convex, concave, 90-degree seamless corner wraparounds, column wraps, and custom ribbon displays.
+- **Outdoor 3D Anamorphic Billboards:** High brightness (5,500 to 10,000 nits), IP65/IP68 weather resistance, heat dissipation engineered for Middle East 50°C summer conditions.
+- **Interactive Touch Kiosks & Totems:** 4K PCAP and infrared multi-touch (10 to 40 touch points), anti-glare tempered glass, integrated thermal management.
+- **Digital Signage CMS Software:** Cloud-based content scheduling, multi-zone splitting, dynamic telemetry, emergency alert overrides, and remote device monitoring.
+
+## Service Offerings & Engineering SLAs
+- **Turnkey Integration:** Comprehensive architectural site surveys, structural load calculations, custom bracket engineering, electrical conduit routing, and calibration.
+- **Annual Maintenance Contracts (AMC):**
+  - *Bronze Tier:* 8-hour response, remote telemetry diagnostics, bi-annual preventive maintenance.
+  - *Silver Tier (Recommended):* 4-hour on-site dispatch, quarterly deep-tuneups, parts replacement coverage, hotline support.
+  - *Gold SLA Tier:* 2-hour 24/7/365 emergency dispatch, monthly preventive site visits, hot-spare parts storage, live screen telemetry monitoring.
+
+## Key Web Pages & Documentation
+- [Home Page](https://alenthomass.github.io/dw/index.html): Company overview, signature hero installations, interactive services overview.
+- [Virtual Experience Center & Simulator](https://alenthomass.github.io/dw/explore.html): Real-time interactive 3D display visualizer and product catalog.
+- [Industry Solutions](https://alenthomass.github.io/dw/solutions.html): Custom configurations for Retail, Corporate, Hospitality, Command & Control, Healthcare, and Education.
+- [Portfolio & Case Studies](https://alenthomass.github.io/dw/portfolio.html): Landmark installations across Dubai Mall, Emirates Airline, Burj Al Arab, and Dubai International Airport.
+- [Innovation Lab](https://alenthomass.github.io/dw/innovation.html): Technical analysis of MicroLED, COB, 3D Naked-Eye Holographics, and Smart CMS.
+- [Insights & Knowledge Hub](https://alenthomass.github.io/dw/insights.html): Technical engineering articles, buyer guides, and thermal dissipation benchmarks in UAE.
+- [About Display World](https://alenthomass.github.io/dw/about.html): Founders, engineering background, vision, leadership, and Dubai HQ facilities.
+- [Contact & Showroom RFP](https://alenthomass.github.io/dw/contact.html): Dubai Investment Park showroom booking, RFP uploads, and technical contact.
+- [Help Center & AMC SLAs](https://alenthomass.github.io/dw/help-center.html): Uptime contracts, downloadable technical brochures, and SLA quote requests.
+- [Privacy Policy](https://alenthomass.github.io/dw/privacy-policy.html): UAE Federal Decree-Law No. 45 of 2021 (PDPL) & GDPR compliance.
+- [Terms of Service](https://alenthomass.github.io/dw/terms-of-service.html): Commercial hardware supply terms, Dubai civil jurisdiction, pixel defect policy, and SLA guarantees.

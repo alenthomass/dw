@@ -1,0 +1,60 @@
+# Robots.txt for Display World (https://alenthomass.github.io/dw/)
+# Commercial LED Video Walls & Turnkey Digital Signage — Dubai, UAE
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Disallow: /portal.html
+Disallow: /admin.html
+
+# AI Answer Engines & Generative Search Crawlers (AEO / GEO)
+User-agent: GPTBot
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: Diffbot
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: Bytespider
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+# Machine-readable knowledge bases for LLMs:
+# https://alenthomass.github.io/dw/llms.txt
+# https://alenthomass.github.io/dw/llms-full.txt
+
+Sitemap: https://alenthomass.github.io/dw/sitemap.xml
