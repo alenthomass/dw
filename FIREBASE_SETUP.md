@@ -45,7 +45,7 @@ Follow these steps to connect your personal Firebase cloud database in under 2 m
 ---
 
 ## Step 5: Connect and Activate
-1. Open your Display World Admin Panel in the browser: `http://localhost:8080/admin.html` (passcode: `admin123`).
+1. Open your Display World Admin Portal in the browser: `http://localhost:8080/portal.html` (Username: `admin`, Password: `DisplayWorld@2026`).
 2. Click the pink **Configure Firebase** button in the header.
 3. Paste the keys you copied in Step 4.
 4. Click **Save & Connect**.

@@ -1971,7 +1971,251 @@ class SiteImagesDataStore {
 }
 
 const SiteImagesStore = new SiteImagesDataStore();
+
+/* =========================================================================
+   AUTH DATA STORE
+   Centralized cryptographic authentication & credentials manager
+   ========================================================================= */
+class AuthDataStore {
+  constructor() {
+    this.localKey = 'dw_auth_creds';
+    this.sessionKey = 'dw_admin_session';
+    this.persistentKey = 'dw_admin_persistent_session';
+    this.attemptsKey = 'dw_auth_failed_attempts';
+    this.lockoutKey = 'dw_auth_lockout_until';
+    this.defaultCreds = {
+      username: 'admin',
+      salt: 'dw_salt_9f2a7b',
+      passwordHash: '14b4f13b8234149117d598c774d5501be316d68be653e6dba1393c0c7e503934',
+      updatedAt: '2026-09-28T00:00:00Z'
+    };
+  }
+
+  async hash(salt, password) {
+    const combined = salt + password;
+    if (typeof crypto !== 'undefined' && crypto.subtle && typeof TextEncoder !== 'undefined') {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(combined);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    if (typeof require !== 'undefined') {
+      try {
+        const nodeCrypto = require('crypto');
+        return nodeCrypto.createHash('sha256').update(combined).digest('hex');
+      } catch (e) {}
+    }
+    // Fallback simple hash
+    let h = 0;
+    for (let i = 0; i < combined.length; i++) {
+      h = ((h << 5) - h) + combined.charCodeAt(i);
+      h |= 0;
+    }
+    return 'simple_' + Math.abs(h).toString(16);
+  }
+
+  generateSalt() {
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      const arr = new Uint8Array(8);
+      crypto.getRandomValues(arr);
+      return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    return Math.random().toString(36).substring(2, 10);
+  }
+
+  async getCredentials() {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        const doc = await db.collection('settings').doc('auth').get();
+        if (doc.exists) {
+          const data = doc.data();
+          if (data && data.username && data.passwordHash && data.salt) {
+            localStorage.setItem(this.localKey, JSON.stringify(data));
+            return data;
+          }
+        } else {
+          // Seed defaults into cloud store
+          await db.collection('settings').doc('auth').set(this.defaultCreds).catch(() => {});
+        }
+      } catch (err) {
+        console.error("Firestore auth read error:", err);
+      }
+    }
+    try {
+      const local = JSON.parse(localStorage.getItem(this.localKey));
+      if (local && local.username && local.passwordHash && local.salt) {
+        return local;
+      }
+    } catch (e) {}
+    return this.defaultCreds;
+  }
+
+  checkLockout() {
+    try {
+      const lockoutUntil = parseInt(localStorage.getItem(this.lockoutKey) || '0', 10);
+      const now = Date.now();
+      if (lockoutUntil > now) {
+        const remainingSec = Math.ceil((lockoutUntil - now) / 1000);
+        return { locked: true, remainingSec };
+      }
+    } catch (e) {}
+    return { locked: false, remainingSec: 0 };
+  }
+
+  recordFailedAttempt() {
+    try {
+      const attempts = parseInt(localStorage.getItem(this.attemptsKey) || '0', 10) + 1;
+      localStorage.setItem(this.attemptsKey, attempts.toString());
+      if (attempts >= 5) {
+        const lockoutUntil = Date.now() + 30000; // 30s lockout
+        localStorage.setItem(this.lockoutKey, lockoutUntil.toString());
+        localStorage.setItem(this.attemptsKey, '0');
+        return { locked: true, remainingSec: 30 };
+      }
+      return { locked: false, remainingAttempts: 5 - attempts };
+    } catch (e) {
+      return { locked: false, remainingAttempts: 4 };
+    }
+  }
+
+  resetFailedAttempts() {
+    try {
+      localStorage.removeItem(this.attemptsKey);
+      localStorage.removeItem(this.lockoutKey);
+    } catch (e) {}
+  }
+
+  async verifyLogin(username, password) {
+    const lockout = this.checkLockout();
+    if (lockout.locked) {
+      return { success: false, error: `Too many failed attempts. Cooldown: ${lockout.remainingSec}s.` };
+    }
+
+    const creds = await this.getCredentials();
+    const cleanUser = (username || '').trim().toLowerCase();
+    const targetUser = (creds.username || '').trim().toLowerCase();
+
+    if (cleanUser !== targetUser) {
+      const rec = this.recordFailedAttempt();
+      if (rec.locked) {
+        return { success: false, error: `Account locked for 30s due to repeated failed attempts.` };
+      }
+      return { success: false, error: `Invalid username or password. (${rec.remainingAttempts} attempts remaining)` };
+    }
+
+    const inputHash = await this.hash(creds.salt, password);
+    if (inputHash !== creds.passwordHash) {
+      const rec = this.recordFailedAttempt();
+      if (rec.locked) {
+        return { success: false, error: `Account locked for 30s due to repeated failed attempts.` };
+      }
+      return { success: false, error: `Invalid username or password. (${rec.remainingAttempts} attempts remaining)` };
+    }
+
+    this.resetFailedAttempts();
+    return { success: true };
+  }
+
+  createSession(rememberMe) {
+    const sessionData = {
+      token: 'dw_' + Math.random().toString(36).substring(2) + Date.now(),
+      created: Date.now(),
+      expires: rememberMe ? (Date.now() + 7 * 24 * 3600 * 1000) : null
+    };
+    try {
+      if (rememberMe) {
+        localStorage.setItem(this.persistentKey, JSON.stringify(sessionData));
+      } else {
+        sessionStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+      }
+    } catch (e) {}
+  }
+
+  isAuthenticated() {
+    // Check sessionStorage
+    try {
+      const s = sessionStorage.getItem(this.sessionKey);
+      if (s) {
+        const parsed = JSON.parse(s);
+        if (parsed && parsed.token) return true;
+      }
+    } catch (e) {}
+
+    // Check localStorage (rememberMe)
+    try {
+      const p = localStorage.getItem(this.persistentKey);
+      if (p) {
+        const parsed = JSON.parse(p);
+        if (parsed && parsed.token && (!parsed.expires || parsed.expires > Date.now())) {
+          return true;
+        } else if (parsed && parsed.expires && parsed.expires <= Date.now()) {
+          localStorage.removeItem(this.persistentKey);
+        }
+      }
+    } catch (e) {}
+
+    // Legacy fallback
+    try {
+      if (sessionStorage.getItem('dw_admin_session') === 'active') {
+        return true;
+      }
+    } catch (e) {}
+
+    return false;
+  }
+
+  clearSession() {
+    try {
+      sessionStorage.removeItem(this.sessionKey);
+      sessionStorage.removeItem('dw_admin_session');
+      localStorage.removeItem(this.persistentKey);
+    } catch (e) {}
+  }
+
+  async changeCredentials(currentPassword, newUsername, newPassword) {
+    const creds = await this.getCredentials();
+    const curHash = await this.hash(creds.salt, currentPassword);
+    if (curHash !== creds.passwordHash) {
+      return { success: false, error: 'Current password does not match.' };
+    }
+
+    if (!newUsername || newUsername.trim().length < 3) {
+      return { success: false, error: 'Username must be at least 3 characters.' };
+    }
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters long.' };
+    }
+
+    const newSalt = this.generateSalt();
+    const newHash = await this.hash(newSalt, newPassword);
+    const updated = {
+      username: newUsername.trim(),
+      salt: newSalt,
+      passwordHash: newHash,
+      updatedAt: new Date().toISOString()
+    };
+
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        await db.collection('settings').doc('auth').set(updated);
+      } catch (err) {
+        console.error("Firestore auth save error:", err);
+      }
+    }
+    try {
+      localStorage.setItem(this.localKey, JSON.stringify(updated));
+    } catch (e) {}
+    return { success: true, username: updated.username };
+  }
+}
+
+const AuthStore = new AuthDataStore();
+
 if (typeof window !== 'undefined') {
   window.SettingsStore = SettingsStore;
   window.SiteImagesStore = SiteImagesStore;
+  window.AuthStore = AuthStore;
 }
