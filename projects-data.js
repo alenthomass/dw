@@ -1554,7 +1554,9 @@ class SettingsDataStore {
         supportEmail: 'support@displayworldme.com',
         whatsapp: '971508411925',
         whatsappMessage: "Hello! I'm interested in Display World's solutions.",
-        address: "Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE"
+        address: "Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE",
+        instagram: "https://www.instagram.com/displayworld.ae/",
+        facebook: "https://www.facebook.com/displayworld.ae/"
       };
       localStorage.setItem(this.localKey, JSON.stringify(newDefaults));
     }
@@ -1596,6 +1598,10 @@ class SettingsDataStore {
             data.instagram = 'https://www.instagram.com/displayworld.ae/';
             needsUpdate = true;
           }
+          if (!data.facebook) {
+            data.facebook = 'https://www.facebook.com/displayworld.ae/';
+            needsUpdate = true;
+          }
           if (needsUpdate) {
             db.collection('settings').doc('site').set(data).catch(() => {});
           }
@@ -1621,6 +1627,7 @@ class SettingsDataStore {
     if (!local.supportEmail) local.supportEmail = 'support@displayworldme.com';
     if (!local.address || local.address.includes('Al Quoz')) local.address = 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE';
     if (!local.instagram) local.instagram = 'https://www.instagram.com/displayworld.ae/';
+    if (!local.facebook) local.facebook = 'https://www.facebook.com/displayworld.ae/';
     return local;
   }
 

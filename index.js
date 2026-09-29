@@ -359,6 +359,14 @@ async function initDynamicFooter() {
       el.target = '_blank';
       el.rel = 'noopener noreferrer';
     });
+
+    // 6. Update Facebook social links
+    const fbUrl = s.facebook || 'https://www.facebook.com/displayworld.ae/';
+    document.querySelectorAll('a[aria-label="Facebook"]').forEach(el => {
+      el.href = fbUrl;
+      el.target = '_blank';
+      el.rel = 'noopener noreferrer';
+    });
   } catch (err) {
     console.error('Failed to init dynamic footer:', err);
   }

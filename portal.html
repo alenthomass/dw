@@ -1394,6 +1394,11 @@
                   <input type="url" id="settings-instagram" placeholder="https://www.instagram.com/displayworld.ae/">
                   <span class="field-hint">Instagram page linked in the footer across all website pages</span>
                 </div>
+                <div class="settings-field full-width" style="grid-column: 1 / -1;">
+                  <label for="settings-facebook">Facebook Profile URL</label>
+                  <input type="url" id="settings-facebook" placeholder="https://www.facebook.com/displayworld.ae/">
+                  <span class="field-hint">Facebook page linked in the footer across all website pages</span>
+                </div>
               </div>
             </div>
 
@@ -2890,6 +2895,7 @@
     const settingsSupportEmail = document.getElementById('settings-support-email');
     const settingsAddress = document.getElementById('settings-address');
     const settingsInstagram = document.getElementById('settings-instagram');
+    const settingsFacebook = document.getElementById('settings-facebook');
     const settingsWhatsapp = document.getElementById('settings-whatsapp');
     const settingsWhatsappMsg = document.getElementById('settings-whatsapp-msg');
     const settingsWaPreview = document.getElementById('settings-wa-preview');
@@ -2922,6 +2928,9 @@
           }
           if (settingsInstagram) {
             settingsInstagram.value = s.instagram || 'https://www.instagram.com/displayworld.ae/';
+          }
+          if (settingsFacebook) {
+            settingsFacebook.value = s.facebook || 'https://www.facebook.com/displayworld.ae/';
           }
           settingsWhatsapp.value = s.whatsapp || '971508411925';
           settingsWhatsappMsg.value = s.whatsappMessage || "Hello! I'm interested in Display World's solutions.";
@@ -3034,6 +3043,7 @@
             supportEmail: settingsSupportEmail ? settingsSupportEmail.value : 'support@displayworldme.com',
             address: settingsAddress ? settingsAddress.value : 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE',
             instagram: settingsInstagram ? settingsInstagram.value : 'https://www.instagram.com/displayworld.ae/',
+            facebook: settingsFacebook ? settingsFacebook.value : 'https://www.facebook.com/displayworld.ae/',
             whatsapp: settingsWhatsapp.value || '971508411925',
             whatsappMessage: settingsWhatsappMsg.value
           });
