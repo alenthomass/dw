@@ -1,64 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 54" width="280" height="54" fill="none">
-  <defs>
-    <linearGradient id="hz-pink" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff007f"/>
-      <stop offset="100%" stop-color="#fa036e"/>
-    </linearGradient>
-    <linearGradient id="hz-purple-mid" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#801878"/>
-      <stop offset="100%" stop-color="#55105a"/>
-    </linearGradient>
-    <linearGradient id="hz-purple-dark" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#55105a"/>
-      <stop offset="100%" stop-color="#38063f"/>
-    </linearGradient>
-    <linearGradient id="hz-ribbon" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#fa036e"/>
-      <stop offset="45%" stop-color="#701069"/>
-      <stop offset="100%" stop-color="#4a0e4e"/>
-    </linearGradient>
-  </defs>
 
-  <!-- DW Mark (Left) -->
-  <g transform="translate(0, 0) scale(0.55)">
-    <path fill-rule="evenodd" fill="url(#hz-pink)" d="
-      M 50 10
-      L 53.5 12
-      L 53.5 54
-      L 50 56
-      L 50 74
-      L 47.5 75.4
-      L 17.1 57.8
-      L 17.1 29
-      L 50 10 Z
-      
-      M 26.6 34.5
-      L 43 25
-      L 43 47.9
-      L 26.6 57.4 Z
-    "/>
-    <path fill="url(#hz-purple-mid)" d="
-      M 58.5 14.9
-      L 68 20.4
-      L 68 58
-      L 58.5 52.5 Z
-    "/>
-    <path fill="url(#hz-purple-dark)" d="
-      M 73 23.3
-      L 82.9 29
-      L 82.9 67
-      L 50 86
-      L 50 76.5
-      L 73 63.2
-      L 73 23.3 Z
-    "/>
-    <path fill="url(#hz-ribbon)" d="
-      M 50 76.5
-      L 50 86
-      L 39 79.6
-      L 39 70.1 Z
-    "/>
-  </g>
+    <defs>
+      <linearGradient id="hz-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#3a296f"/>
+        <stop offset="30%" stop-color="#6c206e"/>
+        <stop offset="60%" stop-color="#a1176d"/>
+        <stop offset="80%" stop-color="#c6116c"/>
+        <stop offset="100%" stop-color="#ec0b6a"/>
+      </linearGradient>
+    </defs>
+    <g transform="translate(5.0, 4.0) scale(0.425)">
+      <!-- Base W & Lower Ribbon Gradient -->
+      <path fill-rule="evenodd" fill="url(#hz-grad)" d="
+        M 36.57 5.80 L 36.60 15.23 L 0.00 36.59 L 0.04 81.34 L 46.52 108.44 L 93.01 81.34 L 93.01 27.10 L 81.35 20.34 L 81.35 74.54 L 46.52 94.87 L 34.96 88.14 L 69.82 67.80 L 69.82 13.60 L 58.16 6.80 L 58.16 61.00 L 23.33 81.34 L 11.70 74.54 L 46.52 54.27 L 46.52 0.00 Z
+        M 11.70 41.40 L 36.70 26.80 L 36.83 48.63 L 11.70 63.29 Z
+      "/>
+
+      <!-- D Letter Overlay (Deep Purple Facet) -->
+      <path fill-rule="evenodd" fill="#462468" d="
+        M 11.91 41.40 L 36.91 26.80 L 37.04 48.63 L 11.91 63.29 Z
+        M 0.25 81.34 L 46.73 54.27 L 46.73 0.00 L 36.78 5.80 L 36.81 15.23 L 0.21 36.59 Z
+      "/>
+
+      <!-- Subtle Fold Crease Dividers -->
+      <path stroke="#2e2c2c" stroke-width="0.6" stroke-linecap="round" opacity="0.6" d="
+        M 58.16 61.00 L 69.82 67.80
+        M 81.35 74.54 L 93.01 81.34
+      "/>
+    </g>
 
   <!-- Typography -->
   <g transform="translate(56, 0)">

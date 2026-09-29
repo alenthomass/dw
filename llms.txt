@@ -42,6 +42,6 @@
 - [Insights & Knowledge Hub](https://displayworldme.com/insights): Technical engineering articles, buyer guides, and thermal dissipation benchmarks in UAE.
 - [About Display World](https://displayworldme.com/about): Founders, engineering background, vision, leadership, and Dubai HQ facilities.
 - [Contact & Showroom RFP](https://displayworldme.com/contact): Dubai Investment Park showroom booking, RFP uploads, and technical contact.
-- [Help Center & AMC SLAs](https://displayworldme.com/help-center): Uptime contracts, downloadable technical brochures, and SLA quote requests.
+- [Help Center & AMC SLAs](https://displayworldme.com/help-center): Uptime contracts, technical support ticketing, and SLA quote requests.
 - [Privacy Policy](https://displayworldme.com/privacy-policy): UAE Federal Decree-Law No. 45 of 2021 (PDPL) & GDPR compliance.
 - [Terms of Service](https://displayworldme.com/terms-of-service): Commercial hardware supply terms, Dubai civil jurisdiction, pixel defect policy, and SLA guarantees.

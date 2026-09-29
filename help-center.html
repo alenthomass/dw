@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maintenance SLAs, AMC Support &amp; Hardware Manuals | Display World UAE</title>
-  <meta name="description" content="Access commercial display AMC maintenance contracts (Bronze, Silver, Gold 24/7 SLAs), technical brochures, ticket logs, and LED display buyer guides in Dubai.">
+  <title>Maintenance SLAs, AMC Support &amp; Technical Help | Display World UAE</title>
+  <meta name="description" content="Access commercial display AMC maintenance contracts (Bronze, Silver, Gold 24/7 SLAs), support ticketing, and LED display buyer guides in Dubai.">
   <meta name="keywords" content="LED display AMC Dubai, video wall maintenance contract UAE, commercial display SLA, LED screen repair Dubai, digital signage support Middle East">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://displayworldme.com/help-center">
@@ -18,8 +18,8 @@
   <!-- Open Graph -->
   <meta property="og:site_name" content="Display World">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Maintenance SLAs, AMC Support &amp; Hardware Manuals | Display World UAE">
-  <meta property="og:description" content="Access commercial display AMC maintenance contracts (Bronze, Silver, Gold 24/7 SLAs), technical brochures, ticket logs, and LED display buyer guides in Dubai.">
+  <meta property="og:title" content="Maintenance SLAs, AMC Support &amp; Technical Help | Display World UAE">
+  <meta property="og:description" content="Access commercial display AMC maintenance contracts (Bronze, Silver, Gold 24/7 SLAs), support ticketing, and LED display buyer guides in Dubai.">
   <meta property="og:url" content="https://displayworldme.com/help-center">
   <meta property="og:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
   <meta property="og:locale" content="en_AE">
@@ -220,55 +220,6 @@
     </div>
   </section>
 
-  <!-- DOWNLOADS VAULT -->
-  <section class="section section-dark">
-    <div class="container">
-      <span class="label-tag">Resource Vault</span>
-      <h2 class="section-title">Brochures & <br><span class="accent-text">Specifications</span></h2>
-      <p style="max-width: 600px; color: var(--text-dim); margin-bottom: 3rem;">Download Display World's digital catalogs, engineering profiles, and hardware specification datasheets.</p>
-      
-      <div class="downloads-vault">
-        
-        <!-- File 1 -->
-        <div class="download-item reveal">
-          <div class="download-info">
-            <h4>Corporate Profile</h4>
-            <span>PDF Catalog — 4.2 MB</span>
-          </div>
-          <button class="dl-btn" onclick="triggerDownload('Corporate_Profile', this)" aria-label="Download Profile">↓</button>
-        </div>
-
-        <!-- File 2 -->
-        <div class="download-item reveal">
-          <div class="download-info">
-            <h4>Fine-Pitch LED Catalog</h4>
-            <span>PDF Specifications — 6.8 MB</span>
-          </div>
-          <button class="dl-btn" onclick="triggerDownload('Fine_Pitch_LED', this)" aria-label="Download LED specifications">↓</button>
-        </div>
-
-        <!-- File 3 -->
-        <div class="download-item reveal">
-          <div class="download-info">
-            <h4>Storefront Display Sheets</h4>
-            <span>PDF Specsheet — 3.1 MB</span>
-          </div>
-          <button class="dl-btn" onclick="triggerDownload('Storefront_LCD', this)" aria-label="Download LCD specifications">↓</button>
-        </div>
-
-        <!-- File 4 -->
-        <div class="download-item reveal">
-          <div class="download-info">
-            <h4>CMS Software Manual</h4>
-            <span>PDF Guidebook — 5.5 MB</span>
-          </div>
-          <button class="dl-btn" onclick="triggerDownload('CMS_User_Guide', this)" aria-label="Download CMS guide">↓</button>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
   <!-- AMC SERVICE TICKET FORM -->
   <section class="section" id="amc-form-section">
     <div class="container" style="max-width:700px;">
@@ -451,33 +402,6 @@
   </footer>
 
   <script>
-    function triggerDownload(fileName, btnElement) {
-      const originalText = btnElement.textContent;
-      btnElement.disabled = true;
-      btnElement.textContent = '…';
-      btnElement.style.background = 'rgba(250, 3, 110, 0.4)';
-      
-      setTimeout(() => {
-        btnElement.textContent = '✓';
-        btnElement.style.background = 'var(--green)';
-        
-        // Virtual trigger download file save
-        const dummyContent = `Display World specifications sheet download: ${fileName}`;
-        const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(dummyContent);
-        const dlAnchor = document.createElement('a');
-        dlAnchor.setAttribute("href", dataStr);
-        dlAnchor.setAttribute("download", `displayworld_${fileName.toLowerCase()}.txt`);
-        document.body.appendChild(dlAnchor);
-        dlAnchor.click();
-        dlAnchor.remove();
-        
-        setTimeout(() => {
-          btnElement.disabled = false;
-          btnElement.textContent = '↓';
-          btnElement.style.background = '';
-        }, 1500);
-      }, 1200);
-    }
 
     async function submitAmcForm(e) {
       e.preventDefault();
