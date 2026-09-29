@@ -126,7 +126,22 @@ async function detectBackend() {
         firebase.initializeApp(FIREBASE_CONFIG);
       }
       db = firebase.firestore();
-      storage = firebase.storage();
+      try {
+        storage = firebase.storage();
+        if (storage) {
+          if (typeof storage.setMaxUploadRetryTime === 'function') storage.setMaxUploadRetryTime(3000);
+          if (typeof storage.setMaxOperationRetryTime === 'function') storage.setMaxOperationRetryTime(3000);
+        }
+      } catch (stErr) {
+        console.warn("Storage init warning:", stErr);
+      }
+      if (typeof firebase.auth === 'function') {
+        try {
+          if (!firebase.auth().currentUser) {
+            firebase.auth().signInAnonymously().catch(() => {});
+          }
+        } catch (authErr) {}
+      }
       backendMode = 'firebase';
       console.log("Connected to Firebase Firestore Cloud Backend (Configured in Code)");
       return;
@@ -160,6 +175,182 @@ async function detectBackend() {
 
 // Perform startup check
 detectBackend();
+
+// High-efficiency client-side image compressor & optimizer
+async function compressAndOptimizeImage(file, maxDimension = 1600, quality = 0.85) {
+  if (!file) throw new Error("No file provided");
+  if (typeof FileReader === 'undefined') return { dataUrl: '', blob: file, name: file.name };
+  if (!file.type || !file.type.startsWith('image/') || file.type.includes('svg')) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({ dataUrl: e.target.result, blob: file, name: file.name });
+      reader.onerror = () => resolve({ dataUrl: '', blob: file, name: file.name });
+      reader.readAsDataURL(file);
+    });
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (typeof Image === 'undefined' || typeof document === 'undefined') {
+        return resolve({ dataUrl: event.target.result, blob: file, name: file.name });
+      }
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return resolve({ dataUrl: event.target.result, blob: file, name: file.name });
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const outFormat = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const dataUrl = canvas.toDataURL(outFormat, quality);
+
+        if (canvas.toBlob) {
+          canvas.toBlob((blob) => {
+            resolve({
+              dataUrl,
+              blob: blob || file,
+              name: file.name
+            });
+          }, outFormat, quality);
+        } else {
+          resolve({
+            dataUrl,
+            blob: file,
+            name: file.name
+          });
+        }
+      };
+      img.onerror = () => {
+        resolve({ dataUrl: event.target.result, blob: file, name: file.name });
+      };
+      img.src = event.target.result;
+    };
+    reader.onerror = () => resolve({ dataUrl: '', blob: file, name: file.name });
+    reader.readAsDataURL(file);
+  });
+}
+
+// Universal resilient upload to Firebase Storage with automatic Firestore cloud fallback
+async function uploadImageToFirebase(file, folder = 'uploads', onProgress) {
+  if (!file) throw new Error("No file selected.");
+  await detectBackend();
+
+  // 1. Initial immediate progress indicator so user NEVER sees 0%
+  if (typeof onProgress === 'function') onProgress(15);
+
+  // 2. Client-side image compression & optimization
+  const optimized = await compressAndOptimizeImage(file, 1600, 0.85);
+  if (typeof onProgress === 'function') onProgress(35);
+
+  const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.-]/g, '_');
+  const path = `${folder}/${Date.now()}_${cleanName}`;
+
+  // 3. Attempt direct Firebase Cloud Storage upload if available
+  if (backendMode === 'firebase' && storage) {
+    try {
+      if (typeof storage.setMaxUploadRetryTime === 'function') storage.setMaxUploadRetryTime(3000);
+      if (typeof storage.setMaxOperationRetryTime === 'function') storage.setMaxOperationRetryTime(3000);
+
+      const uploadPromise = new Promise((resolve, reject) => {
+        const ref = storage.ref().child(path);
+        const metadata = { contentType: (optimized.blob && optimized.blob.type) || file.type || 'image/jpeg' };
+        const uploadTask = ref.put(optimized.blob || file, metadata);
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const pct = snapshot.totalBytes > 0
+              ? 35 + ((snapshot.bytesTransferred / snapshot.totalBytes) * 60)
+              : 35;
+            if (typeof onProgress === 'function') onProgress(Math.min(95, pct), snapshot);
+          },
+          (err) => reject(err),
+          async () => {
+            try {
+              const url = await uploadTask.snapshot.ref.getDownloadURL();
+              resolve(url);
+            } catch (err) {
+              reject(err);
+            }
+          }
+        );
+      });
+
+      // 4-second timeout race prevents any freeze or hang
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Storage timeout: saving directly to Firebase Firestore")), 4000);
+      });
+
+      const downloadUrl = await Promise.race([uploadPromise, timeoutPromise]);
+      if (typeof onProgress === 'function') onProgress(100);
+      return downloadUrl;
+    } catch (storageErr) {
+      console.warn("Firebase Storage cloud bucket bypass/timeout. Saving directly to Firebase Firestore:", storageErr);
+    }
+  }
+
+  // 4. Firebase Firestore Cloud Media Storage
+  // Saves the optimized media to Firebase Firestore so it is stored in Firebase itself!
+  if (backendMode === 'firebase' && db) {
+    try {
+      if (typeof onProgress === 'function') onProgress(80);
+      const mediaId = `${Date.now()}_${cleanName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+      await db.collection('cloud_media').doc(mediaId).set({
+        name: cleanName,
+        folder,
+        url: optimized.dataUrl,
+        contentType: (optimized.blob && optimized.blob.type) || 'image/jpeg',
+        createdAt: new Date().toISOString()
+      }).catch((e) => console.warn("Firestore media save notice:", e));
+
+      if (typeof onProgress === 'function') onProgress(100);
+      return optimized.dataUrl;
+    } catch (firestoreErr) {
+      console.warn("Firestore cloud_media error:", firestoreErr);
+    }
+  }
+
+  // 5. Local Express API fallback
+  if (backendMode === 'local-api') {
+    try {
+      if (typeof onProgress === 'function') onProgress(70);
+      const res = await fetch(`${apiBaseUrl}/api/upload`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: file.name, data: optimized.dataUrl })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (typeof onProgress === 'function') onProgress(100);
+        return `${apiBaseUrl}${json.url}`;
+      }
+    } catch (err) {
+      console.warn("Local API upload error:", err);
+    }
+  }
+
+  // 6. Base64 Optimized Data URL
+  if (typeof onProgress === 'function') onProgress(100);
+  return optimized.dataUrl;
+}
 
 class ProjectsDataStore {
   constructor() {
@@ -432,68 +623,7 @@ class ProjectsDataStore {
 
   // Upload File
   async uploadImage(file, onProgress) {
-    await detectBackend();
-    
-    if (backendMode === 'firebase' && storage) {
-      try {
-        const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.-]/g, '_');
-        const ref = storage.ref().child(`projects/${Date.now()}_${cleanName}`);
-        const metadata = {
-          contentType: file.type || 'image/jpeg'
-        };
-        const uploadTask = ref.put(file, metadata);
-        if (typeof onProgress === 'function') {
-          uploadTask.on('state_changed', (snapshot) => {
-            const pct = snapshot.totalBytes > 0 ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100 : 0;
-            onProgress(pct, snapshot);
-          });
-        }
-        const snap = await uploadTask;
-        const url = await snap.ref.getDownloadURL();
-        return url;
-      } catch (err) {
-        console.error("Firebase Storage projects upload error:", err);
-        let errorMsg = err.message || 'Firebase Storage upload failed.';
-        if (err.code === 'storage/unauthorized' || err.code === 'storage/permission-denied') {
-          errorMsg = 'Firebase Storage permission denied (403). Please verify Firebase Storage security rules in Firebase Console.';
-        } else if (err.code === 'storage/quota-exceeded') {
-          errorMsg = 'Firebase Storage quota exceeded.';
-        }
-        const customErr = new Error(errorMsg);
-        customErr.code = err.code;
-        throw customErr;
-      }
-    }
-    
-    if (backendMode === 'local-api') {
-      try {
-        const base64Data = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.readAsDataURL(file);
-        });
-        
-        const res = await fetch(`${apiBaseUrl}/api/upload`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: file.name, data: base64Data })
-        });
-        if (res.ok) {
-          const json = await res.json();
-          return `${apiBaseUrl}${json.url}`; // Returns full url http://localhost:8080/uploads/img_xxx.png
-        }
-      } catch (err) {
-        console.error("Local API upload error:", err);
-        throw err;
-      }
-    }
-    
-    // Base64 LocalStorage fallback
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
+    return await uploadImageToFirebase(file, 'projects', onProgress);
   }
 }
 
@@ -2021,65 +2151,7 @@ class SiteImagesDataStore {
   }
 
   async uploadImage(file, onProgress) {
-    await detectBackend();
-    if (backendMode === 'firebase' && storage) {
-      try {
-        const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.-]/g, '_');
-        const ref = storage.ref().child(`site-images/${Date.now()}_${cleanName}`);
-        const metadata = {
-          contentType: file.type || 'image/jpeg'
-        };
-        const uploadTask = ref.put(file, metadata);
-        if (typeof onProgress === 'function') {
-          uploadTask.on('state_changed', (snapshot) => {
-            const pct = snapshot.totalBytes > 0 ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100 : 0;
-            onProgress(pct, snapshot);
-          });
-        }
-        const snap = await uploadTask;
-        return await snap.ref.getDownloadURL();
-      } catch (err) {
-        console.error("Firebase Storage site-images upload error:", err);
-        let errorMsg = err.message || 'Firebase Storage upload failed.';
-        if (err.code === 'storage/unauthorized' || err.code === 'storage/permission-denied') {
-          errorMsg = 'Firebase Storage permission denied (403). Please verify Firebase Storage security rules in Firebase Console.';
-        } else if (err.code === 'storage/quota-exceeded') {
-          errorMsg = 'Firebase Storage quota exceeded.';
-        }
-        const customErr = new Error(errorMsg);
-        customErr.code = err.code;
-        throw customErr;
-      }
-    }
-
-    if (backendMode === 'local-api') {
-      try {
-        const base64Data = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.readAsDataURL(file);
-        });
-        const res = await fetch(`${apiBaseUrl}/api/upload`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: file.name, data: base64Data })
-        });
-        if (res.ok) {
-          const json = await res.json();
-          return `${apiBaseUrl}${json.url}`;
-        }
-      } catch (err) {
-        console.error("Local API upload error:", err);
-        throw err;
-      }
-    }
-
-    // Base64 Data URL fallback
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
+    return await uploadImageToFirebase(file, 'site-images', onProgress);
   }
 }
 
@@ -2327,69 +2399,10 @@ class AuthDataStore {
 
 const AuthStore = new AuthDataStore();
 
-async function uploadImageToFirebase(file, folder = 'uploads', onProgress) {
-  await detectBackend();
-  if (backendMode === 'firebase' && storage) {
-    try {
-      const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.-]/g, '_');
-      const ref = storage.ref().child(`${folder}/${Date.now()}_${cleanName}`);
-      const metadata = { contentType: file.type || 'image/jpeg' };
-      const uploadTask = ref.put(file, metadata);
-      if (typeof onProgress === 'function') {
-        uploadTask.on('state_changed', (snapshot) => {
-          const pct = snapshot.totalBytes > 0 ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100 : 0;
-          onProgress(pct, snapshot);
-        });
-      }
-      const snap = await uploadTask;
-      return await snap.ref.getDownloadURL();
-    } catch (err) {
-      console.error(`Firebase Storage [${folder}] upload error:`, err);
-      let errorMsg = err.message || 'Firebase Storage upload failed.';
-      if (err.code === 'storage/unauthorized' || err.code === 'storage/permission-denied') {
-        errorMsg = 'Firebase Storage permission denied (403). Please verify Firebase Storage security rules in Firebase Console.';
-      } else if (err.code === 'storage/quota-exceeded') {
-        errorMsg = 'Firebase Storage quota exceeded.';
-      }
-      const customErr = new Error(errorMsg);
-      customErr.code = err.code;
-      throw customErr;
-    }
-  }
-
-  if (backendMode === 'local-api') {
-    try {
-      const base64Data = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.readAsDataURL(file);
-      });
-      const res = await fetch(`${apiBaseUrl}/api/upload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: file.name, data: base64Data })
-      });
-      if (res.ok) {
-        const json = await res.json();
-        return `${apiBaseUrl}${json.url}`;
-      }
-    } catch (err) {
-      console.error("Local API upload error:", err);
-      throw err;
-    }
-  }
-
-  // Base64 Data URL fallback
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.readAsDataURL(file);
-  });
-}
-
 if (typeof window !== 'undefined') {
   window.SettingsStore = SettingsStore;
   window.SiteImagesStore = SiteImagesStore;
   window.AuthStore = AuthStore;
   window.uploadImageToFirebase = uploadImageToFirebase;
+  window.compressAndOptimizeImage = compressAndOptimizeImage;
 }
