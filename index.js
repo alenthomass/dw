@@ -361,7 +361,7 @@ async function initDynamicFooter() {
     });
 
     // 6. Update Facebook social links
-    const fbUrl = s.facebook || 'https://www.facebook.com/displayworld.ae/';
+    const fbUrl = s.facebook || 'https://www.facebook.com/profile.php?id=61561607341527';
     document.querySelectorAll('a[aria-label="Facebook"]').forEach(el => {
       el.href = fbUrl;
       el.target = '_blank';
