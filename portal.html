@@ -1616,6 +1616,7 @@
               <input type="file" id="field-image-file" accept="image/*" style="border:none; background:none; padding:0;">
               <img id="image-preview" src="" alt="Preview" style="max-height:60px; border-radius:6px; border:1px solid var(--border); display:none;">
             </div>
+            <div id="project-upload-status" style="font-size:0.78rem; margin-top:0.4rem; display:none;"></div>
             <!-- Keep hidden fallback URL field -->
             <input type="hidden" id="field-image-url">
           </div>
@@ -1734,8 +1735,13 @@
           <input type="text" id="prod-category-label" required placeholder="e.g. LED Screens">
         </div>
         <div class="modal-field full-width">
-          <label for="prod-image">Image URL</label>
-          <input type="url" id="prod-image" required placeholder="https://images.unsplash.com/...">
+          <label for="prod-image">Product Image URL</label>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="url" id="prod-image" required placeholder="https://..." style="flex:1;">
+            <button type="button" class="btn-outline" style="padding:0.6rem 0.9rem; font-size:0.8rem; white-space:nowrap;" onclick="document.getElementById('prod-file-upload').click()">📁 Upload</button>
+            <input type="file" id="prod-file-upload" accept="image/*" style="display:none;" onchange="handleGenericUpload(this.files[0], 'prod-image', 'prod-upload-status', 'products')">
+          </div>
+          <div id="prod-upload-status" style="font-size:0.78rem; margin-top:0.3rem; display:none;"></div>
         </div>
         <div class="modal-field full-width">
           <label for="prod-desc">Brief Description</label>
@@ -1831,7 +1837,12 @@
         </div>
         <div class="modal-field">
           <label for="insight-image">Featured Image URL</label>
-          <input type="url" id="insight-image" required placeholder="https://images.unsplash.com/...">
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="url" id="insight-image" required placeholder="https://..." style="flex:1;">
+            <button type="button" class="btn-outline" style="padding:0.6rem 0.9rem; font-size:0.8rem; white-space:nowrap;" onclick="document.getElementById('insight-file-upload').click()">📁 Upload</button>
+            <input type="file" id="insight-file-upload" accept="image/*" style="display:none;" onchange="handleGenericUpload(this.files[0], 'insight-image', 'insight-upload-status', 'insights')">
+          </div>
+          <div id="insight-upload-status" style="font-size:0.78rem; margin-top:0.3rem; display:none;"></div>
         </div>
         <div class="modal-field">
           <label for="insight-date">Date Published</label>
@@ -2296,12 +2307,14 @@
       }
     };
 
-    // File Upload Preview
+    // File Upload Preview & Firebase Upload for Projects
     const fileInput = document.getElementById('field-image-file');
     const imgPreview = document.getElementById('image-preview');
     const fieldImgUrl = document.getElementById('field-image-url');
+    const projectUploadStatus = document.getElementById('project-upload-status');
+    let projectUploadingPromise = null;
 
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -2310,8 +2323,65 @@
           imgPreview.style.display = 'block';
         };
         reader.readAsDataURL(file);
+
+        if (projectUploadStatus) {
+          projectUploadStatus.style.display = 'block';
+          projectUploadStatus.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading "${file.name}" to Firebase Storage...</span>`;
+        }
+
+        try {
+          projectUploadingPromise = ProjectsStore.uploadImage(file, (pct) => {
+            if (projectUploadStatus) {
+              projectUploadStatus.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading to Firebase: ${Math.round(pct)}%</span>`;
+            }
+          });
+          const url = await projectUploadingPromise;
+          fieldImgUrl.value = url;
+          if (projectUploadStatus) {
+            projectUploadStatus.innerHTML = `<span style="color:var(--green);">✅ Stored in Firebase Storage</span>`;
+          }
+        } catch (err) {
+          console.error("Project image upload error:", err);
+          if (projectUploadStatus) {
+            projectUploadStatus.innerHTML = `<span style="color:var(--pink);">❌ ${err.message || 'Firebase upload failed'}</span>`;
+          }
+          alert('Upload to Firebase failed: ' + (err.message || 'Unknown error'));
+        } finally {
+          projectUploadingPromise = null;
+        }
       }
     });
+
+    // Universal Generic Upload Handler for Modals (Products, Insights, etc.)
+    window.handleGenericUpload = async function(file, inputId, statusId, folder = 'uploads') {
+      if (!file) return;
+      const statusEl = document.getElementById(statusId);
+      const inputEl = document.getElementById(inputId);
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading "${file.name}" to Firebase Storage...</span>`;
+      }
+      try {
+        const url = await uploadImageToFirebase(file, folder, (pct) => {
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading to Firebase: ${Math.round(pct)}%</span>`;
+          }
+        });
+        if (url && inputEl) {
+          inputEl.value = url;
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color:var(--green);">✅ Stored in Firebase Storage!</span>`;
+            setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3500);
+          }
+        }
+      } catch (err) {
+        console.error('Upload failed:', err);
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color:var(--pink);">❌ ${err.message || 'Upload failed'}</span>`;
+        }
+        alert('Upload to Firebase failed: ' + (err.message || 'Unknown error'));
+      }
+    };
 
     // Modal Triggers for Projects
     document.getElementById('add-project-btn').addEventListener('click', () => {
@@ -2320,6 +2390,10 @@
       imgPreview.style.display = 'none';
       imgPreview.src = '';
       fieldImgUrl.value = '';
+      if (projectUploadStatus) {
+        projectUploadStatus.style.display = 'none';
+        projectUploadStatus.innerHTML = '';
+      }
       modalTitle.textContent = 'Register New Case Study';
       projectModal.classList.add('active');
     });
@@ -2350,6 +2424,10 @@
       } else {
         imgPreview.style.display = 'none';
       }
+      if (projectUploadStatus) {
+        projectUploadStatus.style.display = 'none';
+        projectUploadStatus.innerHTML = '';
+      }
       
       document.getElementById('field-shortDesc').value = p.shortDesc;
       document.getElementById('field-challenge').value = p.challenge;
@@ -2378,42 +2456,63 @@
     projectForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const file = fileInput.files[0];
-      let imageUrl = fieldImgUrl.value;
-      
-      if (file) {
-        imageUrl = await ProjectsStore.uploadImage(file);
+      const submitBtn = projectForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').textContent = 'Saving...';
       }
-      
-      if (!imageUrl) {
-        imageUrl = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80";
+
+      try {
+        if (projectUploadingPromise) {
+          await projectUploadingPromise;
+        }
+
+        const file = fileInput.files[0];
+        let imageUrl = fieldImgUrl.value;
+        
+        if (file && (!imageUrl || imageUrl.startsWith('data:'))) {
+          imageUrl = await ProjectsStore.uploadImage(file);
+          fieldImgUrl.value = imageUrl;
+        }
+        
+        if (!imageUrl) {
+          imageUrl = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80";
+        }
+        
+        const id = document.getElementById('field-id').value || 'id_' + Date.now();
+        const project = {
+          id: id,
+          title: document.getElementById('field-title').value,
+          category: document.getElementById('field-category').value,
+          client: document.getElementById('field-client').value,
+          year: document.getElementById('field-year').value,
+          location: document.getElementById('field-location').value,
+          image: imageUrl,
+          shortDesc: document.getElementById('field-shortDesc').value,
+          challenge: document.getElementById('field-challenge').value,
+          solution: document.getElementById('field-solution').value,
+          specs: {
+            system: document.getElementById('field-spec-system').value,
+            bezel: document.getElementById('field-spec-bezel').value,
+            brightness: document.getElementById('field-spec-brightness').value,
+            failover: document.getElementById('field-spec-failover').value,
+            uptime: document.getElementById('field-spec-uptime').value
+          },
+          isWide: document.getElementById('field-isWide').checked
+        };
+        
+        await ProjectsStore.save(project);
+        closeModal();
+        loadAdminDashboard();
+      } catch (err) {
+        console.error("Save project error:", err);
+        alert("Failed to save project: " + (err.message || 'Unknown error'));
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = 'Save Project Case';
+        }
       }
-      
-      const id = document.getElementById('field-id').value || 'id_' + Date.now();
-      const project = {
-        id: id,
-        title: document.getElementById('field-title').value,
-        category: document.getElementById('field-category').value,
-        client: document.getElementById('field-client').value,
-        year: document.getElementById('field-year').value,
-        location: document.getElementById('field-location').value,
-        image: imageUrl,
-        shortDesc: document.getElementById('field-shortDesc').value,
-        challenge: document.getElementById('field-challenge').value,
-        solution: document.getElementById('field-solution').value,
-        specs: {
-          system: document.getElementById('field-spec-system').value,
-          bezel: document.getElementById('field-spec-bezel').value,
-          brightness: document.getElementById('field-spec-brightness').value,
-          failover: document.getElementById('field-spec-failover').value,
-          uptime: document.getElementById('field-spec-uptime').value
-        },
-        isWide: document.getElementById('field-isWide').checked
-      };
-      
-      await ProjectsStore.save(project);
-      closeModal();
-      loadAdminDashboard();
     });
 
     // Modal Triggers for Case Studies
@@ -3111,20 +3210,34 @@
       if (!file || typeof SiteImagesStore === 'undefined') return;
       const statusEl = document.getElementById(`upload-status-${key}`);
       const input = document.getElementById(`input-${key}`);
-      if (statusEl) statusEl.classList.add('active');
+      if (statusEl) {
+        statusEl.classList.add('active');
+        statusEl.innerHTML = `<span>⏳</span> <span>Uploading "${file.name}" to Firebase Storage...</span>`;
+      }
 
       try {
-        const uploadedUrl = await SiteImagesStore.uploadImage(file);
+        const uploadedUrl = await SiteImagesStore.uploadImage(file, (pct) => {
+          if (statusEl) {
+            statusEl.innerHTML = `<span>⏳</span> <span>Uploading to Firebase: ${Math.round(pct)}%</span>`;
+          }
+        });
         if (uploadedUrl && input) {
           input.value = uploadedUrl;
           updateImageCardPreview(key);
           await saveSingleImage(key);
+          if (statusEl) {
+            statusEl.innerHTML = `<span>✅</span> <span style="color:var(--green)">Stored in Firebase!</span>`;
+            setTimeout(() => {
+              if (statusEl) statusEl.classList.remove('active');
+            }, 3000);
+          }
         }
       } catch (err) {
         console.error('File upload failed for', key, err);
+        if (statusEl) {
+          statusEl.innerHTML = `<span>❌</span> <span style="color:var(--pink)">${err.message || 'Upload failed'}</span>`;
+        }
         alert('Upload failed: ' + (err.message || 'Unknown error'));
-      } finally {
-        if (statusEl) statusEl.classList.remove('active');
       }
     };
 
