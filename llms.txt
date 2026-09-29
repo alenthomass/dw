@@ -32,14 +32,14 @@
   - *Gold SLA Tier:* 2-hour 24/7/365 emergency dispatch, monthly preventive site visits, hot-spare parts storage, live screen telemetry monitoring.
 
 ## Key Web Pages & Documentation
-- [Home Page](https://displayworldme.com/index.html): Company overview, signature hero installations, interactive services overview.
-- [Virtual Experience Center & Simulator](https://displayworldme.com/explore.html): Real-time interactive 3D display visualizer and product catalog.
-- [Industry Solutions](https://displayworldme.com/solutions.html): Custom configurations for Retail, Corporate, Hospitality, Command & Control, Healthcare, and Education.
-- [Portfolio & Case Studies](https://displayworldme.com/portfolio.html): Landmark installations across Dubai Mall, Emirates Airline, Burj Al Arab, and Dubai International Airport.
-- [Innovation Lab](https://displayworldme.com/innovation.html): Technical analysis of MicroLED, COB, 3D Naked-Eye Holographics, and Smart CMS.
-- [Insights & Knowledge Hub](https://displayworldme.com/insights.html): Technical engineering articles, buyer guides, and thermal dissipation benchmarks in UAE.
-- [About Display World](https://displayworldme.com/about.html): Founders, engineering background, vision, leadership, and Dubai HQ facilities.
-- [Contact & Showroom RFP](https://displayworldme.com/contact.html): Dubai Investment Park showroom booking, RFP uploads, and technical contact.
-- [Help Center & AMC SLAs](https://displayworldme.com/help-center.html): Uptime contracts, downloadable technical brochures, and SLA quote requests.
-- [Privacy Policy](https://displayworldme.com/privacy-policy.html): UAE Federal Decree-Law No. 45 of 2021 (PDPL) & GDPR compliance.
-- [Terms of Service](https://displayworldme.com/terms-of-service.html): Commercial hardware supply terms, Dubai civil jurisdiction, pixel defect policy, and SLA guarantees.
+- [Home Page](https://displayworldme.com/): Company overview, signature hero installations, interactive services overview.
+- [Virtual Experience Center & Simulator](https://displayworldme.com/explore): Real-time interactive 3D display visualizer and product catalog.
+- [Industry Solutions](https://displayworldme.com/solutions): Custom configurations for Retail, Corporate, Hospitality, Command & Control, Healthcare, and Education.
+- [Portfolio & Case Studies](https://displayworldme.com/portfolio): Landmark installations across Dubai Mall, Emirates Airline, Burj Al Arab, and Dubai International Airport.
+- [Innovation Lab](https://displayworldme.com/innovation): Technical analysis of MicroLED, COB, 3D Naked-Eye Holographics, and Smart CMS.
+- [Insights & Knowledge Hub](https://displayworldme.com/insights): Technical engineering articles, buyer guides, and thermal dissipation benchmarks in UAE.
+- [About Display World](https://displayworldme.com/about): Founders, engineering background, vision, leadership, and Dubai HQ facilities.
+- [Contact & Showroom RFP](https://displayworldme.com/contact): Dubai Investment Park showroom booking, RFP uploads, and technical contact.
+- [Help Center & AMC SLAs](https://displayworldme.com/help-center): Uptime contracts, downloadable technical brochures, and SLA quote requests.
+- [Privacy Policy](https://displayworldme.com/privacy-policy): UAE Federal Decree-Law No. 45 of 2021 (PDPL) & GDPR compliance.
+- [Terms of Service](https://displayworldme.com/terms-of-service): Commercial hardware supply terms, Dubai civil jurisdiction, pixel defect policy, and SLA guarantees.
