@@ -852,7 +852,7 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 }
 
 /* ═══════════ SERVICES ═══════════ */
-.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:1.5rem}
 .svc-card{position:relative;background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r);padding:2.5rem;transition:all .4s var(--ease);overflow:hidden}
 .svc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(250,3,110,.05),transparent 50%);opacity:0;transition:opacity .4s}
 .svc-card:hover{border-color:rgba(250,3,110,.25);transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.3)}

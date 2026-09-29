@@ -79,10 +79,30 @@ const DEFAULT_PROJECTS = [
       failover: "Double A/C Cabinets"
     },
     isWide: true
+  },
+  {
+    id: "5",
+    title: "Flagship Architectural & Static Signage",
+    category: "Static Signage",
+    shortDesc: "Bespoke 3D brushed brass and halo-illuminated channel letters, monument entrance pylon, and interior wayfinding.",
+    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=1200&q=80",
+    client: "Al Wasl Plaza & Retail District",
+    year: "2025",
+    location: "Downtown Dubai, UAE",
+    challenge: "The premier development required ultra-high-finish static and architectural signage that withstood extreme summer temperatures, dust storms, and intense UV exposure without acrylic yellowing, paint flaking, or LED burnout. All designs required structural certification for high-wind facades and Dubai Municipality approvals.",
+    solution: "We engineered CNC-machined 316 marine-grade stainless steel channel letters with PVD titanium gold plating and silicone-sealed IP68 warm-white (3000K) halo backlighting. For the main entrance, we installed a 6-meter monolithic architectural pylon with interchangeable magnetic panels and laser-etched directory maps.",
+    specs: {
+      system: "Architectural 3D & Pylon",
+      bezel: "Seamless PVD Brass",
+      brightness: "Warm-White 3000K Halo",
+      uptime: "100% Sealed IP68",
+      failover: "Redundant MeanWell PSUs"
+    },
+    isWide: true
   }
 ];
 
-const DEFAULT_CATEGORIES = ["Aviation", "Retail", "Corporate", "Outdoor LED"];
+const DEFAULT_CATEGORIES = ["Aviation", "Retail", "Corporate", "Outdoor LED", "Static Signage"];
 
 let db = null;
 let storage = null;
@@ -727,6 +747,38 @@ const DEFAULT_PRODUCTS = [
       "Input Latency": "Under 5ms input lag",
       "Accessibility": "ADA-compliant digital directory layout"
     }
+  },
+  {
+    id: "prod_7",
+    name: "Architectural 3D & Illuminated Channel Letters",
+    category: "static",
+    categoryLabel: "Static Signage",
+    desc: "Marine-grade stainless steel, acrylic face-lit and halo-backlit dimensional letters for flagship facades and retail storefronts.",
+    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80",
+    specs: {
+      "Material Grades": "316 Marine Stainless Steel / Architectural Acrylic / Brass",
+      "Illumination Profile": "IP68 Warm/Cool White LED Halo & Face-Lit",
+      "Finish Options": "Mirror Polish, Brushed, Powder-Coated, PVD Titanium",
+      "Power Feed": "Sealed 12V/24V IP67 MeanWell Driver Modules",
+      "Weather Resistance": "UV-Stabilized Acrylic & Heat-Resistant Sealants",
+      "Structural Rating": "Certified Dubai Municipality Wind-Load Compliant"
+    }
+  },
+  {
+    id: "prod_8",
+    name: "Wayfinding Monoliths & Corporate Pylons",
+    category: "static",
+    categoryLabel: "Static Signage",
+    desc: "Freestanding monument structures, directory totems, and campus directional signage with modular directory panels.",
+    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+    specs: {
+      "Structure Framework": "Heavy-duty hot-dip galvanized steel internal armature",
+      "Cladding Material": "Solid Aluminum Sheet / ACM / Architectural Glass",
+      "Dimensions": "Custom engineered up to 10m height monoliths",
+      "Directory Systems": "Modular interchangeable aluminum slats or magnetic acrylic",
+      "Lighting Elements": "Integrated edge-lit light guides or internal LED matrices",
+      "Foundation Engineering": "Cast-in-place rebar anchor cage calculation specs"
+    }
   }
 ];
 
@@ -918,6 +970,14 @@ const DEFAULT_SERVICES = [
     title: "AV Consultancy & FIP",
     desc: "Professional engineering consulting, hardware integration layout plans, and our custom zero-downtime Fault Information Platform (FIP).",
     image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "svc_7",
+    num: "07",
+    iconType: "signage",
+    title: "Static & Architectural Signage",
+    desc: "Bespoke 3D illuminated channel letters, monumental pylons, dimensional metal branding, and campus wayfinding fabrication.",
+    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80"
   }
 ];
 

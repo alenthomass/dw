@@ -23,6 +23,7 @@
 - **Curved & Flexible LED Modules:** Convex, concave, 90-degree seamless corner wraparounds, column wraps, and custom ribbon displays.
 - **Outdoor 3D Anamorphic Billboards:** High brightness (5,500 to 10,000 nits), IP65/IP68 weather resistance, heat dissipation engineered for Middle East 50°C summer conditions.
 - **Interactive Touch Kiosks & Totems:** 4K PCAP and infrared multi-touch (10 to 40 touch points), anti-glare tempered glass, integrated thermal management.
+- **Static & Architectural Signage:** Bespoke 3D channel letters, halo and front-lit LED dimensional signage, monument entrance pylons, corporate monoliths, campus wayfinding totems, and CNC precision metal fabrication.
 - **Digital Signage CMS Software:** Cloud-based content scheduling, multi-zone splitting, dynamic telemetry, emergency alert overrides, and remote device monitoring.
 
 ## Service Offerings & Engineering SLAs
