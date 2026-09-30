@@ -37,7 +37,7 @@
     "page": "index.html",
     "title": "Home: About Showcase Photo",
     "description": "Main primary photo in the About Display World section on the homepage.",
-    "url": "assets/images/home-about-main.svg"
+    "url": "assets/images/home-about-main.jpg"
   },
   "home_about_float": {
     "key": "home_about_float",
@@ -45,7 +45,7 @@
     "page": "index.html",
     "title": "Home: Tech Calibration Badge",
     "description": "Floating secondary image showing calibration metrics on the homepage.",
-    "url": "assets/images/home-about-float.svg"
+    "url": "assets/images/home-about-float.jpg"
   },
   "about_story_main": {
     "key": "about_story_main",
@@ -53,7 +53,7 @@
     "page": "about.html",
     "title": "About: Company Story Photo",
     "description": "Primary high-resolution installation photo on the full About Us page.",
-    "url": "assets/images/about-story-main.svg"
+    "url": "assets/images/about-story-main.jpg"
   },
   "about_story_float": {
     "key": "about_story_float",
@@ -61,7 +61,7 @@
     "page": "about.html",
     "title": "About: Calibration Badge",
     "description": "Floating secondary accent image in the story section on the About Us page.",
-    "url": "assets/images/about-story-float.svg"
+    "url": "assets/images/about-story-float.jpg"
   },
   "explore_bg_lobby": {
     "key": "explore_bg_lobby",
@@ -69,7 +69,7 @@
     "page": "explore.html",
     "title": "Simulator: Corporate Lobby Backdrop",
     "description": "3D virtual simulator environment backdrop for the Corporate Lobby preset.",
-    "url": "assets/images/scene-lobby.svg"
+    "url": "assets/images/scene-lobby.jpg"
   },
   "explore_bg_retail": {
     "key": "explore_bg_retail",
@@ -77,7 +77,7 @@
     "page": "explore.html",
     "title": "Simulator: Retail Storefront Backdrop",
     "description": "3D virtual simulator environment backdrop for the Retail Storefront preset.",
-    "url": "assets/images/scene-retail.svg"
+    "url": "assets/images/scene-retail.jpg"
   },
   "explore_bg_control": {
     "key": "explore_bg_control",
@@ -85,7 +85,7 @@
     "page": "explore.html",
     "title": "Simulator: Command Center Backdrop",
     "description": "3D virtual simulator environment backdrop for the Command Center preset.",
-    "url": "assets/images/scene-control.svg"
+    "url": "assets/images/scene-control.jpg"
   },
   "innov_oled": {
     "key": "innov_oled",
@@ -93,7 +93,7 @@
     "page": "innovation.html",
     "title": "Innovation: Transparent OLED Display",
     "description": "Card visual showcasing Transparent OLED Glass Media technology.",
-    "url": "assets/images/innov-oled.svg"
+    "url": "assets/images/innov-oled.jpg"
   },
   "innov_cob": {
     "key": "innov_cob",
@@ -101,7 +101,7 @@
     "page": "innovation.html",
     "title": "Innovation: MicroLED COB P0.9",
     "description": "Card visual showcasing Chip-on-Board sub-millimeter MicroLED panels.",
-    "url": "assets/images/innov-cob.svg"
+    "url": "assets/images/innov-cob.jpg"
   },
   "innov_holo": {
     "key": "innov_holo",
@@ -109,7 +109,7 @@
     "page": "innovation.html",
     "title": "Innovation: Holographic LED Fan",
     "description": "Card visual showcasing 3D airborne Holographic LED Fan arrays.",
-    "url": "assets/images/innov-holo.svg"
+    "url": "assets/images/innov-holo.jpg"
   },
   "innov_kinetic": {
     "key": "innov_kinetic",
@@ -117,7 +117,7 @@
     "page": "innovation.html",
     "title": "Innovation: Dynamic Kinetic Walls",
     "description": "Card visual showcasing motor-actuated Kinetic LED screen modules.",
-    "url": "assets/images/innov-kinetic.svg"
+    "url": "assets/images/innov-kinetic.jpg"
   },
   "sol_retail": {
     "key": "sol_retail",
@@ -125,7 +125,7 @@
     "page": "solutions.html",
     "title": "Solutions: Retail & Malls",
     "description": "Feature display image in the Retail & Malls interactive industry panel.",
-    "url": "assets/images/sol-retail.svg"
+    "url": "assets/images/sol-retail.jpg"
   },
   "sol_hospitality": {
     "key": "sol_hospitality",
@@ -133,7 +133,7 @@
     "page": "solutions.html",
     "title": "Solutions: Hospitality & Hotels",
     "description": "Feature display image in the Hospitality & Hotels interactive industry panel.",
-    "url": "assets/images/sol-hospitality.svg"
+    "url": "assets/images/sol-hospitality.jpg"
   },
   "sol_healthcare": {
     "key": "sol_healthcare",
@@ -141,7 +141,7 @@
     "page": "solutions.html",
     "title": "Solutions: Healthcare & Clinics",
     "description": "Feature display image in the Healthcare & Clinics interactive industry panel.",
-    "url": "assets/images/sol-healthcare.svg"
+    "url": "assets/images/sol-healthcare.jpg"
   },
   "sol_education": {
     "key": "sol_education",
@@ -149,7 +149,7 @@
     "page": "solutions.html",
     "title": "Solutions: Education & Campus",
     "description": "Feature display image in the Education & Campus interactive industry panel.",
-    "url": "assets/images/sol-education.svg"
+    "url": "assets/images/sol-education.jpg"
   },
   "sol_corporate": {
     "key": "sol_corporate",
@@ -157,6 +157,6 @@
     "page": "solutions.html",
     "title": "Solutions: Corporate Offices",
     "description": "Feature display image in the Corporate Offices interactive industry panel.",
-    "url": "assets/images/sol-corporate.svg"
+    "url": "assets/images/sol-corporate.jpg"
   }
 }

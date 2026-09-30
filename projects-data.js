@@ -5,7 +5,7 @@ const DEFAULT_PROJECTS = [
     title: "Airport Flight Information Displays",
     category: "Aviation",
     shortDesc: "24/7 mission-critical FIDS systems, baggage claim displays, and airport wayfinding installations.",
-    image: "assets/images/project-fids.svg",
+    image: "assets/images/project-fids.jpg",
     client: "Dubai Airports Authority",
     year: "2025",
     location: "Terminal 3, Dubai, UAE",
@@ -25,7 +25,7 @@ const DEFAULT_PROJECTS = [
     title: "Luxury Mall Facades",
     category: "Retail",
     shortDesc: "Ultra-high brightness window displays and curved LED pillars for flagship luxury retail stores.",
-    image: "assets/images/project-retail.svg",
+    image: "assets/images/project-retail.jpg",
     client: "Emaar Retail Group",
     year: "2025",
     location: "The Dubai Mall, UAE",
@@ -45,7 +45,7 @@ const DEFAULT_PROJECTS = [
     title: "Enterprise Command Centers",
     category: "Corporate",
     shortDesc: "0.88mm ultra-narrow bezel LCD video walls with dynamic feed management for operation hubs.",
-    image: "assets/images/project-noc.svg",
+    image: "assets/images/project-noc.jpg",
     client: "Global Logistics Corp",
     year: "2024",
     location: "Dubai Operations Center, Dubai",
@@ -65,7 +65,7 @@ const DEFAULT_PROJECTS = [
     title: "Smart City Digital Landmarks",
     category: "Outdoor LED",
     shortDesc: "Weatherproof IP65-rated outdoor billboard totems and giant building facade mesh LEDs.",
-    image: "assets/images/project-billboard.svg",
+    image: "assets/images/project-billboard.jpg",
     client: "Municipal Tech Authority",
     year: "2026",
     location: "Sheikh Zayed Road, Dubai",
@@ -85,7 +85,7 @@ const DEFAULT_PROJECTS = [
     title: "Flagship Architectural & Static Signage",
     category: "Static Signage",
     shortDesc: "Bespoke 3D brushed brass and halo-illuminated channel letters, monument entrance pylon, and interior wayfinding.",
-    image: "assets/images/project-signage.svg",
+    image: "assets/images/project-signage.jpg",
     client: "Al Wasl Plaza & Retail District",
     year: "2025",
     location: "Downtown Dubai, UAE",
@@ -175,6 +175,22 @@ async function detectBackend() {
 
 // Perform startup check
 detectBackend();
+
+// Safe Firestore write helper with timeout to prevent hanging UI
+async function safeFirestoreSet(docRef, data, options = {}, timeoutMs = 1500) {
+  if (!docRef || typeof docRef.set !== 'function') return false;
+  try {
+    const firestorePromise = (options && Object.keys(options).length > 0)
+      ? docRef.set(data, options)
+      : docRef.set(data);
+    const timeoutPromise = new Promise(resolve => setTimeout(resolve, timeoutMs));
+    await Promise.race([firestorePromise, timeoutPromise]);
+    return true;
+  } catch (err) {
+    console.warn("Firestore set operation notice:", err);
+    return false;
+  }
+}
 
 // High-efficiency client-side image compressor & optimizer
 async function compressAndOptimizeImage(file, maxDimension = 1600, quality = 0.85) {
@@ -313,13 +329,13 @@ async function uploadImageToFirebase(file, folder = 'uploads', onProgress) {
     try {
       if (typeof onProgress === 'function') onProgress(80);
       const mediaId = `${Date.now()}_${cleanName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-      await db.collection('cloud_media').doc(mediaId).set({
+      await safeFirestoreSet(db.collection('cloud_media').doc(mediaId), {
         name: cleanName,
         folder,
         url: optimized.dataUrl,
         contentType: (optimized.blob && optimized.blob.type) || 'image/jpeg',
         createdAt: new Date().toISOString()
-      }).catch((e) => console.warn("Firestore media save notice:", e));
+      }, {}, 1500);
 
       if (typeof onProgress === 'function') onProgress(100);
       return optimized.dataUrl;
@@ -460,7 +476,7 @@ class ProjectsDataStore {
     
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('projects').doc(project.id).set(project);
+        await safeFirestoreSet(db.collection('projects').doc(project.id), project);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -701,7 +717,7 @@ class CaseStudiesDataStore {
     
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('casestudies').doc(cs.id).set(cs);
+        await safeFirestoreSet(db.collection('casestudies').doc(cs.id), cs);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -802,7 +818,7 @@ const DEFAULT_PRODUCTS = [
     category: "led",
     categoryLabel: "LED Screens",
     desc: "High-definition screens with pixel pitches down to 0.7mm for executive boardrooms, broadcast studios, and luxury brand showrooms.",
-    image: "assets/images/product-microled.svg",
+    image: "assets/images/product-microled.jpg",
     specs: {
       "Pixel Pitch Options": "0.7mm / 0.9mm / 1.2mm / 1.5mm",
       "Calibrated Brightness": "800 nits (Adjustable HDR)",
@@ -818,7 +834,7 @@ const DEFAULT_PRODUCTS = [
     category: "led",
     categoryLabel: "LED Screens",
     desc: "IP65 weather-resistant, gold-wire LED displays designed to maintain full visual contrast under direct desert sun.",
-    image: "assets/images/product-billboard.svg",
+    image: "assets/images/product-billboard.jpg",
     specs: {
       "Pixel Pitch Options": "3.0mm / 4.0mm / 5.0mm",
       "Calibrated Brightness": "6500 nits (Auto-dimming)",
@@ -834,7 +850,7 @@ const DEFAULT_PRODUCTS = [
     category: "lcd",
     categoryLabel: "LCD Panels",
     desc: "Ultra-slim storefront screen displaying 3500 nits outside to fight sunlight glare, and 1000 nits inside for retail shoppers.",
-    image: "assets/images/product-lcd.svg",
+    image: "assets/images/product-lcd.jpg",
     specs: {
       "Display Size Options": "49\" / 55\" / 65\" diagonal",
       "Calibrated Brightness": "Outward: 3500 nits | Inward: 1000 nits",
@@ -850,7 +866,7 @@ const DEFAULT_PRODUCTS = [
     category: "lcd",
     categoryLabel: "LCD Panels",
     desc: "Extreme narrow-bezel modular screen panels engineered for operations hubs and security command matrices.",
-    image: "assets/images/product-curved.svg",
+    image: "assets/images/product-curved.jpg",
     specs: {
       "Bezel Gap Width": "0.88mm Active-to-Active",
       "Display Size": "55\" modular tiles",
@@ -866,7 +882,7 @@ const DEFAULT_PRODUCTS = [
     category: "transparent",
     categoryLabel: "Transparent Film",
     desc: "High transparency self-adhesive film that wet-applies directly onto retail shopfront windows to turn glass into screens.",
-    image: "assets/images/product-toled.svg",
+    image: "assets/images/product-toled.jpg",
     specs: {
       "Glass Transparency": "85% optical transparency",
       "Adhesive Profile": "Self-adhesive 2mm film layer",
@@ -882,7 +898,7 @@ const DEFAULT_PRODUCTS = [
     category: "interactive",
     categoryLabel: "Interactive Totems",
     desc: "PCAP touch interactive directories built with powder-coated steel frames for malls, hospitals, and transit lobbies.",
-    image: "assets/images/product-kiosk.svg",
+    image: "assets/images/product-kiosk.jpg",
     specs: {
       "Touch Technology": "Projected Capacitive (10 simultaneous points)",
       "Display Size Options": "43\" / 49\" / 55\"",
@@ -898,7 +914,7 @@ const DEFAULT_PRODUCTS = [
     category: "static",
     categoryLabel: "Static Signage",
     desc: "Marine-grade stainless steel, acrylic face-lit and halo-backlit dimensional letters for flagship facades and retail storefronts.",
-    image: "assets/images/product-static.svg",
+    image: "assets/images/product-static.jpg",
     specs: {
       "Material Grades": "316 Marine Stainless Steel / Architectural Acrylic / Brass",
       "Illumination Profile": "IP68 Warm/Cool White LED Halo & Face-Lit",
@@ -914,7 +930,7 @@ const DEFAULT_PRODUCTS = [
     category: "static",
     categoryLabel: "Static Signage",
     desc: "Freestanding monument structures, directory totems, and campus directional signage with modular directory panels.",
-    image: "assets/images/project-signage.svg",
+    image: "assets/images/project-signage.jpg",
     specs: {
       "Structure Framework": "Heavy-duty hot-dip galvanized steel internal armature",
       "Cladding Material": "Solid Aluminum Sheet / ACM / Architectural Glass",
@@ -938,7 +954,7 @@ class ProductsDataStore {
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (!Array.isArray(parsed) || parsed.some(p => typeof p.image === 'string' && p.image.includes('unsplash'))) {
+        if (!Array.isArray(parsed) || parsed.some(p => typeof p.image === 'string' && (p.image.includes('unsplash') || p.image.endsWith('.svg')))) {
           needsReset = true;
         }
       } catch (e) {
@@ -997,7 +1013,7 @@ class ProductsDataStore {
     
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('products').doc(prod.id).set(prod);
+        await safeFirestoreSet(db.collection('products').doc(prod.id), prod);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -1098,7 +1114,7 @@ const DEFAULT_SERVICES = [
     iconType: "lcd",
     title: "LCD Video Walls",
     desc: "Ultra-narrow 0.88mm bezel screens for control command centers, lobbies, and 24/7 aviation displays with anti-glare coatings.",
-    image: "assets/images/product-lcd.svg"
+    image: "assets/images/product-lcd.jpg"
   },
   {
     id: "svc_2",
@@ -1106,7 +1122,7 @@ const DEFAULT_SERVICES = [
     iconType: "led",
     title: "LED Screens & Mesh",
     desc: "Fine pixel pitch indoor/outdoor LED screens, transparent glass facade meshes, IP65-rated structural weatherproofing.",
-    image: "assets/images/product-microled.svg"
+    image: "assets/images/product-microled.jpg"
   },
   {
     id: "svc_3",
@@ -1114,7 +1130,7 @@ const DEFAULT_SERVICES = [
     iconType: "kiosk",
     title: "Interactive Kiosks",
     desc: "Multi-touch wayfinding pedestals, self-service information terminals, custom steel enclosures, and rugged branding.",
-    image: "assets/images/product-kiosk.svg"
+    image: "assets/images/product-kiosk.jpg"
   },
   {
     id: "svc_4",
@@ -1122,7 +1138,7 @@ const DEFAULT_SERVICES = [
     iconType: "cms",
     title: "CMS Software",
     desc: "Cloud-based content management system for multi-zone playlists, live content scheduling, and remote player health diagnostic feeds.",
-    image: "assets/images/insight-tech.svg"
+    image: "assets/images/insight-tech.jpg"
   },
   {
     id: "svc_5",
@@ -1130,7 +1146,7 @@ const DEFAULT_SERVICES = [
     iconType: "lighting",
     title: "Facade Linear Lighting",
     desc: "DMX-controlled architectural dynamic RGB linear strips to outline structural facade contours and exterior accent colors.",
-    image: "assets/images/product-billboard.svg"
+    image: "assets/images/product-billboard.jpg"
   },
   {
     id: "svc_6",
@@ -1138,7 +1154,7 @@ const DEFAULT_SERVICES = [
     iconType: "consultancy",
     title: "AV Consultancy & FIP",
     desc: "Professional engineering consulting, hardware integration layout plans, and our custom zero-downtime Fault Information Platform (FIP).",
-    image: "assets/images/insight-thermal.svg"
+    image: "assets/images/insight-thermal.jpg"
   },
   {
     id: "svc_7",
@@ -1146,7 +1162,7 @@ const DEFAULT_SERVICES = [
     iconType: "signage",
     title: "Static & Architectural Signage",
     desc: "Bespoke 3D illuminated channel letters, monumental pylons, dimensional metal branding, and campus wayfinding fabrication.",
-    image: "assets/images/product-static.svg"
+    image: "assets/images/product-static.jpg"
   }
 ];
 
@@ -1162,7 +1178,7 @@ class ServicesDataStore {
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (!Array.isArray(parsed) || parsed.some(s => typeof s.image === 'string' && s.image.includes('unsplash'))) {
+        if (!Array.isArray(parsed) || parsed.some(s => typeof s.image === 'string' && (s.image.includes('unsplash') || s.image.endsWith('.svg')))) {
           needsReset = true;
         }
       } catch (e) {
@@ -1221,7 +1237,7 @@ class ServicesDataStore {
     
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('services').doc(svc.id).set(svc);
+        await safeFirestoreSet(db.collection('services').doc(svc.id), svc);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -1321,11 +1337,11 @@ const DEFAULT_INSIGHTS = [
     title: "Mitigating Outdoor LED Thermal Loads in Middle East Heat",
     meta: "Engineering Guide",
     desc: "A technical guide detailing how dual-chamber active cooling enclosures, ambient dimming photocells, and gold-wire encapsulation prevent pixel failures on outdoor billboards during peak Gulf summer temperatures.",
-    image: "assets/images/insight-thermal.svg",
+    image: "assets/images/insight-thermal.jpg",
     content: `<h2>The Thermal Challenge in GCC Region</h2>
 <p>Direct exposure to the desert sun can raise the internal chassis temperature of an outdoor LED display above 85°C. Without active mitigation, this thermal load leads to rapid pixel degradation, color shifting, and eventual power supply shutdown.</p>
 
-<img src="assets/images/insight-thermal.svg" alt="LED Screen Panel Grid" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
+<img src="assets/images/insight-thermal.jpg" alt="LED Screen Panel Grid" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
 
 <h3>Key Mitigation Strategies Deployed</h3>
 <ul>
@@ -1340,11 +1356,11 @@ const DEFAULT_INSIGHTS = [
     title: "The Rise of COB MicroLED in Corporate Dubai Lobbies",
     meta: "Technology Trend",
     desc: "Why corporate headquarters in DIFC are transitioning from traditional LCD video walls to Chip-on-Board MicroLED to secure bezel-free boardroom screens with extreme visual contrasts.",
-    image: "assets/images/innov-cob.svg",
+    image: "assets/images/innov-cob.jpg",
     content: `<h2>Transitioning to Bezel-free Display Canvas</h2>
 <p>Traditional LCD panels, while highly cost-effective, introduce visible grid bezels (ranging from 0.88mm to 3.5mm) that break up spreadsheets, data visualizers, and brand graphics. Chip-on-Board (COB) MicroLED technology eliminates bezels completely while providing superior contrast ratings.</p>
 
-<img src="assets/images/innov-cob.svg" alt="Corporate Lobby" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
+<img src="assets/images/innov-cob.jpg" alt="Corporate Lobby" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
 
 <h3>Why COB Technology Wins</h3>
 <p>Standard SMD LED diodes are soldered to the surface of a board, exposing them to physical damage and moisture. COB technology packs the LED chips directly onto the substrate and seals them with an epoxy resin shield, resulting in:</p>
@@ -1360,11 +1376,11 @@ const DEFAULT_INSIGHTS = [
     title: "Why Professional Calibration Beats Factory Presets",
     meta: "Expert Advice",
     desc: "An inside look at color-calibration metrics. Learn how matching chromaticity gamuts across cabinet boards prevents visual screen bleaching under high-brightness direct desert sunlight.",
-    image: "assets/images/insight-tech.svg",
+    image: "assets/images/insight-tech.jpg",
     content: `<h2>The Factory Preset Fallacy</h2>
 <p>When displays are manufactured, each batch of LED modules has minor chromaticity shifts in the red, green, and blue diodes. While presets look fine inside a showroom, displaying them outdoors under the harsh UAE sun reveals blotchy color patches and bleached highlights.</p>
 
-<img src="assets/images/insight-tech.svg" alt="Data Analytics Calibration Chart" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
+<img src="assets/images/insight-tech.jpg" alt="Data Analytics Calibration Chart" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
 
 <h3>Our Optical Calibration Process</h3>
 <p>We deploy high-accuracy colorimeters (like Minolta CA-410) to map the coordinate values of each cabinet tile on-site:</p>
@@ -1389,7 +1405,7 @@ class InsightsDataStore {
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (!Array.isArray(parsed) || parsed.some(p => typeof p.image === 'string' && p.image.includes('unsplash'))) {
+        if (!Array.isArray(parsed) || parsed.some(p => typeof p.image === 'string' && (p.image.includes('unsplash') || p.image.endsWith('.svg')))) {
           needsReset = true;
         }
       } catch (e) {
@@ -1453,7 +1469,7 @@ class InsightsDataStore {
     
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('insights').doc(post.id).set(post);
+        await safeFirestoreSet(db.collection('insights').doc(post.id), post);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -1632,7 +1648,7 @@ class CareersDataStore {
     
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('careers').doc(job.id).set(job);
+        await safeFirestoreSet(db.collection('careers').doc(job.id), job);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -1760,7 +1776,7 @@ class InquiriesDataStore {
 
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('inquiries').doc(inq.id).set(inq);
+        await safeFirestoreSet(db.collection('inquiries').doc(inq.id), inq);
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
@@ -1914,7 +1930,7 @@ class SettingsDataStore {
     await detectBackend();
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('settings').doc('site').set(s);
+        await safeFirestoreSet(db.collection('settings').doc('site'), s);
         return true;
       } catch (err) {
         console.error("Firestore settings save error:", err);
@@ -1988,7 +2004,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: About Showcase Photo",
         description: "Main primary photo in the About Display World section on the homepage.",
-        url: "assets/images/home-about-main.svg"
+        url: "assets/images/home-about-main.jpg"
       },
       home_about_float: {
         key: "home_about_float",
@@ -1996,7 +2012,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: Tech Calibration Badge",
         description: "Floating secondary image showing calibration metrics on the homepage.",
-        url: "assets/images/home-about-float.svg"
+        url: "assets/images/home-about-float.jpg"
       },
       about_story_main: {
         key: "about_story_main",
@@ -2004,7 +2020,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Company Story Photo",
         description: "Primary high-resolution installation photo on the full About Us page.",
-        url: "assets/images/about-story-main.svg"
+        url: "assets/images/about-story-main.jpg"
       },
       about_story_float: {
         key: "about_story_float",
@@ -2012,7 +2028,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Calibration Badge",
         description: "Floating secondary accent image in the story section on the About Us page.",
-        url: "assets/images/about-story-float.svg"
+        url: "assets/images/about-story-float.jpg"
       },
       explore_bg_lobby: {
         key: "explore_bg_lobby",
@@ -2020,7 +2036,7 @@ class SiteImagesDataStore {
         page: "explore.html",
         title: "Simulator: Corporate Lobby Backdrop",
         description: "3D virtual simulator environment backdrop for the Corporate Lobby preset.",
-        url: "assets/images/scene-lobby.svg"
+        url: "assets/images/scene-lobby.jpg"
       },
       explore_bg_retail: {
         key: "explore_bg_retail",
@@ -2028,7 +2044,7 @@ class SiteImagesDataStore {
         page: "explore.html",
         title: "Simulator: Retail Storefront Backdrop",
         description: "3D virtual simulator environment backdrop for the Retail Storefront preset.",
-        url: "assets/images/scene-retail.svg"
+        url: "assets/images/scene-retail.jpg"
       },
       explore_bg_control: {
         key: "explore_bg_control",
@@ -2036,7 +2052,7 @@ class SiteImagesDataStore {
         page: "explore.html",
         title: "Simulator: Command Center Backdrop",
         description: "3D virtual simulator environment backdrop for the Command Center preset.",
-        url: "assets/images/scene-control.svg"
+        url: "assets/images/scene-control.jpg"
       },
       innov_oled: {
         key: "innov_oled",
@@ -2044,7 +2060,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: Transparent OLED Display",
         description: "Card visual showcasing Transparent OLED Glass Media technology.",
-        url: "assets/images/innov-oled.svg"
+        url: "assets/images/innov-oled.jpg"
       },
       innov_cob: {
         key: "innov_cob",
@@ -2052,7 +2068,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: MicroLED COB P0.9",
         description: "Card visual showcasing Chip-on-Board sub-millimeter MicroLED panels.",
-        url: "assets/images/innov-cob.svg"
+        url: "assets/images/innov-cob.jpg"
       },
       innov_holo: {
         key: "innov_holo",
@@ -2060,7 +2076,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: Holographic LED Fan",
         description: "Card visual showcasing 3D airborne Holographic LED Fan arrays.",
-        url: "assets/images/innov-holo.svg"
+        url: "assets/images/innov-holo.jpg"
       },
       innov_kinetic: {
         key: "innov_kinetic",
@@ -2068,7 +2084,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: Dynamic Kinetic Walls",
         description: "Card visual showcasing motor-actuated Kinetic LED screen modules.",
-        url: "assets/images/innov-kinetic.svg"
+        url: "assets/images/innov-kinetic.jpg"
       },
       sol_retail: {
         key: "sol_retail",
@@ -2076,7 +2092,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Retail & Malls",
         description: "Feature display image in the Retail & Malls interactive industry panel.",
-        url: "assets/images/sol-retail.svg"
+        url: "assets/images/sol-retail.jpg"
       },
       sol_hospitality: {
         key: "sol_hospitality",
@@ -2084,7 +2100,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Hospitality & Hotels",
         description: "Feature display image in the Hospitality & Hotels interactive industry panel.",
-        url: "assets/images/sol-hospitality.svg"
+        url: "assets/images/sol-hospitality.jpg"
       },
       sol_healthcare: {
         key: "sol_healthcare",
@@ -2092,7 +2108,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Healthcare & Clinics",
         description: "Feature display image in the Healthcare & Clinics interactive industry panel.",
-        url: "assets/images/sol-healthcare.svg"
+        url: "assets/images/sol-healthcare.jpg"
       },
       sol_education: {
         key: "sol_education",
@@ -2100,7 +2116,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Education & Campus",
         description: "Feature display image in the Education & Campus interactive industry panel.",
-        url: "assets/images/sol-education.svg"
+        url: "assets/images/sol-education.jpg"
       },
       sol_corporate: {
         key: "sol_corporate",
@@ -2108,7 +2124,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Corporate Offices",
         description: "Feature display image in the Corporate Offices interactive industry panel.",
-        url: "assets/images/sol-corporate.svg"
+        url: "assets/images/sol-corporate.jpg"
       }
     };
   }
@@ -2144,10 +2160,12 @@ class SiteImagesDataStore {
       }
     }
 
-    // Automatic purge for any stale external/Unsplash URLs:
+    // Automatic purge for any stale external/Unsplash URLs or old SVG placeholders:
     Object.keys(storedUrls).forEach(k => {
-      if (storedUrls[k] && typeof storedUrls[k] === 'string' && storedUrls[k].includes('unsplash')) {
-        delete storedUrls[k];
+      if (storedUrls[k] && typeof storedUrls[k] === 'string') {
+        if (storedUrls[k].includes('unsplash') || (defaults[k] && defaults[k].url.endsWith('.jpg') && storedUrls[k].endsWith('.svg'))) {
+          delete storedUrls[k];
+        }
       }
     });
 
@@ -2212,10 +2230,9 @@ class SiteImagesDataStore {
     await detectBackend();
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('settings').doc('images').set(imagesMap);
+        await safeFirestoreSet(db.collection('settings').doc('images'), imagesMap, {}, 1500);
       } catch (err) {
-        console.error("Firestore site images save error:", err);
-        throw err;
+        console.warn("Firestore site images save warning:", err);
       }
     }
     try {
@@ -2481,7 +2498,7 @@ class AuthDataStore {
     await detectBackend();
     if (backendMode === 'firebase' && db) {
       try {
-        await db.collection('settings').doc('auth').set(updated);
+        await safeFirestoreSet(db.collection('settings').doc('auth'), updated);
       } catch (err) {
         console.error("Firestore auth save error:", err);
       }
