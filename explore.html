@@ -137,7 +137,7 @@
         
         <!-- Canvas view -->
         <div class="scene-canvas" id="canvas-container">
-          <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80" alt="Corporate Lobby Scene" class="scene-backdrop" id="canvas-bg" data-img-key="explore_bg_lobby">
+          <img src="assets/images/scene-lobby.svg" alt="Corporate Lobby Scene" class="scene-backdrop" id="canvas-bg" data-img-key="explore_bg_lobby">
           <div class="virtual-screen" id="virtual-led-screen">
             <div class="virtual-screen-hud" id="screen-hud">
               <div id="hud-res">0 x 0 Pixels</div>
@@ -151,9 +151,9 @@
           <div class="control-group">
             <label>Select Installation Backdrop</label>
             <div class="scene-selectors">
-              <button class="scene-btn active" onclick="changeScene('lobby', 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', this)">Corporate Lobby</button>
-              <button class="scene-btn" onclick="changeScene('store', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80', this)">Retail Storefront</button>
-              <button class="scene-btn" onclick="changeScene('control', 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80', this)">Command Center</button>
+              <button class="scene-btn active" onclick="changeScene('lobby', 'assets/images/scene-lobby.svg', this)">Corporate Lobby</button>
+              <button class="scene-btn" onclick="changeScene('store', 'assets/images/scene-retail.svg', this)">Retail Storefront</button>
+              <button class="scene-btn" onclick="changeScene('control', 'assets/images/scene-control.svg', this)">Command Center</button>
             </div>
           </div>
 
@@ -469,7 +469,7 @@
         card.innerHTML = `
           <div class="product-image-box">
             <span class="product-cat-tag">${p.categoryLabel || p.category.toUpperCase()}</span>
-            <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80';">
+            <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
           </div>
           <div class="product-info-box">
             <h3>${p.name}</h3>

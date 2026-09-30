@@ -287,7 +287,7 @@
       <!-- Retail Panel -->
       <div class="industry-panel active" id="panel-retail">
         <div class="industry-img-box">
-          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" alt="Retail Signage Display" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80';" data-img-key="sol_retail">
+          <img src="assets/images/sol-retail.svg" alt="Retail Signage Display" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';" data-img-key="sol_retail">
         </div>
         <div class="industry-info-box">
           <h2>Retail & Malls</h2>
@@ -304,7 +304,7 @@
       <!-- Hospitality Panel -->
       <div class="industry-panel" id="panel-hospitality">
         <div class="industry-img-box">
-          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" alt="Hospitality Welcome LEDs" data-img-key="sol_hospitality">
+          <img src="assets/images/sol-hospitality.svg" alt="Hospitality Welcome LEDs" data-img-key="sol_hospitality">
         </div>
         <div class="industry-info-box">
           <h2>Hospitality & Hotels</h2>
@@ -320,7 +320,7 @@
       <!-- Healthcare Panel -->
       <div class="industry-panel" id="panel-healthcare">
         <div class="industry-img-box">
-          <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" alt="Healthcare Signage Directories" data-img-key="sol_healthcare">
+          <img src="assets/images/sol-healthcare.svg" alt="Healthcare Signage Directories" data-img-key="sol_healthcare">
         </div>
         <div class="industry-info-box">
           <h2>Healthcare & Clinics</h2>
@@ -336,7 +336,7 @@
       <!-- Education Panel -->
       <div class="industry-panel" id="panel-education">
         <div class="industry-img-box">
-          <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80" alt="Education Lecture Hall Screen" data-img-key="sol_education">
+          <img src="assets/images/sol-education.svg" alt="Education Lecture Hall Screen" data-img-key="sol_education">
         </div>
         <div class="industry-info-box">
           <h2>Education & Campus</h2>
@@ -352,7 +352,7 @@
       <!-- Corporate Panel -->
       <div class="industry-panel" id="panel-corporate">
         <div class="industry-img-box">
-          <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80" alt="Corporate Boardroom Screen" data-img-key="sol_corporate">
+          <img src="assets/images/sol-corporate.svg" alt="Corporate Boardroom Screen" data-img-key="sol_corporate">
         </div>
         <div class="industry-info-box">
           <h2>Corporate Offices</h2>
@@ -492,10 +492,10 @@
         const iconSvg = SVG_ICONS[s.iconType] || SVG_ICONS.consultancy;
         
         // Fallback default image if none specified
-        const bgImg = s.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
+        const bgImg = s.image || 'assets/images/placeholder.svg';
         
         card.innerHTML = `
-          <img class="svc-visual-bg" src="${bgImg}" alt="${s.title}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';">
+          <img class="svc-visual-bg" src="${bgImg}" alt="${s.title}" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
           <div class="svc-visual-overlay"></div>
           <div class="svc-visual-content">
             <div class="svc-visual-badge-row">

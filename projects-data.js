@@ -5,7 +5,7 @@ const DEFAULT_PROJECTS = [
     title: "Airport Flight Information Displays",
     category: "Aviation",
     shortDesc: "24/7 mission-critical FIDS systems, baggage claim displays, and airport wayfinding installations.",
-    image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80",
+    image: "assets/images/project-fids.svg",
     client: "Dubai Airports Authority",
     year: "2025",
     location: "Terminal 3, Dubai, UAE",
@@ -25,7 +25,7 @@ const DEFAULT_PROJECTS = [
     title: "Luxury Mall Facades",
     category: "Retail",
     shortDesc: "Ultra-high brightness window displays and curved LED pillars for flagship luxury retail stores.",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/project-retail.svg",
     client: "Emaar Retail Group",
     year: "2025",
     location: "The Dubai Mall, UAE",
@@ -45,7 +45,7 @@ const DEFAULT_PROJECTS = [
     title: "Enterprise Command Centers",
     category: "Corporate",
     shortDesc: "0.88mm ultra-narrow bezel LCD video walls with dynamic feed management for operation hubs.",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/project-noc.svg",
     client: "Global Logistics Corp",
     year: "2024",
     location: "Dubai Operations Center, Dubai",
@@ -65,7 +65,7 @@ const DEFAULT_PROJECTS = [
     title: "Smart City Digital Landmarks",
     category: "Outdoor LED",
     shortDesc: "Weatherproof IP65-rated outdoor billboard totems and giant building facade mesh LEDs.",
-    image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80",
+    image: "assets/images/project-billboard.svg",
     client: "Municipal Tech Authority",
     year: "2026",
     location: "Sheikh Zayed Road, Dubai",
@@ -85,7 +85,7 @@ const DEFAULT_PROJECTS = [
     title: "Flagship Architectural & Static Signage",
     category: "Static Signage",
     shortDesc: "Bespoke 3D brushed brass and halo-illuminated channel letters, monument entrance pylon, and interior wayfinding.",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=1200&q=80",
+    image: "assets/images/project-signage.svg",
     client: "Al Wasl Plaza & Retail District",
     year: "2025",
     location: "Downtown Dubai, UAE",
@@ -366,7 +366,7 @@ class ProjectsDataStore {
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (!Array.isArray(parsed) || parsed.some(p => !p.specs || !p.client || (p.id === "4" && !p.image.includes("photo-1477959858617")))) {
+        if (!Array.isArray(parsed) || parsed.some(p => !p.specs || !p.client || (typeof p.image === 'string' && p.image.includes('unsplash')))) {
           needsReset = true;
         }
       } catch(e) {
@@ -393,7 +393,14 @@ class ProjectsDataStore {
         const snap = await db.collection('projects').get();
         if (!snap.empty) {
           const list = [];
-          snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
+          snap.forEach(doc => {
+            const data = { ...doc.data(), id: doc.id };
+            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+              const def = DEFAULT_PROJECTS.find(d => d.id === doc.id);
+              if (def) data.image = def.image;
+            }
+            list.push(data);
+          });
           return list;
         }
       } catch (err) {
@@ -410,7 +417,14 @@ class ProjectsDataStore {
       }
     }
     
-    return JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PROJECTS;
+    const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PROJECTS;
+    return localList.map(item => {
+      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+        const def = DEFAULT_PROJECTS.find(d => d.id === item.id);
+        if (def) item.image = def.image;
+      }
+      return item;
+    });
   }
 
   async getById(id) {
@@ -788,7 +802,7 @@ const DEFAULT_PRODUCTS = [
     category: "led",
     categoryLabel: "LED Screens",
     desc: "High-definition screens with pixel pitches down to 0.7mm for executive boardrooms, broadcast studios, and luxury brand showrooms.",
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-microled.svg",
     specs: {
       "Pixel Pitch Options": "0.7mm / 0.9mm / 1.2mm / 1.5mm",
       "Calibrated Brightness": "800 nits (Adjustable HDR)",
@@ -804,7 +818,7 @@ const DEFAULT_PRODUCTS = [
     category: "led",
     categoryLabel: "LED Screens",
     desc: "IP65 weather-resistant, gold-wire LED displays designed to maintain full visual contrast under direct desert sun.",
-    image: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-billboard.svg",
     specs: {
       "Pixel Pitch Options": "3.0mm / 4.0mm / 5.0mm",
       "Calibrated Brightness": "6500 nits (Auto-dimming)",
@@ -820,7 +834,7 @@ const DEFAULT_PRODUCTS = [
     category: "lcd",
     categoryLabel: "LCD Panels",
     desc: "Ultra-slim storefront screen displaying 3500 nits outside to fight sunlight glare, and 1000 nits inside for retail shoppers.",
-    image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-lcd.svg",
     specs: {
       "Display Size Options": "49\" / 55\" / 65\" diagonal",
       "Calibrated Brightness": "Outward: 3500 nits | Inward: 1000 nits",
@@ -836,7 +850,7 @@ const DEFAULT_PRODUCTS = [
     category: "lcd",
     categoryLabel: "LCD Panels",
     desc: "Extreme narrow-bezel modular screen panels engineered for operations hubs and security command matrices.",
-    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-curved.svg",
     specs: {
       "Bezel Gap Width": "0.88mm Active-to-Active",
       "Display Size": "55\" modular tiles",
@@ -852,7 +866,7 @@ const DEFAULT_PRODUCTS = [
     category: "transparent",
     categoryLabel: "Transparent Film",
     desc: "High transparency self-adhesive film that wet-applies directly onto retail shopfront windows to turn glass into screens.",
-    image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-toled.svg",
     specs: {
       "Glass Transparency": "85% optical transparency",
       "Adhesive Profile": "Self-adhesive 2mm film layer",
@@ -868,7 +882,7 @@ const DEFAULT_PRODUCTS = [
     category: "interactive",
     categoryLabel: "Interactive Totems",
     desc: "PCAP touch interactive directories built with powder-coated steel frames for malls, hospitals, and transit lobbies.",
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-kiosk.svg",
     specs: {
       "Touch Technology": "Projected Capacitive (10 simultaneous points)",
       "Display Size Options": "43\" / 49\" / 55\"",
@@ -884,7 +898,7 @@ const DEFAULT_PRODUCTS = [
     category: "static",
     categoryLabel: "Static Signage",
     desc: "Marine-grade stainless steel, acrylic face-lit and halo-backlit dimensional letters for flagship facades and retail storefronts.",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/product-static.svg",
     specs: {
       "Material Grades": "316 Marine Stainless Steel / Architectural Acrylic / Brass",
       "Illumination Profile": "IP68 Warm/Cool White LED Halo & Face-Lit",
@@ -900,7 +914,7 @@ const DEFAULT_PRODUCTS = [
     category: "static",
     categoryLabel: "Static Signage",
     desc: "Freestanding monument structures, directory totems, and campus directional signage with modular directory panels.",
-    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/project-signage.svg",
     specs: {
       "Structure Framework": "Heavy-duty hot-dip galvanized steel internal armature",
       "Cladding Material": "Solid Aluminum Sheet / ACM / Architectural Glass",
@@ -920,7 +934,18 @@ class ProductsDataStore {
 
   initLocalDefaults() {
     const localData = localStorage.getItem(this.localKey);
-    if (!localData) {
+    let needsReset = !localData;
+    if (localData) {
+      try {
+        const parsed = JSON.parse(localData);
+        if (!Array.isArray(parsed) || parsed.some(p => typeof p.image === 'string' && p.image.includes('unsplash'))) {
+          needsReset = true;
+        }
+      } catch (e) {
+        needsReset = true;
+      }
+    }
+    if (needsReset) {
       localStorage.setItem(this.localKey, JSON.stringify(DEFAULT_PRODUCTS));
     }
   }
@@ -933,7 +958,14 @@ class ProductsDataStore {
         const snap = await db.collection('products').get();
         if (!snap.empty) {
           const list = [];
-          snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
+          snap.forEach(doc => {
+            const data = { ...doc.data(), id: doc.id };
+            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+              const def = DEFAULT_PRODUCTS.find(d => d.id === doc.id);
+              if (def) data.image = def.image;
+            }
+            list.push(data);
+          });
           return list;
         }
       } catch (err) {
@@ -950,7 +982,14 @@ class ProductsDataStore {
       }
     }
     
-    return JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PRODUCTS;
+    const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PRODUCTS;
+    return localList.map(item => {
+      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+        const def = DEFAULT_PRODUCTS.find(d => d.id === item.id);
+        if (def) item.image = def.image;
+      }
+      return item;
+    });
   }
 
   async save(prod) {
@@ -1059,7 +1098,7 @@ const DEFAULT_SERVICES = [
     iconType: "lcd",
     title: "LCD Video Walls",
     desc: "Ultra-narrow 0.88mm bezel screens for control command centers, lobbies, and 24/7 aviation displays with anti-glare coatings.",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/product-lcd.svg"
   },
   {
     id: "svc_2",
@@ -1067,7 +1106,7 @@ const DEFAULT_SERVICES = [
     iconType: "led",
     title: "LED Screens & Mesh",
     desc: "Fine pixel pitch indoor/outdoor LED screens, transparent glass facade meshes, IP65-rated structural weatherproofing.",
-    image: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/product-microled.svg"
   },
   {
     id: "svc_3",
@@ -1075,7 +1114,7 @@ const DEFAULT_SERVICES = [
     iconType: "kiosk",
     title: "Interactive Kiosks",
     desc: "Multi-touch wayfinding pedestals, self-service information terminals, custom steel enclosures, and rugged branding.",
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/product-kiosk.svg"
   },
   {
     id: "svc_4",
@@ -1083,7 +1122,7 @@ const DEFAULT_SERVICES = [
     iconType: "cms",
     title: "CMS Software",
     desc: "Cloud-based content management system for multi-zone playlists, live content scheduling, and remote player health diagnostic feeds.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/insight-tech.svg"
   },
   {
     id: "svc_5",
@@ -1091,7 +1130,7 @@ const DEFAULT_SERVICES = [
     iconType: "lighting",
     title: "Facade Linear Lighting",
     desc: "DMX-controlled architectural dynamic RGB linear strips to outline structural facade contours and exterior accent colors.",
-    image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/product-billboard.svg"
   },
   {
     id: "svc_6",
@@ -1099,7 +1138,7 @@ const DEFAULT_SERVICES = [
     iconType: "consultancy",
     title: "AV Consultancy & FIP",
     desc: "Professional engineering consulting, hardware integration layout plans, and our custom zero-downtime Fault Information Platform (FIP).",
-    image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/insight-thermal.svg"
   },
   {
     id: "svc_7",
@@ -1107,7 +1146,7 @@ const DEFAULT_SERVICES = [
     iconType: "signage",
     title: "Static & Architectural Signage",
     desc: "Bespoke 3D illuminated channel letters, monumental pylons, dimensional metal branding, and campus wayfinding fabrication.",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=800&q=80"
+    image: "assets/images/product-static.svg"
   }
 ];
 
@@ -1119,7 +1158,18 @@ class ServicesDataStore {
 
   initLocalDefaults() {
     const localData = localStorage.getItem(this.localKey);
-    if (!localData) {
+    let needsReset = !localData;
+    if (localData) {
+      try {
+        const parsed = JSON.parse(localData);
+        if (!Array.isArray(parsed) || parsed.some(s => typeof s.image === 'string' && s.image.includes('unsplash'))) {
+          needsReset = true;
+        }
+      } catch (e) {
+        needsReset = true;
+      }
+    }
+    if (needsReset) {
       localStorage.setItem(this.localKey, JSON.stringify(DEFAULT_SERVICES));
     }
   }
@@ -1132,7 +1182,14 @@ class ServicesDataStore {
         const snap = await db.collection('services').get();
         if (!snap.empty) {
           const list = [];
-          snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
+          snap.forEach(doc => {
+            const data = { ...doc.data(), id: doc.id };
+            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+              const def = DEFAULT_SERVICES.find(d => d.id === doc.id);
+              if (def) data.image = def.image;
+            }
+            list.push(data);
+          });
           return list;
         }
       } catch (err) {
@@ -1149,7 +1206,14 @@ class ServicesDataStore {
       }
     }
     
-    return JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_SERVICES;
+    const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_SERVICES;
+    return localList.map(item => {
+      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+        const def = DEFAULT_SERVICES.find(d => d.id === item.id);
+        if (def) item.image = def.image;
+      }
+      return item;
+    });
   }
 
   async save(svc) {
@@ -1257,11 +1321,11 @@ const DEFAULT_INSIGHTS = [
     title: "Mitigating Outdoor LED Thermal Loads in Middle East Heat",
     meta: "Engineering Guide",
     desc: "A technical guide detailing how dual-chamber active cooling enclosures, ambient dimming photocells, and gold-wire encapsulation prevent pixel failures on outdoor billboards during peak Gulf summer temperatures.",
-    image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/insight-thermal.svg",
     content: `<h2>The Thermal Challenge in GCC Region</h2>
 <p>Direct exposure to the desert sun can raise the internal chassis temperature of an outdoor LED display above 85°C. Without active mitigation, this thermal load leads to rapid pixel degradation, color shifting, and eventual power supply shutdown.</p>
 
-<img src="https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?auto=format&fit=crop&w=800&q=80" alt="LED Screen Panel Grid" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
+<img src="assets/images/insight-thermal.svg" alt="LED Screen Panel Grid" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
 
 <h3>Key Mitigation Strategies Deployed</h3>
 <ul>
@@ -1276,11 +1340,11 @@ const DEFAULT_INSIGHTS = [
     title: "The Rise of COB MicroLED in Corporate Dubai Lobbies",
     meta: "Technology Trend",
     desc: "Why corporate headquarters in DIFC are transitioning from traditional LCD video walls to Chip-on-Board MicroLED to secure bezel-free boardroom screens with extreme visual contrasts.",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/innov-cob.svg",
     content: `<h2>Transitioning to Bezel-free Display Canvas</h2>
 <p>Traditional LCD panels, while highly cost-effective, introduce visible grid bezels (ranging from 0.88mm to 3.5mm) that break up spreadsheets, data visualizers, and brand graphics. Chip-on-Board (COB) MicroLED technology eliminates bezels completely while providing superior contrast ratings.</p>
 
-<img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=80" alt="Corporate Lobby" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
+<img src="assets/images/innov-cob.svg" alt="Corporate Lobby" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
 
 <h3>Why COB Technology Wins</h3>
 <p>Standard SMD LED diodes are soldered to the surface of a board, exposing them to physical damage and moisture. COB technology packs the LED chips directly onto the substrate and seals them with an epoxy resin shield, resulting in:</p>
@@ -1296,11 +1360,11 @@ const DEFAULT_INSIGHTS = [
     title: "Why Professional Calibration Beats Factory Presets",
     meta: "Expert Advice",
     desc: "An inside look at color-calibration metrics. Learn how matching chromaticity gamuts across cabinet boards prevents visual screen bleaching under high-brightness direct desert sunlight.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+    image: "assets/images/insight-tech.svg",
     content: `<h2>The Factory Preset Fallacy</h2>
 <p>When displays are manufactured, each batch of LED modules has minor chromaticity shifts in the red, green, and blue diodes. While presets look fine inside a showroom, displaying them outdoors under the harsh UAE sun reveals blotchy color patches and bleached highlights.</p>
 
-<img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Data Analytics Calibration Chart" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
+<img src="assets/images/insight-tech.svg" alt="Data Analytics Calibration Chart" style="width:100%; border-radius:12px; margin: 1.5rem 0; border: 1px solid var(--border);">
 
 <h3>Our Optical Calibration Process</h3>
 <p>We deploy high-accuracy colorimeters (like Minolta CA-410) to map the coordinate values of each cabinet tile on-site:</p>
@@ -1321,7 +1385,18 @@ class InsightsDataStore {
 
   initLocalDefaults() {
     const localData = localStorage.getItem(this.localKey);
-    if (!localData) {
+    let needsReset = !localData;
+    if (localData) {
+      try {
+        const parsed = JSON.parse(localData);
+        if (!Array.isArray(parsed) || parsed.some(p => typeof p.image === 'string' && p.image.includes('unsplash'))) {
+          needsReset = true;
+        }
+      } catch (e) {
+        needsReset = true;
+      }
+    }
+    if (needsReset) {
       localStorage.setItem(this.localKey, JSON.stringify(DEFAULT_INSIGHTS));
     }
   }
@@ -1334,7 +1409,14 @@ class InsightsDataStore {
         const snap = await db.collection('insights').get();
         if (!snap.empty) {
           const list = [];
-          snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
+          snap.forEach(doc => {
+            const data = { ...doc.data(), id: doc.id };
+            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+              const def = DEFAULT_INSIGHTS.find(d => d.id === doc.id);
+              if (def) data.image = def.image;
+            }
+            list.push(data);
+          });
           return list;
         }
       } catch (err) {
@@ -1351,7 +1433,14 @@ class InsightsDataStore {
       }
     }
     
-    return JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_INSIGHTS;
+    const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_INSIGHTS;
+    return localList.map(item => {
+      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+        const def = DEFAULT_INSIGHTS.find(d => d.id === item.id);
+        if (def) item.image = def.image;
+      }
+      return item;
+    });
   }
 
   async getById(id) {
@@ -1899,7 +1988,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: About Showcase Photo",
         description: "Main primary photo in the About Display World section on the homepage.",
-        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/home-about-main.svg"
       },
       home_about_float: {
         key: "home_about_float",
@@ -1907,7 +1996,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: Tech Calibration Badge",
         description: "Floating secondary image showing calibration metrics on the homepage.",
-        url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80"
+        url: "assets/images/home-about-float.svg"
       },
       about_story_main: {
         key: "about_story_main",
@@ -1915,7 +2004,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Company Story Photo",
         description: "Primary high-resolution installation photo on the full About Us page.",
-        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/about-story-main.svg"
       },
       about_story_float: {
         key: "about_story_float",
@@ -1923,7 +2012,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Calibration Badge",
         description: "Floating secondary accent image in the story section on the About Us page.",
-        url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80"
+        url: "assets/images/about-story-float.svg"
       },
       explore_bg_lobby: {
         key: "explore_bg_lobby",
@@ -1931,7 +2020,7 @@ class SiteImagesDataStore {
         page: "explore.html",
         title: "Simulator: Corporate Lobby Backdrop",
         description: "3D virtual simulator environment backdrop for the Corporate Lobby preset.",
-        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80"
+        url: "assets/images/scene-lobby.svg"
       },
       explore_bg_retail: {
         key: "explore_bg_retail",
@@ -1939,7 +2028,7 @@ class SiteImagesDataStore {
         page: "explore.html",
         title: "Simulator: Retail Storefront Backdrop",
         description: "3D virtual simulator environment backdrop for the Retail Storefront preset.",
-        url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80"
+        url: "assets/images/scene-retail.svg"
       },
       explore_bg_control: {
         key: "explore_bg_control",
@@ -1947,7 +2036,7 @@ class SiteImagesDataStore {
         page: "explore.html",
         title: "Simulator: Command Center Backdrop",
         description: "3D virtual simulator environment backdrop for the Command Center preset.",
-        url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80"
+        url: "assets/images/scene-control.svg"
       },
       innov_oled: {
         key: "innov_oled",
@@ -1955,7 +2044,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: Transparent OLED Display",
         description: "Card visual showcasing Transparent OLED Glass Media technology.",
-        url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/innov-oled.svg"
       },
       innov_cob: {
         key: "innov_cob",
@@ -1963,7 +2052,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: MicroLED COB P0.9",
         description: "Card visual showcasing Chip-on-Board sub-millimeter MicroLED panels.",
-        url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/innov-cob.svg"
       },
       innov_holo: {
         key: "innov_holo",
@@ -1971,7 +2060,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: Holographic LED Fan",
         description: "Card visual showcasing 3D airborne Holographic LED Fan arrays.",
-        url: "https://images.unsplash.com/photo-1548345680-f5475ea5df84?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/innov-holo.svg"
       },
       innov_kinetic: {
         key: "innov_kinetic",
@@ -1979,7 +2068,7 @@ class SiteImagesDataStore {
         page: "innovation.html",
         title: "Innovation: Dynamic Kinetic Walls",
         description: "Card visual showcasing motor-actuated Kinetic LED screen modules.",
-        url: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/innov-kinetic.svg"
       },
       sol_retail: {
         key: "sol_retail",
@@ -1987,7 +2076,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Retail & Malls",
         description: "Feature display image in the Retail & Malls interactive industry panel.",
-        url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/sol-retail.svg"
       },
       sol_hospitality: {
         key: "sol_hospitality",
@@ -1995,7 +2084,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Hospitality & Hotels",
         description: "Feature display image in the Hospitality & Hotels interactive industry panel.",
-        url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/sol-hospitality.svg"
       },
       sol_healthcare: {
         key: "sol_healthcare",
@@ -2003,7 +2092,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Healthcare & Clinics",
         description: "Feature display image in the Healthcare & Clinics interactive industry panel.",
-        url: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/sol-healthcare.svg"
       },
       sol_education: {
         key: "sol_education",
@@ -2011,7 +2100,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Education & Campus",
         description: "Feature display image in the Education & Campus interactive industry panel.",
-        url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/sol-education.svg"
       },
       sol_corporate: {
         key: "sol_corporate",
@@ -2019,7 +2108,7 @@ class SiteImagesDataStore {
         page: "solutions.html",
         title: "Solutions: Corporate Offices",
         description: "Feature display image in the Corporate Offices interactive industry panel.",
-        url: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80"
+        url: "assets/images/sol-corporate.svg"
       }
     };
   }
@@ -2054,6 +2143,13 @@ class SiteImagesDataStore {
         console.error("Local site images read error:", e);
       }
     }
+
+    // Automatic purge for any stale external/Unsplash URLs:
+    Object.keys(storedUrls).forEach(k => {
+      if (storedUrls[k] && typeof storedUrls[k] === 'string' && storedUrls[k].includes('unsplash')) {
+        delete storedUrls[k];
+      }
+    });
 
     // Automatic migration/healing for logos from broken/unreachable third-party server:
     if (!storedUrls.logo_header || storedUrls.logo_header.includes('displayworldme.com')) {
