@@ -382,7 +382,7 @@ class ProjectsDataStore {
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (!Array.isArray(parsed) || parsed.some(p => !p.specs || !p.client || (typeof p.image === 'string' && p.image.includes('unsplash')))) {
+        if (!Array.isArray(parsed) || parsed.some(p => !p.specs || !p.client || (typeof p.image === 'string' && (p.image.includes('unsplash') || p.image.endsWith('.svg'))))) {
           needsReset = true;
         }
       } catch(e) {
@@ -411,7 +411,7 @@ class ProjectsDataStore {
           const list = [];
           snap.forEach(doc => {
             const data = { ...doc.data(), id: doc.id };
-            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+            if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
               const def = DEFAULT_PROJECTS.find(d => d.id === doc.id);
               if (def) data.image = def.image;
             }
@@ -427,7 +427,16 @@ class ProjectsDataStore {
     if (backendMode === 'local-api') {
       try {
         const res = await fetch(`${apiBaseUrl}/api/projects`);
-        if (res.ok) return await res.json();
+        if (res.ok) {
+          const list = await res.json();
+          return list.map(item => {
+            if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
+              const def = DEFAULT_PROJECTS.find(d => d.id === item.id);
+              if (def) item.image = def.image;
+            }
+            return item;
+          });
+        }
       } catch (err) {
         console.error("Local API read error:", err);
       }
@@ -435,7 +444,7 @@ class ProjectsDataStore {
     
     const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PROJECTS;
     return localList.map(item => {
-      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+      if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
         const def = DEFAULT_PROJECTS.find(d => d.id === item.id);
         if (def) item.image = def.image;
       }
@@ -449,7 +458,14 @@ class ProjectsDataStore {
     if (backendMode === 'firebase' && db) {
       try {
         const doc = await db.collection('projects').doc(id).get();
-        if (doc.exists) return { ...doc.data(), id: doc.id };
+        if (doc.exists) {
+          const data = { ...doc.data(), id: doc.id };
+          if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
+            const def = DEFAULT_PROJECTS.find(d => d.id === doc.id);
+            if (def) data.image = def.image;
+          }
+          return data;
+        }
       } catch (err) {
         console.error("Firestore getById error:", err);
       }
@@ -976,7 +992,7 @@ class ProductsDataStore {
           const list = [];
           snap.forEach(doc => {
             const data = { ...doc.data(), id: doc.id };
-            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+            if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
               const def = DEFAULT_PRODUCTS.find(d => d.id === doc.id);
               if (def) data.image = def.image;
             }
@@ -992,7 +1008,16 @@ class ProductsDataStore {
     if (backendMode === 'local-api') {
       try {
         const res = await fetch(`${apiBaseUrl}/api/products`);
-        if (res.ok) return await res.json();
+        if (res.ok) {
+          const list = await res.json();
+          return list.map(item => {
+            if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
+              const def = DEFAULT_PRODUCTS.find(d => d.id === item.id);
+              if (def) item.image = def.image;
+            }
+            return item;
+          });
+        }
       } catch (err) {
         console.error("Local API read error:", err);
       }
@@ -1000,7 +1025,7 @@ class ProductsDataStore {
     
     const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PRODUCTS;
     return localList.map(item => {
-      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+      if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
         const def = DEFAULT_PRODUCTS.find(d => d.id === item.id);
         if (def) item.image = def.image;
       }
@@ -1200,7 +1225,7 @@ class ServicesDataStore {
           const list = [];
           snap.forEach(doc => {
             const data = { ...doc.data(), id: doc.id };
-            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+            if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
               const def = DEFAULT_SERVICES.find(d => d.id === doc.id);
               if (def) data.image = def.image;
             }
@@ -1216,7 +1241,16 @@ class ServicesDataStore {
     if (backendMode === 'local-api') {
       try {
         const res = await fetch(`${apiBaseUrl}/api/services`);
-        if (res.ok) return await res.json();
+        if (res.ok) {
+          const list = await res.json();
+          return list.map(item => {
+            if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
+              const def = DEFAULT_SERVICES.find(d => d.id === item.id);
+              if (def) item.image = def.image;
+            }
+            return item;
+          });
+        }
       } catch (err) {
         console.error("Local API read error:", err);
       }
@@ -1224,7 +1258,7 @@ class ServicesDataStore {
     
     const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_SERVICES;
     return localList.map(item => {
-      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+      if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
         const def = DEFAULT_SERVICES.find(d => d.id === item.id);
         if (def) item.image = def.image;
       }
@@ -1427,7 +1461,7 @@ class InsightsDataStore {
           const list = [];
           snap.forEach(doc => {
             const data = { ...doc.data(), id: doc.id };
-            if (data.image && typeof data.image === 'string' && data.image.includes('unsplash')) {
+            if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
               const def = DEFAULT_INSIGHTS.find(d => d.id === doc.id);
               if (def) data.image = def.image;
             }
@@ -1443,7 +1477,16 @@ class InsightsDataStore {
     if (backendMode === 'local-api') {
       try {
         const res = await fetch(`${apiBaseUrl}/api/insights`);
-        if (res.ok) return await res.json();
+        if (res.ok) {
+          const list = await res.json();
+          return list.map(item => {
+            if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
+              const def = DEFAULT_INSIGHTS.find(d => d.id === item.id);
+              if (def) item.image = def.image;
+            }
+            return item;
+          });
+        }
       } catch (err) {
         console.error("Local API read error:", err);
       }
@@ -1451,7 +1494,7 @@ class InsightsDataStore {
     
     const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_INSIGHTS;
     return localList.map(item => {
-      if (item.image && typeof item.image === 'string' && item.image.includes('unsplash')) {
+      if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
         const def = DEFAULT_INSIGHTS.find(d => d.id === item.id);
         if (def) item.image = def.image;
       }
