@@ -2203,46 +2203,6 @@ class SiteImagesDataStore {
 
   getDefaults() {
     return {
-      logo_header: {
-        key: "logo_header",
-        category: "branding",
-        page: "All Pages (Header)",
-        title: "Navbar Brand Logo",
-        description: "Horizontal logo displayed in the top navigation bar across all pages.",
-        url: "assets/dw-logo-white.svg"
-      },
-      logo_footer: {
-        key: "logo_footer",
-        category: "branding",
-        page: "All Pages (Footer)",
-        title: "Footer Brand Logo",
-        description: "Logo displayed in the footer branding section across all pages.",
-        url: "assets/dw-logo.svg"
-      },
-      site_favicon: {
-        key: "site_favicon",
-        category: "branding",
-        page: "Browser Tab",
-        title: "Website Favicon",
-        description: "Small icon displayed in browser tabs, bookmark bars, and mobile shortcuts.",
-        url: "assets/dw-favicon.svg"
-      },
-      logo_stacked: {
-        key: "logo_stacked",
-        category: "branding",
-        page: "Social & Media / Centered",
-        title: "Centered Stacked Logo",
-        description: "Centered vertical logo lockup with DW monogram above DISPLAY WORLD typography.",
-        url: "assets/dw-logo-stacked.svg"
-      },
-      home_hero: {
-        key: "home_hero",
-        category: "home",
-        page: "index.html",
-        title: "Home: Hero Background Photo",
-        description: "Full-screen photo behind the headline at the top of the homepage. Use a wide landscape photo, ideally a real Display World installation.",
-        url: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c"
-      },
       home_about_main: {
         key: "home_about_main",
         category: "home",
@@ -2415,15 +2375,8 @@ class SiteImagesDataStore {
     });
 
     // Automatic migration/healing for logos from broken/unreachable third-party server:
-    if (!storedUrls.logo_header || storedUrls.logo_header.includes('displayworldme.com')) {
-      storedUrls.logo_header = defaultUrls.logo_header;
-    }
-    if (!storedUrls.logo_footer || storedUrls.logo_footer.includes('displayworldme.com')) {
-      storedUrls.logo_footer = defaultUrls.logo_footer;
-    }
-    if (!storedUrls.site_favicon || storedUrls.site_favicon.includes('displayworldme.com')) {
-      storedUrls.site_favicon = defaultUrls.site_favicon;
-    }
+    // Logos, favicon and the home hero are fixed in code (not editable from the admin); ignore old saved values
+    ['logo_header','logo_footer','site_favicon','logo_stacked','home_hero'].forEach(k => delete storedUrls[k]);
 
     // "Save all" used to store the old default paths; treat those as defaults so new defaults apply
     const RETIRED_DEFAULTS = [
