@@ -35,7 +35,7 @@
   <meta name="twitter:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
 
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=6">
+  <link rel="stylesheet" href="index.css?v=7">
 
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -603,7 +603,7 @@
     </button>
   </div>
 
-  <script src="projects-data.js?v=10"></script>
+  <script src="projects-data.js?v=12"></script>
   <script>
     async function renderHomePortfolio() {
       const container = document.getElementById('portfolio-container-home');
@@ -615,16 +615,17 @@
       
       projects.forEach((p, idx) => {
         const card = document.createElement('a');
-        card.href = `project-detail.html?id=${p.id}`;
+        card.href = `project-detail.html?id=${encodeURIComponent(p.id)}`;
         const isWide = idx === 0;
         card.className = `pf-card ${isWide ? 'pf-wide' : ''} reveal`;
         
         card.innerHTML = `
-          <img src="${p.image}" alt="${p.title}">
+          <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
+          ${p.photoCount > 1 ? `<span class="pf-photos">${p.photoCount} photos</span>` : ''}
           <div class="pf-overlay">
-            <span class="pf-cat">${p.category}</span>
-            <h3>${p.title}</h3>
-            <p>${p.shortDesc}</p>
+            <span class="pf-cat">${escapeHtml(p.category)}</span>
+            <h3>${escapeHtml(p.title)}</h3>
+            <p>${escapeHtml(p.shortDesc)}</p>
           </div>
         `;
         container.appendChild(card);
@@ -637,6 +638,6 @@
     }
     renderHomePortfolio();
   </script>
-  <script src="index.js?v=6"></script>
+  <script src="index.js?v=7"></script>
 </body>
 </html>

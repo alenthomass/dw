@@ -7,7 +7,7 @@
   <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
   <title>Management Portal | Display World</title>
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=6">
+  <link rel="stylesheet" href="index.css?v=7">
   
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -926,6 +926,34 @@
       border-color: rgba(0,0,0,0.1);
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
+
+    /* ===== Project gallery manager ===== */
+    .pg-dropzone { border:1.5px dashed var(--border); border-radius:10px; padding:1.25rem; text-align:center; cursor:pointer; color:var(--text-dim); font-size:0.85rem; transition:border-color .2s, background .2s; display:flex; flex-direction:column; gap:.3rem; align-items:center; }
+    .pg-dropzone:hover, .pg-dropzone:focus, .pg-dropzone.drag { border-color:var(--pink); background:rgba(250,3,110,0.05); outline:none; }
+    .pg-dropzone strong { color:var(--white); }
+    .pg-drop-icon { font-size:1.2rem; color:var(--pink); }
+    .pg-drop-hint { font-size:0.72rem; opacity:.75; }
+    .pg-summary { font-size:0.78rem; margin:.6rem 0 .2rem; color:var(--text-dim); min-height:1em; }
+    .pg-summary .err { color:var(--pink); }
+    .pg-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(118px, 1fr)); gap:.6rem; margin-top:.4rem; }
+    .pg-item { position:relative; border:1px solid var(--border); border-radius:8px; overflow:hidden; aspect-ratio:4/3; background:rgba(255,255,255,0.03); }
+    .pg-item img { width:100%; height:100%; object-fit:cover; display:block; }
+    .pg-item.is-cover { border-color:var(--pink); box-shadow:0 0 0 1px var(--pink); }
+    .pg-item.is-error img { opacity:.35; filter:grayscale(1); }
+    .pg-badge { position:absolute; top:5px; left:5px; background:var(--pink); color:#fff; font-size:0.62rem; font-weight:700; padding:2px 6px; border-radius:4px; letter-spacing:.3px; text-transform:uppercase; }
+    .pg-actions { position:absolute; inset:auto 0 0 0; display:flex; justify-content:space-between; gap:2px; padding:4px; background:linear-gradient(transparent, rgba(0,0,0,.75)); opacity:0; transition:opacity .15s; }
+    .pg-item:hover .pg-actions, .pg-item:focus-within .pg-actions { opacity:1; }
+    @media (hover:none) { .pg-actions { opacity:1; } }
+    .pg-actions button { background:rgba(0,0,0,.6); color:#fff; border:1px solid rgba(255,255,255,.2); border-radius:5px; font-size:0.7rem; padding:3px 6px; cursor:pointer; line-height:1; }
+    .pg-actions button:hover { background:var(--pink); border-color:var(--pink); }
+    .pg-actions button:disabled { opacity:.3; cursor:default; background:rgba(0,0,0,.6); border-color:rgba(255,255,255,.2); }
+    .pg-progress { position:absolute; left:0; right:0; bottom:0; height:4px; background:rgba(255,255,255,.15); }
+    .pg-progress span { display:block; height:100%; background:var(--pink); width:0; transition:width .2s; }
+    .pg-state { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:600; color:#fff; text-align:center; padding:.4rem; background:rgba(0,0,0,.35); }
+    .pg-item.is-error .pg-state { background:rgba(120,0,40,.55); }
+    .admin-thumb { width:44px; height:33px; object-fit:cover; border-radius:5px; border:1px solid var(--border); vertical-align:middle; margin-right:.6rem; }
+    .admin-photo-count { font-size:0.7rem; color:var(--text-dim); font-weight:500; margin-left:.4rem; white-space:nowrap; }
+    [data-theme="light"] .pg-dropzone strong { color:#111; }
   </style>
 </head>
 <body>
@@ -945,9 +973,9 @@
       <div id="login-error-msg" class="login-error-box"></div>
 
       <div style="text-align:left; margin-bottom:1rem;">
-        <label for="login-username" style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:0.4rem;">Username</label>
+        <label for="login-username" style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:0.4rem;">Username or Admin Email</label>
         <div style="position:relative;">
-          <input type="text" id="login-username" placeholder="e.g. admin" autocomplete="username" style="padding-left:2.5rem;">
+          <input type="text" id="login-username" placeholder="admin email" autocomplete="username" style="padding-left:2.5rem;">
           <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); font-size:1rem; opacity:0.65; pointer-events:none;">👤</span>
         </div>
       </div>
@@ -1588,7 +1616,7 @@
   <div class="admin-modal" id="project-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modal-title">Register Case Study</h3>
+        <h3 id="modal-title">Register Project</h3>
         <button class="close-modal" id="close-modal-btn">×</button>
       </div>
       <form id="project-form">
@@ -1610,21 +1638,22 @@
           </div>
           <div class="modal-field">
             <label for="field-year">Deployment Year</label>
-            <input type="text" id="field-year" required>
+            <input type="text" id="field-year" required inputmode="numeric" maxlength="4" placeholder="e.g. 2025">
           </div>
           <div class="modal-field">
             <label for="field-location">Location / Region</label>
             <input type="text" id="field-location" required>
           </div>
           <div class="modal-field full-width">
-            <label>Upload Display Image File</label>
-            <div style="display:flex; gap:1.5rem; align-items:center; background:rgba(255,255,255,0.01); border:1px dashed var(--border); padding:1rem; border-radius:8px;">
-              <input type="file" id="field-image-file" accept="image/*" style="border:none; background:none; padding:0;">
-              <img id="image-preview" src="" alt="Preview" style="max-height:60px; border-radius:6px; border:1px solid var(--border); display:none;">
+            <label>Project Photos <span style="text-transform:none; letter-spacing:0; font-weight:500; color:var(--text-dim);">(select or drop several at once; the first photo is the cover)</span></label>
+            <div class="pg-dropzone" id="pg-dropzone" tabindex="0" role="button" aria-label="Add project photos">
+              <input type="file" id="field-image-file" accept="image/*" multiple hidden>
+              <div class="pg-drop-icon">⬆</div>
+              <div><strong>Click to choose photos</strong> or drag them here</div>
+              <div class="pg-drop-hint">JPG, PNG, WebP, GIF or SVG. Up to 25 MB each. Large photos are optimised automatically.</div>
             </div>
-            <div id="project-upload-status" style="font-size:0.78rem; margin-top:0.4rem; display:none;"></div>
-            <!-- Keep hidden fallback URL field -->
-            <input type="hidden" id="field-image-url">
+            <div class="pg-summary" id="pg-summary"></div>
+            <div class="pg-grid" id="pg-grid"></div>
           </div>
           <div class="modal-field full-width">
             <label for="field-shortDesc">Short Description</label>
@@ -1669,7 +1698,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-outline" id="cancel-modal-btn">Cancel</button>
-          <button type="submit" class="btn-primary"><span>Save Project Case</span></button>
+          <button type="submit" class="btn-primary"><span>Save Project</span></button>
         </div>
       </form>
     </div>
@@ -1909,7 +1938,7 @@
   </div>
 
 
-  <script src="projects-data.js?v=10"></script>
+  <script src="projects-data.js?v=12"></script>
   <script>
     // ==========================================
     // AUTHENTICATION & SESSION MANAGEMENT
@@ -2037,6 +2066,43 @@
         indicator.style.background = 'var(--pink)';
         bannerText.textContent = 'Backend Connection Mode: Local Storage Simulation (Offline)';
       }
+      verifyCloudConnection();
+    }
+
+    // Checks the cloud database and the admin's Firebase sign-in for real, and says so loudly if either is missing
+    let cloudCheckRunning = false;
+    async function verifyCloudConnection() {
+      if (cloudCheckRunning || ProjectsStore.getMode() !== 'firebase') return;
+      cloudCheckRunning = true;
+      const indicator = document.getElementById('conn-indicator');
+      const bannerText = document.getElementById('conn-text');
+      try {
+        const health = await checkCloudHealth();
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          await new Promise(res => { const off = firebase.auth().onAuthStateChanged(() => { off(); res(); }); });
+        }
+        if (!health.ok) {
+          indicator.style.background = 'var(--pink)';
+          bannerText.textContent = '⚠ ' + health.reason;
+        } else if (!AuthStore.hasCloudSession()) {
+          indicator.style.background = '#f5a623';
+          bannerText.textContent = '⚠ Cloud database online, but you are not signed in with the admin email. Log out and log in with the Firebase admin email, otherwise saves and uploads will be rejected.';
+        } else {
+          indicator.style.background = '#61CE70';
+          bannerText.textContent = `Cloud database online · signed in as ${firebase.auth().currentUser.email}`;
+          try {
+            const { seeded } = await seedCloudIfEmpty();
+            if (seeded.length) {
+              bannerText.textContent += ` · copied existing site content into the new database (${seeded.join(', ')})`;
+              loadAdminDashboard();
+            }
+          } catch (err) {
+            console.warn('Initial content copy failed:', err);
+          }
+        }
+      } finally {
+        cloudCheckRunning = false;
+      }
     }
 
 
@@ -2090,6 +2156,7 @@
     };
 
     async function loadAdminDashboard() {
+      await detectBackend(); // banner used to render before the backend was known
       updateConnectionStatusBanner();
       
       // Load Categories List
@@ -2101,37 +2168,40 @@
       categories.forEach(c => {
         const tag = document.createElement('div');
         tag.className = 'category-tag';
-        tag.innerHTML = `
-          <span>${c}</span>
-          <button onclick="deleteCategory('${c}')">×</button>
-        `;
+        tag.innerHTML = `<span>${escapeHtml(c)}</span><button type="button" aria-label="Remove category">×</button>`;
+        tag.querySelector('button').addEventListener('click', () => deleteCategory(c));
         catContainer.appendChild(tag);
-        
+
         const opt = document.createElement('option');
         opt.value = c;
         opt.textContent = c;
         categorySelect.appendChild(opt);
       });
-      
+
       // Load Projects List
       const projects = await ProjectsStore.getAll();
       tableBody.innerHTML = '';
       projects.forEach(p => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td style="font-weight:bold; color:var(--white);">${p.title}</td>
-          <td><span class="label-tag" style="margin:0;">${p.category}</span></td>
-          <td>${p.client}</td>
-          <td>${p.location}</td>
+          <td style="font-weight:bold; color:var(--white);"><img class="admin-thumb" src="${escapeHtml(p.image)}" alt="" loading="lazy" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">${escapeHtml(p.title)}<span class="admin-photo-count">${p.photoCount || 0} photo${p.photoCount === 1 ? '' : 's'}</span></td>
+          <td><span class="label-tag" style="margin:0;">${escapeHtml(p.category)}</span></td>
+          <td>${escapeHtml(p.client)}</td>
+          <td>${escapeHtml(p.location)}</td>
           <td>
             <div class="action-btn-row">
-              <button class="action-btn edit" onclick="editProject('${p.id}')">Edit</button>
-              <button class="action-btn delete" onclick="deleteProject('${p.id}')">Delete</button>
+              <button class="action-btn edit" data-id="${escapeHtml(p.id)}" data-act="edit">Edit</button>
+              <button class="action-btn delete" data-id="${escapeHtml(p.id)}" data-act="delete">Delete</button>
             </div>
           </td>
         `;
+        row.querySelector('[data-act="edit"]').addEventListener('click', () => editProject(p.id));
+        row.querySelector('[data-act="delete"]').addEventListener('click', () => deleteProject(p.id));
         tableBody.appendChild(row);
       });
+      if (projects.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim); padding:2rem;">No projects yet. Click "Add" to create the first one.</td></tr>`;
+      }
 
       // Load Case Studies List
       const caseStudies = await CaseStudiesStore.getAll();
@@ -2169,35 +2239,36 @@
           if (inquiries.length > 0) {
             alertBanner.style.display = 'flex';
             alertText.textContent = `You have ${inquiries.length} customer message${inquiries.length > 1 ? 's' : ''} awaiting response.`;
-            pingDot.style.display = 'block';
-            statCard.style.background = 'rgba(250, 3, 110, 0.05)';
-            statCard.style.borderColor = 'var(--pink)';
-            statLabel.style.color = 'var(--pink)';
+            if (pingDot) pingDot.style.display = 'block';
+            if (statCard) { statCard.style.background = 'rgba(250, 3, 110, 0.05)'; statCard.style.borderColor = 'var(--pink)'; }
+            if (statLabel) statLabel.style.color = 'var(--pink)';
           } else {
             alertBanner.style.display = 'none';
-            pingDot.style.display = 'none';
-            statCard.style.background = 'var(--bg2)';
-            statCard.style.borderColor = 'var(--border)';
-            statLabel.style.color = 'var(--text-dim)';
+            if (pingDot) pingDot.style.display = 'none';
+            if (statCard) { statCard.style.background = 'var(--bg2)'; statCard.style.borderColor = 'var(--border)'; }
+            if (statLabel) statLabel.style.color = 'var(--text-dim)';
           }
 
           if (inquiries.length === 0) {
             inquiriesTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:2rem;">No customer inquiries received yet.</td></tr>`;
           } else {
-            inquiries.slice().reverse().forEach(inq => {
+            inquiries.slice().sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || ''))).forEach(inq => {
               const row = document.createElement('tr');
+              const isAmc = inq.type === 'AMC SLA Inquiry';
+              const when = inq.timestamp ? new Date(inq.timestamp) : null;
               row.innerHTML = `
-                <td><span class="label-tag" style="margin:0; background:${inq.type === 'AMC SLA Inquiry' ? 'rgba(156,39,176,0.1)' : 'rgba(250,3,110,0.1)'}; color:${inq.type === 'AMC SLA Inquiry' ? '#e040fb' : '#fa036e'}; border-color:${inq.type === 'AMC SLA Inquiry' ? 'rgba(224,64,251,0.2)' : 'rgba(250,3,110,0.2)'}">${inq.type}</span></td>
-                <td style="font-weight:bold; color:var(--white);">${inq.name}${inq.company ? `<br><span style="font-weight:normal; font-size:0.75rem; color:var(--text-dim);">${inq.company}</span>` : ''}</td>
-                <td><a href="mailto:${inq.email}" style="color:var(--pink); text-decoration:none;">${inq.email}</a></td>
-                <td style="font-size:0.85rem; max-width:300px; white-space:normal; line-height:1.4;">${inq.subject ? `<strong>Subj: ${inq.subject}</strong><br>` : ''}${inq.message || inq.details || ''}</td>
-                <td style="font-size:0.75rem; font-family:monospace;">${new Date(inq.timestamp).toLocaleString()}</td>
+                <td><span class="label-tag" style="margin:0; background:${isAmc ? 'rgba(156,39,176,0.1)' : 'rgba(250,3,110,0.1)'}; color:${isAmc ? '#e040fb' : '#fa036e'}; border-color:${isAmc ? 'rgba(224,64,251,0.2)' : 'rgba(250,3,110,0.2)'}">${escapeHtml(inq.type || 'Inquiry')}</span></td>
+                <td style="font-weight:bold; color:var(--white);">${escapeHtml(inq.name)}${inq.company ? `<br><span style="font-weight:normal; font-size:0.75rem; color:var(--text-dim);">${escapeHtml(inq.company)}</span>` : ''}</td>
+                <td><a href="mailto:${encodeURIComponent(inq.email || '').replace(/%40/g, '@')}" style="color:var(--pink); text-decoration:none;">${escapeHtml(inq.email)}</a></td>
+                <td style="font-size:0.85rem; max-width:300px; white-space:pre-wrap; line-height:1.4;">${inq.subject ? `<strong>Subj: ${escapeHtml(inq.subject)}</strong><br>` : ''}${inq.plan ? `<strong>Plan: ${escapeHtml(String(inq.plan).toUpperCase())}</strong><br>` : ''}${escapeHtml(inq.message || inq.details || '')}</td>
+                <td style="font-size:0.75rem; font-family:monospace;">${when && !isNaN(when) ? when.toLocaleString() : '-'}</td>
                 <td>
                   <div class="action-btn-row">
-                    <button class="action-btn delete" onclick="deleteInquiry('${inq.id}')">Delete</button>
+                    <button class="action-btn delete" data-act="delete">Delete</button>
                   </div>
                 </td>
               `;
+              row.querySelector('[data-act="delete"]').addEventListener('click', () => deleteInquiry(inq.id));
               inquiriesTableBody.appendChild(row);
             });
           }
@@ -2298,67 +2369,190 @@
     }
 
     // Add category handler
-    addCatBtn.addEventListener('click', async () => {
+    async function addCategory() {
       const val = newCatInput.value.trim();
       if (!val) return;
-      
-      await ProjectsStore.saveCategory(val);
-      newCatInput.value = '';
+      try {
+        const added = await ProjectsStore.saveCategory(val);
+        if (!added) alert(`"${val}" already exists.`);
+        newCatInput.value = '';
+      } catch (err) {
+        alert('Could not add category: ' + (err.message || 'Unknown error'));
+      }
       loadAdminDashboard();
-    });
+    }
+    addCatBtn.addEventListener('click', addCategory);
+    newCatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addCategory(); } });
 
     // Delete category handler
     window.deleteCategory = async function(category) {
-      if (confirm(`Remove category "${category}" from registry selectors?`)) {
-        await ProjectsStore.deleteCategory(category);
+      const inUse = (await ProjectsStore.getAll()).filter(p => p.category === category).length;
+      const msg = inUse
+        ? `${inUse} project(s) still use "${category}". They will keep showing it until you edit them. Remove the category anyway?`
+        : `Remove category "${category}"?`;
+      if (confirm(msg)) {
+        try {
+          await ProjectsStore.deleteCategory(category);
+        } catch (err) {
+          alert('Could not remove category: ' + (err.message || 'Unknown error'));
+        }
         loadAdminDashboard();
       }
     };
 
-    // File Upload Preview & Firebase Upload for Projects
+    // ==========================================
+    // PROJECT PHOTO GALLERY (multiple uploads, stored per project)
+    // ==========================================
     const fileInput = document.getElementById('field-image-file');
-    const imgPreview = document.getElementById('image-preview');
-    const fieldImgUrl = document.getElementById('field-image-url');
-    const projectUploadStatus = document.getElementById('project-upload-status');
-    let projectUploadingPromise = null;
+    const pgDropzone = document.getElementById('pg-dropzone');
+    const pgGrid = document.getElementById('pg-grid');
+    const pgSummary = document.getElementById('pg-summary');
+    const MAX_PROJECT_PHOTOS = 30;
 
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          imgPreview.src = e.target.result;
-          imgPreview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+    let galleryItems = [];        // [{ key, ref, preview, status: 'done'|'uploading'|'error', pct, error, name }]
+    let originalRefs = [];        // photos the project had when the modal opened
+    let sessionUploads = [];      // photos uploaded since the modal opened (cleaned up if the admin cancels)
+    let currentProjectId = null;
+    let projectSaved = false;
 
-        if (projectUploadStatus) {
-          projectUploadStatus.style.display = 'block';
-          projectUploadStatus.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading "${file.name}" to Firebase Storage...</span>`;
-        }
+    function newProjectId() {
+      return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    }
 
-        try {
-          projectUploadingPromise = ProjectsStore.uploadImage(file, (pct) => {
-            if (projectUploadStatus) {
-              projectUploadStatus.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading to Firebase: ${Math.round(pct)}%</span>`;
-            }
-          });
-          const url = await projectUploadingPromise;
-          fieldImgUrl.value = url;
-          if (projectUploadStatus) {
-            projectUploadStatus.innerHTML = `<span style="color:var(--green);">✅ Stored in Firebase Storage</span>`;
-          }
-        } catch (err) {
-          console.error("Project image upload error:", err);
-          if (projectUploadStatus) {
-            projectUploadStatus.innerHTML = `<span style="color:var(--pink);">❌ ${err.message || 'Firebase upload failed'}</span>`;
-          }
-          alert('Upload to Firebase failed: ' + (err.message || 'Unknown error'));
-        } finally {
-          projectUploadingPromise = null;
-        }
+    function renderGallery() {
+      pgGrid.innerHTML = '';
+      galleryItems.forEach((item, idx) => {
+        const el = document.createElement('div');
+        el.className = 'pg-item' + (idx === 0 ? ' is-cover' : '') + (item.status === 'error' ? ' is-error' : '');
+        const busy = item.status === 'uploading';
+        el.innerHTML = `
+          <img src="${escapeHtml(item.preview || 'assets/images/placeholder.svg')}" alt="${escapeHtml(item.name || 'Project photo')}" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
+          ${idx === 0 && item.status !== 'error' ? '<span class="pg-badge">Cover</span>' : ''}
+          ${busy ? `<div class="pg-state">${Math.round(item.pct || 0)}%</div><div class="pg-progress"><span style="width:${Math.round(item.pct || 0)}%"></span></div>` : ''}
+          ${item.status === 'error' ? `<div class="pg-state" title="${escapeHtml(item.error)}">Failed<br>${escapeHtml((item.error || '').slice(0, 60))}</div>` : ''}
+          <div class="pg-actions">
+            <button type="button" data-act="left" title="Move left" ${idx === 0 || busy ? 'disabled' : ''}>◀</button>
+            <button type="button" data-act="cover" title="Make cover photo" ${idx === 0 || item.status !== 'done' ? 'disabled' : ''}>★</button>
+            <button type="button" data-act="right" title="Move right" ${idx === galleryItems.length - 1 || busy ? 'disabled' : ''}>▶</button>
+            <button type="button" data-act="remove" title="Remove photo" ${busy ? 'disabled' : ''}>✕</button>
+          </div>`;
+        el.querySelectorAll('button[data-act]').forEach(btn => {
+          btn.addEventListener('click', (ev) => { ev.stopPropagation(); galleryAction(item.key, btn.dataset.act); });
+        });
+        pgGrid.appendChild(el);
+      });
+
+      const done = galleryItems.filter(i => i.status === 'done').length;
+      const uploading = galleryItems.filter(i => i.status === 'uploading').length;
+      const failed = galleryItems.filter(i => i.status === 'error').length;
+      const parts = [];
+      if (galleryItems.length === 0) parts.push('No photos yet. A placeholder will be shown until you add one.');
+      else parts.push(`${done} photo${done === 1 ? '' : 's'} ready`);
+      if (uploading) parts.push(`${uploading} uploading…`);
+      if (failed) parts.push(`<span class="err">${failed} failed (remove them or try again)</span>`);
+      pgSummary.innerHTML = parts.join(' · ');
+    }
+
+    function galleryAction(key, act) {
+      const idx = galleryItems.findIndex(i => i.key === key);
+      if (idx === -1) return;
+      if (act === 'remove') {
+        galleryItems.splice(idx, 1);
+      } else if (act === 'cover') {
+        const [item] = galleryItems.splice(idx, 1);
+        galleryItems.unshift(item);
+      } else if (act === 'left' && idx > 0) {
+        [galleryItems[idx - 1], galleryItems[idx]] = [galleryItems[idx], galleryItems[idx - 1]];
+      } else if (act === 'right' && idx < galleryItems.length - 1) {
+        [galleryItems[idx + 1], galleryItems[idx]] = [galleryItems[idx], galleryItems[idx + 1]];
       }
+      renderGallery();
+    }
+
+    async function addGalleryFiles(fileList) {
+      let files = Array.from(fileList || []).filter(f => f && (!f.type || f.type.startsWith('image/')));
+      const skipped = (fileList ? fileList.length : 0) - files.length;
+      const room = MAX_PROJECT_PHOTOS - galleryItems.length;
+      if (room <= 0) {
+        alert(`A project can have up to ${MAX_PROJECT_PHOTOS} photos.`);
+        return;
+      }
+      if (files.length > room) {
+        alert(`Only the first ${room} photo(s) were added. A project can have up to ${MAX_PROJECT_PHOTOS} photos.`);
+        files = files.slice(0, room);
+      }
+      if (skipped > 0) alert(`${skipped} file(s) skipped because they are not images.`);
+      if (!files.length) return;
+
+      const projectIdAtStart = currentProjectId;
+      const newItems = files.map(f => ({
+        key: 'k' + Math.random().toString(36).slice(2),
+        ref: null,
+        preview: URL.createObjectURL(f),
+        status: 'uploading',
+        pct: 0,
+        name: f.name
+      }));
+      galleryItems.push(...newItems);
+      renderGallery();
+
+      await ProjectsStore.uploadImages(files, projectIdAtStart, (i, info) => {
+        const item = newItems[i];
+        if (info.status === 'uploading') item.pct = info.pct;
+        if (info.status === 'done') {
+          item.status = 'done';
+          item.ref = info.url;
+          sessionUploads.push(info.url);
+        }
+        if (info.status === 'error') {
+          item.status = 'error';
+          item.error = info.error;
+        }
+        // The modal may have been closed/reopened for another project mid-upload; ignore stale updates
+        if (projectIdAtStart === currentProjectId) renderGallery();
+      });
+    }
+
+    pgDropzone.addEventListener('click', () => fileInput.click());
+    pgDropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+    fileInput.addEventListener('change', () => {
+      addGalleryFiles(fileInput.files);
+      fileInput.value = ''; // lets the admin pick the same file again later
     });
+    ['dragenter', 'dragover'].forEach(ev => pgDropzone.addEventListener(ev, (e) => { e.preventDefault(); pgDropzone.classList.add('drag'); }));
+    ['dragleave', 'drop'].forEach(ev => pgDropzone.addEventListener(ev, (e) => { e.preventDefault(); pgDropzone.classList.remove('drag'); }));
+    pgDropzone.addEventListener('drop', (e) => addGalleryFiles(e.dataTransfer && e.dataTransfer.files));
+
+    function openProjectModal(project) {
+      projectForm.reset();
+      projectSaved = false;
+      sessionUploads = [];
+      currentProjectId = project ? project.id : newProjectId();
+      document.getElementById('field-id').value = project ? project.id : '';
+      originalRefs = project ? (project.images || []).slice() : [];
+      const previews = project ? (project.gallery || []) : [];
+      galleryItems = originalRefs.map((ref, i) => ({
+        key: 'k' + Math.random().toString(36).slice(2),
+        ref,
+        preview: previews[i] || (ref.startsWith('media:') ? '' : ref),
+        status: 'done',
+        pct: 100,
+        name: `Photo ${i + 1}`
+      }));
+      renderGallery();
+      projectModal.classList.add('active');
+    }
+
+    function closeModal() {
+      const stillUploading = galleryItems.some(i => i.status === 'uploading');
+      if (stillUploading && !projectSaved && !confirm('Photos are still uploading. Close anyway and discard them?')) return;
+      projectModal.classList.remove('active');
+      // Admin cancelled: remove photos uploaded in this session that were never saved
+      if (!projectSaved) sessionUploads.forEach(ref => { if (!originalRefs.includes(ref)) deleteUploadedMedia(ref); });
+      galleryItems.forEach(i => { if (i.preview && i.preview.startsWith('blob:')) URL.revokeObjectURL(i.preview); });
+      sessionUploads = [];
+      currentProjectId = null;
+    }
 
     // Universal Generic Upload Handler for Modals (Products, Insights, etc.)
     window.handleGenericUpload = async function(file, inputId, statusId, folder = 'uploads') {
@@ -2367,95 +2561,84 @@
       const inputEl = document.getElementById(inputId);
       if (statusEl) {
         statusEl.style.display = 'block';
-        statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading "${file.name}" to Firebase Storage...</span>`;
+        statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading "${escapeHtml(file.name)}"...</span>`;
       }
       try {
         const url = await uploadImageToFirebase(file, folder, (pct) => {
           if (statusEl) {
-            statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading to Firebase: ${Math.round(pct)}%</span>`;
+            statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading: ${Math.round(pct)}%</span>`;
           }
         });
         if (url && inputEl) {
           inputEl.value = url;
           if (statusEl) {
-            statusEl.innerHTML = `<span style="color:var(--green);">✅ Stored in Firebase Storage!</span>`;
+            statusEl.innerHTML = `<span style="color:#61CE70;">✅ Uploaded</span>`;
             setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3500);
           }
         }
       } catch (err) {
         console.error('Upload failed:', err);
         if (statusEl) {
-          statusEl.innerHTML = `<span style="color:var(--pink);">❌ ${err.message || 'Upload failed'}</span>`;
+          statusEl.innerHTML = `<span style="color:var(--pink);">❌ ${escapeHtml(err.message || 'Upload failed')}</span>`;
         }
-        alert('Upload to Firebase failed: ' + (err.message || 'Unknown error'));
+        alert('Upload failed: ' + (err.message || 'Unknown error'));
       }
     };
 
     // Modal Triggers for Projects
     document.getElementById('add-project-btn').addEventListener('click', () => {
-      projectForm.reset();
-      document.getElementById('field-id').value = '';
-      imgPreview.style.display = 'none';
-      imgPreview.src = '';
-      fieldImgUrl.value = '';
-      if (projectUploadStatus) {
-        projectUploadStatus.style.display = 'none';
-        projectUploadStatus.innerHTML = '';
-      }
-      modalTitle.textContent = 'Register New Case Study';
-      projectModal.classList.add('active');
+      modalTitle.textContent = 'Register New Project';
+      openProjectModal(null);
     });
 
-    function closeModal() {
-      projectModal.classList.remove('active');
-    }
-    
     document.getElementById('close-modal-btn').addEventListener('click', closeModal);
     document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
 
-    // Edit case study details
+    // Edit project details
     window.editProject = async function(id) {
       const p = await ProjectsStore.getById(id);
-      if (!p) return;
-      
-      document.getElementById('field-id').value = p.id;
-      document.getElementById('field-title').value = p.title;
-      document.getElementById('field-category').value = p.category;
-      document.getElementById('field-client').value = p.client;
-      document.getElementById('field-year').value = p.year;
-      document.getElementById('field-location').value = p.location;
-      fieldImgUrl.value = p.image;
-      
-      if (p.image) {
-        imgPreview.src = p.image;
-        imgPreview.style.display = 'block';
-      } else {
-        imgPreview.style.display = 'none';
+      if (!p) {
+        alert('This project could not be found. It may have been deleted.');
+        loadAdminDashboard();
+        return;
       }
-      if (projectUploadStatus) {
-        projectUploadStatus.style.display = 'none';
-        projectUploadStatus.innerHTML = '';
+
+      modalTitle.textContent = 'Edit Project';
+      openProjectModal(p);
+
+      document.getElementById('field-title').value = p.title || '';
+      // A project can point at a category that was deleted since; keep it selectable instead of silently switching
+      if (p.category && ![...categorySelect.options].some(o => o.value === p.category)) {
+        const opt = document.createElement('option');
+        opt.value = p.category;
+        opt.textContent = `${p.category} (removed category)`;
+        categorySelect.appendChild(opt);
       }
-      
-      document.getElementById('field-shortDesc').value = p.shortDesc;
-      document.getElementById('field-challenge').value = p.challenge;
-      document.getElementById('field-solution').value = p.solution;
-      
-      document.getElementById('field-spec-system').value = p.specs.system || '';
-      document.getElementById('field-spec-bezel').value = p.specs.bezel || '';
-      document.getElementById('field-spec-brightness').value = p.specs.brightness || '';
-      document.getElementById('field-spec-failover').value = p.specs.failover || '';
-      document.getElementById('field-spec-uptime').value = p.specs.uptime || '';
+      document.getElementById('field-category').value = p.category || '';
+      document.getElementById('field-client').value = p.client || '';
+      document.getElementById('field-year').value = p.year || '';
+      document.getElementById('field-location').value = p.location || '';
+      document.getElementById('field-shortDesc').value = p.shortDesc || '';
+      document.getElementById('field-challenge').value = p.challenge || '';
+      document.getElementById('field-solution').value = p.solution || '';
+
+      const specs = p.specs || {};
+      document.getElementById('field-spec-system').value = specs.system || '';
+      document.getElementById('field-spec-bezel').value = specs.bezel || '';
+      document.getElementById('field-spec-brightness').value = specs.brightness || '';
+      document.getElementById('field-spec-failover').value = specs.failover || '';
+      document.getElementById('field-spec-uptime').value = specs.uptime || '';
       document.getElementById('field-isWide').checked = !!p.isWide;
-      
-      modalTitle.textContent = 'Edit Case Study';
-      projectModal.classList.add('active');
     };
 
-    // Delete case
+    // Delete project (and its uploaded photos)
     window.deleteProject = async function(id) {
-      if (confirm('Are you sure you want to delete this case study registry?')) {
-        await ProjectsStore.delete(id);
+      if (confirm('Delete this project and all of its photos? This cannot be undone.')) {
+        try {
+          await ProjectsStore.delete(id);
+        } catch (err) {
+          alert('Could not delete the project: ' + (err.message || 'Unknown error'));
+        }
         loadAdminDashboard();
       }
     };
@@ -2463,7 +2646,21 @@
     // Form submission save for Projects
     projectForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
+      if (galleryItems.some(i => i.status === 'uploading')) {
+        alert('Please wait until all photos have finished uploading.');
+        return;
+      }
+      const failed = galleryItems.filter(i => i.status === 'error');
+      if (failed.length && !confirm(`${failed.length} photo(s) failed to upload and will be left out. Save anyway?`)) return;
+
+      const year = document.getElementById('field-year').value.trim();
+      if (!/^\d{4}$/.test(year)) {
+        alert('Deployment year should be a 4-digit year, for example 2025.');
+        document.getElementById('field-year').focus();
+        return;
+      }
+
       const submitBtn = projectForm.querySelector('button[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -2471,45 +2668,41 @@
       }
 
       try {
-        if (projectUploadingPromise) {
-          await projectUploadingPromise;
-        }
+        const images = galleryItems.filter(i => i.status === 'done' && i.ref).map(i => i.ref);
+        const id = document.getElementById('field-id').value || currentProjectId || newProjectId();
+        const existing = document.getElementById('field-id').value ? await ProjectsStore.getById(id) : null;
 
-        const file = fileInput.files[0];
-        let imageUrl = fieldImgUrl.value;
-        
-        if (file && (!imageUrl || imageUrl.startsWith('data:'))) {
-          imageUrl = await ProjectsStore.uploadImage(file);
-          fieldImgUrl.value = imageUrl;
-        }
-        
-        if (!imageUrl) {
-          imageUrl = "assets/images/placeholder.svg";
-        }
-        
-        const id = document.getElementById('field-id').value || 'id_' + Date.now();
         const project = {
+          ...(existing ? { createdAt: existing.createdAt, sortOrder: existing.sortOrder } : { createdAt: new Date().toISOString() }),
           id: id,
-          title: document.getElementById('field-title').value,
+          title: document.getElementById('field-title').value.trim(),
           category: document.getElementById('field-category').value,
-          client: document.getElementById('field-client').value,
-          year: document.getElementById('field-year').value,
-          location: document.getElementById('field-location').value,
-          image: imageUrl,
-          shortDesc: document.getElementById('field-shortDesc').value,
-          challenge: document.getElementById('field-challenge').value,
-          solution: document.getElementById('field-solution').value,
+          client: document.getElementById('field-client').value.trim(),
+          year: year,
+          location: document.getElementById('field-location').value.trim(),
+          images: images,
+          image: images[0] || 'assets/images/placeholder.svg',
+          shortDesc: document.getElementById('field-shortDesc').value.trim(),
+          challenge: document.getElementById('field-challenge').value.trim(),
+          solution: document.getElementById('field-solution').value.trim(),
           specs: {
-            system: document.getElementById('field-spec-system').value,
-            bezel: document.getElementById('field-spec-bezel').value,
-            brightness: document.getElementById('field-spec-brightness').value,
-            failover: document.getElementById('field-spec-failover').value,
-            uptime: document.getElementById('field-spec-uptime').value
+            system: document.getElementById('field-spec-system').value.trim(),
+            bezel: document.getElementById('field-spec-bezel').value.trim(),
+            brightness: document.getElementById('field-spec-brightness').value.trim(),
+            failover: document.getElementById('field-spec-failover').value.trim(),
+            uptime: document.getElementById('field-spec-uptime').value.trim()
           },
           isWide: document.getElementById('field-isWide').checked
         };
-        
+        Object.keys(project).forEach(k => project[k] === undefined && delete project[k]);
+
         await ProjectsStore.save(project);
+        projectSaved = true;
+
+        // Photos removed during this edit are deleted from storage only after the save succeeded
+        originalRefs.filter(ref => !images.includes(ref)).forEach(ref => deleteUploadedMedia(ref));
+        sessionUploads.filter(ref => !images.includes(ref)).forEach(ref => deleteUploadedMedia(ref));
+
         closeModal();
         loadAdminDashboard();
       } catch (err) {
@@ -2518,7 +2711,7 @@
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.querySelector('span').textContent = 'Save Project Case';
+          submitBtn.querySelector('span').textContent = 'Save Project';
         }
       }
     });
@@ -2556,7 +2749,7 @@
 
     window.deleteCaseStudy = async function(id) {
       if (confirm('Are you sure you want to delete this case study?')) {
-        await CaseStudiesStore.delete(id);
+        try { await CaseStudiesStore.delete(id); } catch (err) { alert('Could not delete: ' + (err.message || 'Unknown error')); }
         loadAdminDashboard();
       }
     };
@@ -2574,7 +2767,13 @@
         logs: document.getElementById('field-cs-logs').value
       };
 
-      await CaseStudiesStore.save(csObj);
+      try {
+        await CaseStudiesStore.save(csObj);
+      } catch (err) {
+        console.error('Save failed:', err);
+        alert('Could not save: ' + (err.message || 'Unknown error'));
+        return;
+      }
       closeCsModal();
       loadAdminDashboard();
     });
@@ -2630,7 +2829,7 @@
 
     window.deleteProduct = async function(id) {
       if (confirm('Are you sure you want to delete this product?')) {
-        await ProductsStore.delete(id);
+        try { await ProductsStore.delete(id); } catch (err) { alert('Could not delete: ' + (err.message || 'Unknown error')); }
         loadAdminDashboard();
       }
     };
@@ -2659,7 +2858,13 @@
         specs: specs
       };
 
-      await ProductsStore.save(prodObj);
+      try {
+        await ProductsStore.save(prodObj);
+      } catch (err) {
+        console.error('Save failed:', err);
+        alert('Could not save: ' + (err.message || 'Unknown error'));
+        return;
+      }
       closeProductModal();
       loadAdminDashboard();
     });
@@ -2702,7 +2907,7 @@
 
     window.deleteService = async function(id) {
       if (confirm('Are you sure you want to delete this service?')) {
-        await ServicesStore.delete(id);
+        try { await ServicesStore.delete(id); } catch (err) { alert('Could not delete: ' + (err.message || 'Unknown error')); }
         loadAdminDashboard();
       }
     };
@@ -2720,7 +2925,13 @@
         desc: document.getElementById('svc-desc').value
       };
 
-      await ServicesStore.save(svcObj);
+      try {
+        await ServicesStore.save(svcObj);
+      } catch (err) {
+        console.error('Save failed:', err);
+        alert('Could not save: ' + (err.message || 'Unknown error'));
+        return;
+      }
       closeServiceModal();
       loadAdminDashboard();
     });
@@ -2772,7 +2983,7 @@
 
     window.deleteInsight = async function(id) {
       if (confirm('Are you sure you want to delete this blog post?')) {
-        await InsightsStore.delete(id);
+        try { await InsightsStore.delete(id); } catch (err) { alert('Could not delete: ' + (err.message || 'Unknown error')); }
         loadAdminDashboard();
       }
     };
@@ -2791,7 +3002,13 @@
         content: document.getElementById('insight-content').value
       };
 
-      await InsightsStore.save(postObj);
+      try {
+        await InsightsStore.save(postObj);
+      } catch (err) {
+        console.error('Save failed:', err);
+        alert('Could not save: ' + (err.message || 'Unknown error'));
+        return;
+      }
       closeInsightModal();
       loadAdminDashboard();
     });
@@ -2808,21 +3025,27 @@
           }
         } catch(err) {
           console.error('Failed to delete inquiry:', err);
+          alert('Could not delete the inquiry: ' + (err.message || 'Unknown error'));
         }
       }
     };
 
     // Reset Defaults
     document.getElementById('reset-btn').addEventListener('click', async () => {
-      if (confirm('Are you sure you want to reset all registry files to factory defaults? This will erase custom entries.')) {
+      // This wipes every project, product, article and job the client has added, so make it hard to click by accident
+      const typed = prompt('This permanently erases ALL projects, case studies, products, services, articles and job openings and restores the demo content.\n\nType RESET to confirm.');
+      if (typed !== 'RESET') return;
+      try {
         await ProjectsStore.reset();
         await CaseStudiesStore.reset();
         await ProductsStore.reset();
         await ServicesStore.reset();
         await InsightsStore.reset();
         await CareersStore.reset();
-        loadAdminDashboard();
+      } catch (err) {
+        alert('Reset did not finish: ' + (err.message || 'Unknown error'));
       }
+      loadAdminDashboard();
     });
 
     // ==========================================
@@ -2862,7 +3085,7 @@
 
     window.deleteCareer = async function(id) {
       if (confirm('Are you sure you want to delete this job position opening?')) {
-        await CareersStore.delete(id);
+        try { await CareersStore.delete(id); } catch (err) { alert('Could not delete: ' + (err.message || 'Unknown error')); }
         loadAdminDashboard();
       }
     };
@@ -2885,7 +3108,13 @@
         requirements: requirements
       };
 
-      await CareersStore.save(jobObj);
+      try {
+        await CareersStore.save(jobObj);
+      } catch (err) {
+        console.error('Save failed:', err);
+        alert('Could not save: ' + (err.message || 'Unknown error'));
+        return;
+      }
       closeCareerModal();
       loadAdminDashboard();
     });
@@ -3285,7 +3514,12 @@
       
       const all = await SiteImagesStore.getAll();
       all[key] = input.value.trim();
-      await SiteImagesStore.save(all);
+      try {
+        await SiteImagesStore.save(all);
+      } catch (err) {
+        alert('Could not save this image: ' + (err.message || 'Unknown error'));
+        return;
+      }
 
       // Update in-memory item
       const item = siteImagesItems.find(i => i.key === key);
@@ -3401,6 +3635,6 @@
     loadAdminDashboard();
     console.log("Diagnostic: initial active elements:", Array.from(document.querySelectorAll('.active')).map(el => el.id || el.className));
   </script>
-  <script src="index.js?v=6"></script>
+  <script src="index.js?v=7"></script>
 </body>
 </html>

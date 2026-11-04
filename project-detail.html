@@ -31,7 +31,7 @@
   <meta name="twitter:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
 
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=6">
+  <link rel="stylesheet" href="index.css?v=7">
 
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -179,6 +179,30 @@
       .challenge-solution-grid { grid-template-columns: 1fr; gap: 2rem; }
       .project-banner-wrap { height: 300px; }
     }
+
+    /* Project gallery + lightbox */
+    .pd-gallery-wrap { margin-top: 4rem; }
+    .pd-gallery-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; margin-bottom:1.25rem; }
+    .pd-gallery-head h3 { font-family: var(--font-d); font-size: 1.35rem; margin:0; }
+    .pd-gallery-head span { color: var(--text-dim); font-size: 0.85rem; }
+    .pd-gallery { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.85rem; }
+    .pd-gallery button { padding:0; border:1px solid var(--border); border-radius: 12px; overflow:hidden; aspect-ratio: 4/3; background: rgba(255,255,255,0.02); cursor: pointer; display:block; }
+    .pd-gallery img { width:100%; height:100%; object-fit:cover; display:block; transition: transform .5s ease; }
+    .pd-gallery button:hover img, .pd-gallery button:focus-visible img { transform: scale(1.04); }
+    .pd-gallery button:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+    @media (max-width: 600px) { .pd-gallery { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; } }
+    .project-banner-wrap.is-clickable { cursor: zoom-in; }
+    .pd-lightbox { position: fixed; inset: 0; z-index: 10000; background: rgba(5,5,12,0.94); display:flex; align-items:center; justify-content:center; padding: 3.5rem 4rem; }
+    .pd-lightbox[hidden] { display:none; }
+    .pd-lightbox figure { margin:0; max-width:100%; max-height:100%; display:flex; flex-direction:column; align-items:center; gap:.75rem; }
+    .pd-lightbox img { max-width: min(1400px, 100%); max-height: calc(100vh - 8rem); object-fit: contain; border-radius: 8px; }
+    .pd-lightbox figcaption { color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+    .pd-lb-close, .pd-lb-nav { position:absolute; background: rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); border-radius: 50%; width: 46px; height: 46px; font-size: 1.6rem; line-height: 1; cursor: pointer; display:flex; align-items:center; justify-content:center; }
+    .pd-lb-close:hover, .pd-lb-nav:hover { background: var(--pink); border-color: var(--pink); }
+    .pd-lb-close { top: 1rem; right: 1rem; }
+    .pd-lb-prev { left: 1rem; top: 50%; transform: translateY(-50%); }
+    .pd-lb-next { right: 1rem; top: 50%; transform: translateY(-50%); }
+    @media (max-width: 600px) { .pd-lightbox { padding: 3.5rem 0.5rem; } .pd-lb-nav { top:auto; bottom: 1rem; transform:none; } }
   </style>
 </head>
 <body>
@@ -315,9 +339,29 @@
           </div>
         </div>
       </div>
-      
+
+      <!-- Project photo gallery (shown when the project has more than one photo) -->
+      <div class="pd-gallery-wrap" id="p-gallery-wrap" hidden>
+        <div class="pd-gallery-head">
+          <h3>Project Gallery</h3>
+          <span id="p-gallery-count"></span>
+        </div>
+        <div class="pd-gallery" id="p-gallery"></div>
+      </div>
+
     </div>
   </section>
+
+  <!-- Lightbox -->
+  <div class="pd-lightbox" id="pd-lightbox" role="dialog" aria-modal="true" aria-label="Project photo viewer" hidden>
+    <button class="pd-lb-close" id="pd-lb-close" aria-label="Close">×</button>
+    <button class="pd-lb-nav pd-lb-prev" id="pd-lb-prev" aria-label="Previous photo">‹</button>
+    <figure>
+      <img id="pd-lb-img" src="" alt="">
+      <figcaption id="pd-lb-caption"></figcaption>
+    </figure>
+    <button class="pd-lb-nav pd-lb-next" id="pd-lb-next" aria-label="Next photo">›</button>
+  </div>
 
           <!-- FOOTER -->
   <footer class="footer">
@@ -399,7 +443,7 @@
     </button>
   </div>
 
-  <script src="projects-data.js?v=10"></script>
+  <script src="projects-data.js?v=12"></script>
   <script>
     // Load Specific Project Details
     async function loadProjectDetail() {
@@ -421,7 +465,12 @@
         document.title = `${p.title || ''} | Case Study | Display World`;
         if (document.getElementById('p-title')) document.getElementById('p-title').textContent = p.title || '';
         if (document.getElementById('p-category')) document.getElementById('p-category').textContent = p.category || '';
-        if (document.getElementById('p-image') && p.image) document.getElementById('p-image').src = p.image;
+        const banner = document.getElementById('p-image');
+        if (banner) {
+          banner.src = p.image;
+          banner.alt = `${p.title || 'Project'} installation by Display World`;
+        }
+        renderGallery(p);
         if (document.getElementById('p-client')) document.getElementById('p-client').textContent = p.client || '-';
         if (document.getElementById('p-year')) document.getElementById('p-year').textContent = p.year || '-';
         if (document.getElementById('p-location')) document.getElementById('p-location').textContent = p.location || '-';
@@ -440,8 +489,93 @@
       }
     }
     
+    // ---------- Gallery & lightbox ----------
+    let lbPhotos = [];
+    let lbIndex = 0;
+    let lbTitle = '';
+
+    function renderGallery(p) {
+      lbPhotos = (p.gallery && p.gallery.length ? p.gallery : [p.image]).filter(Boolean);
+      lbTitle = p.title || 'Project';
+      const wrap = document.getElementById('p-gallery-wrap');
+      const grid = document.getElementById('p-gallery');
+      const bannerWrap = document.querySelector('.project-banner-wrap');
+      if (bannerWrap && lbPhotos.length) {
+        bannerWrap.classList.add('is-clickable');
+        bannerWrap.onclick = () => openLightbox(0);
+      }
+      if (!wrap || !grid || lbPhotos.length < 2) return;
+      grid.innerHTML = '';
+      lbPhotos.forEach((url, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label', `Open photo ${i + 1} of ${lbPhotos.length}`);
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = `${lbTitle}, photo ${i + 1}`;
+        img.loading = 'lazy';
+        img.onerror = () => { btn.remove(); };
+        btn.appendChild(img);
+        btn.addEventListener('click', () => openLightbox(i));
+        grid.appendChild(btn);
+      });
+      document.getElementById('p-gallery-count').textContent = `${lbPhotos.length} photos`;
+      wrap.hidden = false;
+    }
+
+    const lb = document.getElementById('pd-lightbox');
+    const lbImg = document.getElementById('pd-lb-img');
+    const lbCaption = document.getElementById('pd-lb-caption');
+    let lbLastFocus = null;
+
+    function showLightboxPhoto() {
+      lbImg.src = lbPhotos[lbIndex];
+      lbImg.alt = `${lbTitle}, photo ${lbIndex + 1}`;
+      lbCaption.textContent = lbPhotos.length > 1 ? `${lbIndex + 1} / ${lbPhotos.length}` : '';
+      const multi = lbPhotos.length > 1;
+      document.getElementById('pd-lb-prev').hidden = !multi;
+      document.getElementById('pd-lb-next').hidden = !multi;
+    }
+    function openLightbox(i) {
+      if (!lbPhotos.length) return;
+      lbIndex = i;
+      lbLastFocus = document.activeElement;
+      showLightboxPhoto();
+      lb.hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.getElementById('pd-lb-close').focus();
+    }
+    function closeLightbox() {
+      lb.hidden = true;
+      document.body.style.overflow = '';
+      if (lbLastFocus && lbLastFocus.focus) lbLastFocus.focus();
+    }
+    function stepLightbox(d) {
+      lbIndex = (lbIndex + d + lbPhotos.length) % lbPhotos.length;
+      showLightboxPhoto();
+    }
+    document.getElementById('pd-lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('pd-lb-prev').addEventListener('click', () => stepLightbox(-1));
+    document.getElementById('pd-lb-next').addEventListener('click', () => stepLightbox(1));
+    lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') stepLightbox(-1);
+      if (e.key === 'ArrowRight') stepLightbox(1);
+    });
+    // Swipe on phones
+    let touchX = null;
+    lb.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', (e) => {
+      if (touchX === null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 50) stepLightbox(dx < 0 ? 1 : -1);
+      touchX = null;
+    });
+
     loadProjectDetail();
   </script>
-  <script src="index.js?v=6"></script>
+  <script src="index.js?v=7"></script>
 </body>
 </html>

@@ -244,26 +244,37 @@ function initContactForm() {
     const message = msgEl ? msgEl.value : '';
 
     try {
-      if (typeof InquiriesStore !== 'undefined') {
-        await InquiriesStore.save({
-          type: 'Contact Inquiry',
-          name,
-          email,
-          subject,
-          message
-        });
-      } else {
-        console.error('InquiriesStore is undefined');
-      }
-    } catch(err) {
-      console.error('Failed to submit inquiry:', err);
-    }
-
-    setTimeout(() => {
+      if (typeof InquiriesStore === 'undefined') throw new Error('Inquiry service not loaded');
+      await InquiriesStore.save({
+        type: 'Contact Inquiry',
+        name: name.trim(),
+        email: email.trim(),
+        subject: subject.trim(),
+        message: message.trim()
+      });
       form.classList.add('hidden');
       success.classList.add('visible');
-    }, 1500);
+    } catch (err) {
+      // Never pretend a lead was received when it was not
+      console.error('Failed to submit inquiry:', err);
+      showFormError(form, 'Sorry, your message could not be sent right now. Please try again, or reach us directly on WhatsApp or by email.');
+      if (btnText) btnText.textContent = 'Send Message';
+      if (btn) btn.disabled = false;
+    }
   });
+}
+
+// Shows an inline error under a form (created on first use)
+function showFormError(form, msg) {
+  let el = form.querySelector('.form-error-msg');
+  if (!el) {
+    el = document.createElement('p');
+    el.className = 'form-error-msg';
+    el.setAttribute('role', 'alert');
+    el.style.cssText = 'color:var(--pink); font-size:0.85rem; margin-top:0.85rem; line-height:1.5;';
+    form.appendChild(el);
+  }
+  el.textContent = msg;
 }
 
 /* ═══════════════════════════════════════

@@ -1,0 +1,39 @@
+rules_version = '2';
+// Display World: paste this into Firebase console > Firestore Database > Rules > Publish.
+// Everyone can READ the public website content. Only the signed-in admin (Email/Password
+// account created in Firebase Authentication) can change it. Visitors can only CREATE inquiries.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+
+    // Public website content
+    match /projects/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /media/{id}        { allow read: if true; allow write: if isAdmin(); }
+    match /casestudies/{id}  { allow read: if true; allow write: if isAdmin(); }
+    match /products/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /services/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /insights/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /careers/{id}      { allow read: if true; allow write: if isAdmin(); }
+
+    // Site settings (contact details, site images, categories). The old password hash stays private.
+    match /settings/{id} {
+      allow read: if id != 'auth' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Contact + AMC forms: anyone may send one, only the admin may read or delete them
+    match /inquiries/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['id','type','name','email','subject','message','company','plan','details','timestamp'])
+        && request.resource.data.name is string && request.resource.data.name.size() < 200
+        && request.resource.data.email is string && request.resource.data.email.size() < 200
+        && request.resource.size() < 20000;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

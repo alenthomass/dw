@@ -111,59 +111,62 @@ let apiBaseUrl = 'http://localhost:8080'; // Default express backend url
 
 // Hardcoded Firebase Config in Code (Edit this with your production credentials to activate cloud storage)
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBBac1FFuVvIwigbq4ZPpXlnntTcLcEjL0",
-  authDomain: "display-world-website.firebaseapp.com",
-  projectId: "display-world-website",
-  storageBucket: "display-world-website.firebasestorage.app",
-  appId: "1:1091017590421:web:cd2bf90afa1e59780efd9c"
+  apiKey: "AIzaSyA7rK6RrUlbWSG9uGcvRSeJDfqbu6NsuAw",
+  authDomain: "dw-website-dbba1.firebaseapp.com",
+  projectId: "dw-website-dbba1",
+  storageBucket: "dw-website-dbba1.firebasestorage.app",
+  messagingSenderId: "760211366187",
+  appId: "1:760211366187:web:68f9464746cf19c672256e"
 };
 
-async function detectBackend() {
-  // 1. Check if Firebase config is defined in code
+// Backend detection runs ONCE per page load. Every store method awaits the same promise,
+// so we no longer re-initialise Firebase / re-sign-in on every single read or write.
+let _backendPromise = null;
+function detectBackend() {
+  if (!_backendPromise) _backendPromise = _detectBackendOnce();
+  return _backendPromise;
+}
+
+async function _detectBackendOnce() {
+  // 1. Firebase (configured in code)
   if (typeof firebase !== 'undefined' && FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey) {
     try {
       if (!firebase.apps.length) {
         firebase.initializeApp(FIREBASE_CONFIG);
+        try {
+          // Helps on networks/proxies where Firestore's streaming connection stalls (the old "save hangs" issue)
+          firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, merge: true });
+        } catch (setErr) {}
       }
       db = firebase.firestore();
       try {
-        storage = firebase.storage();
-        if (storage) {
-          if (typeof storage.setMaxUploadRetryTime === 'function') storage.setMaxUploadRetryTime(3000);
-          if (typeof storage.setMaxOperationRetryTime === 'function') storage.setMaxOperationRetryTime(3000);
+        if (typeof firebase.storage === 'function') {
+          storage = firebase.storage();
+          if (typeof storage.setMaxUploadRetryTime === 'function') storage.setMaxUploadRetryTime(20000);
+          if (typeof storage.setMaxOperationRetryTime === 'function') storage.setMaxOperationRetryTime(20000);
         }
       } catch (stErr) {
         console.warn("Storage init warning:", stErr);
       }
-      if (typeof firebase.auth === 'function') {
-        try {
-          if (!firebase.auth().currentUser) {
-            firebase.auth().signInAnonymously().catch(() => {});
-          }
-        } catch (authErr) {}
-      }
+      // No anonymous sign-in: it used to replace the admin's login on every page load.
+      // Writes are protected by Firestore rules that require the admin's Firebase account.
       backendMode = 'firebase';
       console.log("Connected to Firebase Firestore Cloud Backend (Configured in Code)");
-      return;
+      return backendMode;
     } catch (e) {
       console.error("Firebase startup check failed:", e);
     }
   }
 
-  // 2. Check if Local Express API Server is online
+  // 2. Local Express API Server
   try {
-    const testUrl = window.location.hostname === 'localhost' && window.location.port !== '8080'
-      ? `${apiBaseUrl}/api/projects`
-      : '/api/projects';
-      
-    const res = await fetch(testUrl, { method: 'GET' });
-    if (res.ok) {
+    const base = window.location.hostname === 'localhost' && window.location.port !== '8080' ? 'http://localhost:8080' : '';
+    const res = await fetch(`${base}/api/projects`, { method: 'GET' });
+    if (res.ok && (res.headers.get('content-type') || '').includes('json')) {
       backendMode = 'local-api';
-      apiBaseUrl = window.location.hostname === 'localhost' && window.location.port !== '8080'
-        ? 'http://localhost:8080'
-        : '';
+      apiBaseUrl = base;
       console.log("Connected to Local Node.js Express API Server at", apiBaseUrl || 'Relative Path');
-      return;
+      return backendMode;
     }
   } catch (err) {
     // Node server is offline or unreachable
@@ -171,32 +174,78 @@ async function detectBackend() {
 
   console.log("Fallback to Browser LocalStorage Simulation");
   backendMode = 'local-storage';
+  return backendMode;
 }
 
 // Perform startup check
 detectBackend();
 
-// Safe Firestore write helper with timeout to prevent hanging UI
-async function safeFirestoreSet(docRef, data, options = {}, timeoutMs = 1500) {
-  if (!docRef || typeof docRef.set !== 'function') return false;
+// Real round trip to the cloud database. The SDK otherwise "succeeds" offline, so a missing
+// database looked like it was working. Returns { ok, reason }.
+async function checkCloudHealth(timeoutMs = 8000) {
+  await detectBackend();
+  if (backendMode !== 'firebase' || !db) return { ok: true, mode: backendMode };
   try {
-    const firestorePromise = (options && Object.keys(options).length > 0)
-      ? docRef.set(data, options)
-      : docRef.set(data);
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, timeoutMs));
-    await Promise.race([firestorePromise, timeoutPromise]);
-    return true;
+    const probe = db.collection('settings').doc('categories').get({ source: 'server' });
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(Object.assign(new Error('timeout'), { code: 'unavailable' })), timeoutMs));
+    await Promise.race([probe, timeout]);
+    return { ok: true, mode: backendMode };
   } catch (err) {
-    console.warn("Firestore set operation notice:", err);
-    return false;
+    let reason = 'The cloud database could not be reached, so saves and uploads will not work.';
+    if (err && err.code === 'unavailable') reason = 'The cloud database is not reachable. Usually this means the Firestore database has not been created in the Firebase console yet (or the internet is down). Saves and uploads will NOT work until it is.';
+    if (err && err.code === 'permission-denied') reason = 'The cloud database is refusing access. Check the Firestore security rules.';
+    return { ok: false, reason, code: err && err.code };
   }
+}
+
+
+// Firestore write helper. It used to give up after 1.5s and report success anyway, which meant
+// slow or rejected writes were silently lost. Now it waits properly and THROWS on failure so the
+// admin sees a real error instead of a fake "saved".
+async function safeFirestoreSet(docRef, data, options = {}, timeoutMs = 20000) {
+  if (!docRef || typeof docRef.set !== 'function') throw new Error('Database not ready');
+  const firestorePromise = (options && Object.keys(options).length > 0)
+    ? docRef.set(data, options)
+    : docRef.set(data);
+  let timer;
+  const timeoutPromise = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error('Saving to the cloud database timed out. Either you are offline or the Firestore database has not been created in the Firebase console.')), timeoutMs);
+  });
+  try {
+    await Promise.race([firestorePromise, timeoutPromise]);
+  } catch (err) {
+    console.warn("Firestore set failed:", err);
+    if (err && err.code === 'permission-denied') {
+      throw new Error('The cloud database rejected this save. Log out and log back in with the admin email account (Firebase sign-in), then try again.');
+    }
+    if (err && err.code === 'unavailable') {
+      throw new Error('The cloud database is not reachable. Check that the Firestore database exists in the Firebase console and that you are online.');
+    }
+    if (err && err.code === 'invalid-argument' && /bytes|size/i.test(err.message || '')) {
+      throw new Error('This record is too large for the database. Use fewer or smaller images.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+  return true;
+}
+
+// Escapes text before it goes into innerHTML (stops visitors injecting HTML/scripts via forms)
+function escapeHtml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // High-efficiency client-side image compressor & optimizer
 async function compressAndOptimizeImage(file, maxDimension = 1600, quality = 0.85) {
   if (!file) throw new Error("No file provided");
   if (typeof FileReader === 'undefined') return { dataUrl: '', blob: file, name: file.name };
-  if (!file.type || !file.type.startsWith('image/') || file.type.includes('svg')) {
+  if (!file.type || !file.type.startsWith('image/') || file.type.includes('svg') || file.type.includes('gif')) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => resolve({ dataUrl: e.target.result, blob: file, name: file.name });
@@ -233,25 +282,28 @@ async function compressAndOptimizeImage(file, maxDimension = 1600, quality = 0.8
         if (!ctx) {
           return resolve({ dataUrl: event.target.result, blob: file, name: file.name });
         }
+        // PNG/WebP keep transparency, everything else becomes JPEG (much smaller)
+        const keepAlpha = file.type === 'image/png' || file.type === 'image/webp';
+        const outFormat = keepAlpha ? 'image/webp' : 'image/jpeg';
+        if (!keepAlpha) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+        }
         ctx.drawImage(img, 0, 0, width, height);
 
-        const outFormat = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(outFormat, quality);
+        let dataUrl = canvas.toDataURL(outFormat, quality);
+        let finalFormat = outFormat;
+        if (!dataUrl.startsWith(`data:${outFormat}`)) { // browser without WebP encoding (old Safari)
+          dataUrl = canvas.toDataURL('image/png');
+          finalFormat = 'image/png';
+        }
 
         if (canvas.toBlob) {
           canvas.toBlob((blob) => {
-            resolve({
-              dataUrl,
-              blob: blob || file,
-              name: file.name
-            });
-          }, outFormat, quality);
+            resolve({ dataUrl, blob: blob || file, name: file.name });
+          }, finalFormat, quality);
         } else {
-          resolve({
-            dataUrl,
-            blob: file,
-            name: file.name
-          });
+          resolve({ dataUrl, blob: file, name: file.name });
         }
       };
       img.onerror = () => {
@@ -264,108 +316,208 @@ async function compressAndOptimizeImage(file, maxDimension = 1600, quality = 0.8
   });
 }
 
-// Universal resilient upload to Firebase Storage with automatic Firestore cloud fallback
-async function uploadImageToFirebase(file, folder = 'uploads', onProgress) {
-  if (!file) throw new Error("No file selected.");
-  await detectBackend();
+// Firestore documents are capped at ~1 MB, so an image saved inside the database must stay well under that
+const FIRESTORE_MEDIA_MAX_CHARS = 900000;
+let storageUnavailable = false; // set after the first Storage failure so later images skip straight to the fallback
 
-  // 1. Initial immediate progress indicator so user NEVER sees 0%
-  if (typeof onProgress === 'function') onProgress(15);
-
-  // 2. Client-side image compression & optimization
-  const optimized = await compressAndOptimizeImage(file, 1600, 0.85);
-  if (typeof onProgress === 'function') onProgress(35);
-
-  const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.-]/g, '_');
-  const path = `${folder}/${Date.now()}_${cleanName}`;
-
-  // 3. Attempt direct Firebase Cloud Storage upload if available
-  if (backendMode === 'firebase' && storage) {
-    try {
-      if (typeof storage.setMaxUploadRetryTime === 'function') storage.setMaxUploadRetryTime(3000);
-      if (typeof storage.setMaxOperationRetryTime === 'function') storage.setMaxOperationRetryTime(3000);
-
-      const uploadPromise = new Promise((resolve, reject) => {
-        const ref = storage.ref().child(path);
-        const metadata = { contentType: (optimized.blob && optimized.blob.type) || file.type || 'image/jpeg' };
-        const uploadTask = ref.put(optimized.blob || file, metadata);
-
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            const pct = snapshot.totalBytes > 0
-              ? 35 + ((snapshot.bytesTransferred / snapshot.totalBytes) * 60)
-              : 35;
-            if (typeof onProgress === 'function') onProgress(Math.min(95, pct), snapshot);
-          },
-          (err) => reject(err),
-          async () => {
-            try {
-              const url = await uploadTask.snapshot.ref.getDownloadURL();
-              resolve(url);
-            } catch (err) {
-              reject(err);
-            }
-          }
-        );
-      });
-
-      // 4-second timeout race prevents any freeze or hang
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Storage timeout: saving directly to Firebase Firestore")), 4000);
-      });
-
-      const downloadUrl = await Promise.race([uploadPromise, timeoutPromise]);
-      if (typeof onProgress === 'function') onProgress(100);
-      return downloadUrl;
-    } catch (storageErr) {
-      console.warn("Firebase Storage cloud bucket bypass/timeout. Saving directly to Firebase Firestore:", storageErr);
-    }
+// Shrinks an image until its base64 form fits inside one Firestore document
+async function compressToFit(file, maxChars = FIRESTORE_MEDIA_MAX_CHARS) {
+  const attempts = [[1600, 0.82], [1400, 0.75], [1200, 0.7], [1000, 0.65], [800, 0.6]];
+  let last = null;
+  for (const [dim, q] of attempts) {
+    last = await compressAndOptimizeImage(file, dim, q);
+    if (last.dataUrl && last.dataUrl.length <= maxChars) return last;
   }
+  return last;
+}
 
-  // 4. Firebase Firestore Cloud Media Storage
-  // Saves the optimized media to Firebase Firestore so it is stored in Firebase itself!
-  if (backendMode === 'firebase' && db) {
-    try {
-      if (typeof onProgress === 'function') onProgress(80);
-      const mediaId = `${Date.now()}_${cleanName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-      await safeFirestoreSet(db.collection('cloud_media').doc(mediaId), {
-        name: cleanName,
-        folder,
-        url: optimized.dataUrl,
-        contentType: (optimized.blob && optimized.blob.type) || 'image/jpeg',
-        createdAt: new Date().toISOString()
-      }, {}, 1500);
-
-      if (typeof onProgress === 'function') onProgress(100);
-      return optimized.dataUrl;
-    } catch (firestoreErr) {
-      console.warn("Firestore cloud_media error:", firestoreErr);
-    }
-  }
-
-  // 5. Local Express API fallback
-  if (backendMode === 'local-api') {
-    try {
-      if (typeof onProgress === 'function') onProgress(70);
-      const res = await fetch(`${apiBaseUrl}/api/upload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: file.name, data: optimized.dataUrl })
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (typeof onProgress === 'function') onProgress(100);
-        return `${apiBaseUrl}${json.url}`;
+// Uploads one file to Firebase Storage. Fails fast if Storage stops making progress instead of
+// racing a fixed 4s timer (which used to abandon perfectly healthy uploads on slower connections).
+function uploadToStorage(blob, path, contentType, onProgress) {
+  return new Promise((resolve, reject) => {
+    const ref = storage.ref().child(path);
+    const task = ref.put(blob, { contentType, cacheControl: 'public, max-age=31536000' });
+    let lastBytes = -1;
+    let lastChange = Date.now();
+    const STALL_MS = 15000;
+    const watchdog = setInterval(() => {
+      if (Date.now() - lastChange > STALL_MS) {
+        clearInterval(watchdog);
+        try { task.cancel(); } catch (e) {}
+        reject(new Error('Storage upload stalled'));
       }
-    } catch (err) {
-      console.warn("Local API upload error:", err);
+    }, 1000);
+
+    task.on('state_changed',
+      (snap) => {
+        if (snap.bytesTransferred !== lastBytes) {
+          lastBytes = snap.bytesTransferred;
+          lastChange = Date.now();
+        }
+        if (typeof onProgress === 'function' && snap.totalBytes > 0) {
+          onProgress(snap.bytesTransferred / snap.totalBytes);
+        }
+      },
+      (err) => { clearInterval(watchdog); reject(err); },
+      async () => {
+        clearInterval(watchdog);
+        try { resolve(await task.snapshot.ref.getDownloadURL()); } catch (err) { reject(err); }
+      }
+    );
+  });
+}
+
+// Media references that point at an image stored as a Firestore document look like "media:<docId>"
+const MEDIA_REF_PREFIX = 'media:';
+const _mediaCache = new Map();
+
+async function resolveMediaRef(ref) {
+  if (!ref || typeof ref !== 'string') return '';
+  if (!ref.startsWith(MEDIA_REF_PREFIX)) return ref;
+  const id = ref.slice(MEDIA_REF_PREFIX.length);
+  if (_mediaCache.has(id)) return _mediaCache.get(id);
+  const p = (async () => {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        const doc = await db.collection('media').doc(id).get();
+        if (doc.exists) return doc.data().url || '';
+      } catch (err) {
+        console.warn('Media lookup failed:', id, err);
+      }
+    }
+    return '';
+  })();
+  _mediaCache.set(id, p);
+  return p;
+}
+
+// Universal upload. Returns a URL (Storage / local server), a "media:<id>" reference
+// (Firestore fallback, when opts.allowMediaRef is true) or a data URL (legacy single-image fields).
+async function uploadImageToFirebase(file, folder = 'uploads', onProgress, opts = {}) {
+  if (!file) throw new Error("No file selected.");
+  if (file.type && !file.type.startsWith('image/')) throw new Error(`"${file.name}" is not an image file.`);
+  if (file.size > 25 * 1024 * 1024) throw new Error(`"${file.name}" is larger than 25 MB.`);
+  await detectBackend();
+  const report = (pct) => { if (typeof onProgress === 'function') onProgress(Math.max(0, Math.min(100, pct))); };
+
+  report(5);
+  const optimized = await compressAndOptimizeImage(file, 1920, 0.85);
+  report(25);
+
+  const baseName = (file.name || 'image').replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9-]/g, '_').slice(0, 60) || 'image';
+  const blobType = (optimized.blob && optimized.blob.type) || file.type || 'image/jpeg';
+  const ext = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif', 'image/svg+xml': 'svg' })[blobType] || 'jpg';
+  const uid = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const path = `${folder}/${uid}_${baseName}.${ext}`;
+
+  // 1. Firebase Cloud Storage (best option: real files, any size)
+  if (backendMode === 'firebase' && storage && !storageUnavailable) {
+    try {
+      const url = await uploadToStorage(optimized.blob || file, path, blobType, (f) => report(25 + f * 73));
+      report(100);
+      return url;
+    } catch (storageErr) {
+      console.warn("Firebase Storage unavailable, falling back to Firestore media:", storageErr);
+      storageUnavailable = true;
     }
   }
 
-  // 6. Base64 Optimized Data URL
-  if (typeof onProgress === 'function') onProgress(100);
-  return optimized.dataUrl;
+  // 2. Firestore fallback: image stored as its own document (never inside the project record)
+  if (backendMode === 'firebase' && db) {
+    report(60);
+    const fitted = await compressToFit(file);
+    if (!fitted || !fitted.dataUrl || fitted.dataUrl.length > FIRESTORE_MEDIA_MAX_CHARS) {
+      throw new Error(`"${file.name}" is too large to store. Try a smaller image.`);
+    }
+    if (!opts.allowMediaRef) {
+      // Single-image fields (products, insights, site images) keep the old behaviour: inline data URL
+      report(100);
+      return fitted.dataUrl;
+    }
+    const mediaId = uid;
+    await safeFirestoreSet(db.collection('media').doc(mediaId), {
+      url: fitted.dataUrl,
+      name: file.name || baseName,
+      folder,
+      projectId: opts.projectId || null,
+      contentType: (fitted.blob && fitted.blob.type) || 'image/jpeg',
+      createdAt: new Date().toISOString()
+    });
+    _mediaCache.set(mediaId, Promise.resolve(fitted.dataUrl));
+    report(100);
+    return MEDIA_REF_PREFIX + mediaId;
+  }
+
+  // 3. Local Express API server
+  if (backendMode === 'local-api') {
+    const res = await fetch(`${apiBaseUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: `${baseName}.${ext}`, data: optimized.dataUrl, folder })
+    });
+    if (!res.ok) throw new Error(`Upload failed (server responded ${res.status})`);
+    const json = await res.json();
+    report(100);
+    return json.absolute || /^https?:/.test(json.url) ? json.url : `${apiBaseUrl}${json.url}`;
+  }
+
+  // 4. Offline browser simulation: small data URL
+  const small = await compressAndOptimizeImage(file, 1000, 0.7);
+  report(100);
+  return small.dataUrl;
+}
+
+// Best-effort clean-up of an uploaded image that is no longer used
+async function deleteUploadedMedia(ref) {
+  if (!ref || typeof ref !== 'string') return;
+  await detectBackend();
+  try {
+    if (ref.startsWith(MEDIA_REF_PREFIX) && db) {
+      await db.collection('media').doc(ref.slice(MEDIA_REF_PREFIX.length)).delete();
+      _mediaCache.delete(ref.slice(MEDIA_REF_PREFIX.length));
+    } else if (storage && /firebasestorage\.googleapis\.com|\.firebasestorage\.app/.test(ref) && ref.includes('/projects%2F')) {
+      await storage.refFromURL(ref).delete();
+    } else if (backendMode === 'local-api' && ref.includes('/uploads/projects/')) {
+      await fetch(`${apiBaseUrl}/api/upload`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: ref })
+      });
+    }
+  } catch (err) {
+    console.warn('Could not delete old media (safe to ignore):', err);
+  }
+}
+
+// Old default images (Unsplash links / SVG placeholders) are swapped for the bundled photos.
+// Only touches the built-in demo paths, never something the admin uploaded.
+function isStaleDefaultImage(url) {
+  return typeof url === 'string' && (url.includes('images.unsplash.com') || (/^assets\/images\/.+\.svg$/.test(url) && !url.endsWith('placeholder.svg')));
+}
+
+// Gives every project a consistent shape: images[] (raw refs, cover first) and image (cover)
+function normalizeProject(p) {
+  if (!p) return p;
+  const def = DEFAULT_PROJECTS.find(d => d.id === p.id);
+  let images = Array.isArray(p.images) && p.images.length ? p.images.slice() : (p.image ? [p.image] : []);
+  images = images.filter(Boolean).map(u => (isStaleDefaultImage(u) && def ? def.image : u));
+  images = images.filter((u, i) => images.indexOf(u) === i);
+  return {
+    ...p,
+    specs: p.specs || {},
+    images,
+    image: images[0] || 'assets/images/placeholder.svg'
+  };
+}
+
+// Adds display-ready URLs (media refs resolved): gallery[] and coverUrl
+async function withResolvedImages(p, coverOnly = false) {
+  if (!p) return p;
+  const list = coverOnly ? p.images.slice(0, 1) : p.images;
+  const resolved = await Promise.all(list.map(resolveMediaRef));
+  const gallery = resolved.filter(Boolean);
+  return { ...p, gallery, coverUrl: gallery[0] || 'assets/images/placeholder.svg', photoCount: p.images.length };
 }
 
 class ProjectsDataStore {
@@ -376,23 +528,39 @@ class ProjectsDataStore {
   }
 
   initLocalDefaults() {
-    const localData = localStorage.getItem(this.localKey);
+    let localData = null;
+    try { localData = localStorage.getItem(this.localKey); } catch (e) {}
     let needsReset = !localData;
-    
+
     if (localData) {
       try {
         const parsed = JSON.parse(localData);
-        if (!Array.isArray(parsed) || parsed.some(p => !p.specs || !p.client || (typeof p.image === 'string' && (p.image.includes('unsplash') || p.image.endsWith('.svg'))))) {
-          needsReset = true;
-        }
+        if (!Array.isArray(parsed)) needsReset = true;
       } catch(e) {
         needsReset = true;
       }
     }
 
     if (needsReset) {
-      localStorage.setItem(this.localKey, JSON.stringify(DEFAULT_PROJECTS));
-      localStorage.setItem(this.catKey, JSON.stringify(DEFAULT_CATEGORIES));
+      this._writeLocal(DEFAULT_PROJECTS);
+      try { localStorage.setItem(this.catKey, JSON.stringify(DEFAULT_CATEGORIES)); } catch (e) {}
+    }
+  }
+
+  _readLocal() {
+    try {
+      const list = JSON.parse(localStorage.getItem(this.localKey));
+      return Array.isArray(list) ? list : DEFAULT_PROJECTS.slice();
+    } catch (e) {
+      return DEFAULT_PROJECTS.slice();
+    }
+  }
+
+  _writeLocal(list) {
+    try {
+      localStorage.setItem(this.localKey, JSON.stringify(list));
+    } catch (e) {
+      throw new Error('Browser storage is full. Remove some images or connect the cloud backend.');
     }
   }
 
@@ -400,186 +568,153 @@ class ProjectsDataStore {
     return backendMode;
   }
 
-  // Projects CRUD
-  async getAll() {
-    await detectBackend(); // Ensure connection check is completed
-    
+  // Raw records (images are stored references, not resolved)
+  async _getAllRaw() {
+    await detectBackend();
+
     if (backendMode === 'firebase' && db) {
       try {
         const snap = await db.collection('projects').get();
         if (!snap.empty) {
           const list = [];
-          snap.forEach(doc => {
-            const data = { ...doc.data(), id: doc.id };
-            if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
-              const def = DEFAULT_PROJECTS.find(d => d.id === doc.id);
-              if (def) data.image = def.image;
-            }
-            list.push(data);
-          });
+          snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
           return list;
         }
       } catch (err) {
         console.error("Firestore read error:", err);
       }
+      return DEFAULT_PROJECTS.slice();
     }
-    
+
     if (backendMode === 'local-api') {
       try {
         const res = await fetch(`${apiBaseUrl}/api/projects`);
-        if (res.ok) {
-          const list = await res.json();
-          return list.map(item => {
-            if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
-              const def = DEFAULT_PROJECTS.find(d => d.id === item.id);
-              if (def) item.image = def.image;
-            }
-            return item;
-          });
-        }
+        if (res.ok) return await res.json();
       } catch (err) {
         console.error("Local API read error:", err);
       }
     }
-    
-    const localList = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PROJECTS;
-    return localList.map(item => {
-      if (item.image && typeof item.image === 'string' && (item.image.includes('unsplash') || item.image.endsWith('.svg'))) {
-        const def = DEFAULT_PROJECTS.find(d => d.id === item.id);
-        if (def) item.image = def.image;
-      }
-      return item;
+
+    return this._readLocal();
+  }
+
+  _sort(list) {
+    // Admin-defined order first (sortOrder), then newest year, then title
+    return list.sort((a, b) => {
+      const ao = typeof a.sortOrder === 'number' ? a.sortOrder : 9999;
+      const bo = typeof b.sortOrder === 'number' ? b.sortOrder : 9999;
+      if (ao !== bo) return ao - bo;
+      const ay = parseInt(a.year, 10) || 0, by = parseInt(b.year, 10) || 0;
+      if (ay !== by) return by - ay;
+      return String(a.title || '').localeCompare(String(b.title || ''));
     });
   }
 
+  // Projects with cover image resolved (for listings)
+  async getAll() {
+    const list = this._sort((await this._getAllRaw()).map(normalizeProject));
+    const resolved = await Promise.all(list.map(p => withResolvedImages(p, true)));
+    return resolved.map(p => ({ ...p, image: p.coverUrl }));
+  }
+
+  // One project with every gallery image resolved. `image` stays the display cover,
+  // `images` stays the raw stored references (used by the admin when saving).
   async getById(id) {
     await detectBackend();
-    
+    let raw = null;
+
     if (backendMode === 'firebase' && db) {
       try {
         const doc = await db.collection('projects').doc(id).get();
-        if (doc.exists) {
-          const data = { ...doc.data(), id: doc.id };
-          if (data.image && typeof data.image === 'string' && (data.image.includes('unsplash') || data.image.endsWith('.svg'))) {
-            const def = DEFAULT_PROJECTS.find(d => d.id === doc.id);
-            if (def) data.image = def.image;
-          }
-          return data;
-        }
+        if (doc.exists) raw = { ...doc.data(), id: doc.id };
       } catch (err) {
         console.error("Firestore getById error:", err);
       }
     }
-    
-    if (backendMode === 'local-api') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/api/projects`);
-        if (res.ok) {
-          const list = await res.json();
-          return list.find(p => p.id === id);
-        }
-      } catch (err) {
-        console.error("Local API getById error:", err);
-      }
+
+    if (!raw) {
+      const list = await this._getAllRaw();
+      raw = list.find(p => String(p.id) === String(id)) || null;
     }
-    
-    const projects = await this.getAll();
-    return projects.find(p => p.id === id);
+    if (!raw) return null;
+
+    const p = await withResolvedImages(normalizeProject(raw));
+    return { ...p, image: p.coverUrl };
   }
 
   async save(project) {
     await detectBackend();
-    
+    const clean = normalizeProject(project);
+    delete clean.gallery;
+    delete clean.coverUrl;
+    delete clean.photoCount;
+    clean.updatedAt = new Date().toISOString();
+
     if (backendMode === 'firebase' && db) {
-      try {
-        await safeFirestoreSet(db.collection('projects').doc(project.id), project);
-        return true;
-      } catch (err) {
-        console.error("Firestore save error:", err);
-      }
+      // Throws on failure so the admin sees the real error (no silent fallback to this browser only)
+      await safeFirestoreSet(db.collection('projects').doc(String(clean.id)), clean);
+      return true;
     }
-    
+
     if (backendMode === 'local-api') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/api/projects`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(project)
-        });
-        if (res.ok) return true;
-      } catch (err) {
-        console.error("Local API save error:", err);
-      }
+      const res = await fetch(`${apiBaseUrl}/api/projects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(clean)
+      });
+      if (!res.ok) throw new Error(`Server refused the save (${res.status})`);
+      return true;
     }
-    
-    const projects = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PROJECTS;
-    const index = projects.findIndex(p => p.id === project.id);
-    if (index > -1) {
-      projects[index] = project;
-    } else {
-      projects.push(project);
-    }
-    localStorage.setItem(this.localKey, JSON.stringify(projects));
+
+    const projects = this._readLocal();
+    const index = projects.findIndex(p => String(p.id) === String(clean.id));
+    if (index > -1) projects[index] = clean; else projects.push(clean);
+    this._writeLocal(projects);
     return true;
   }
 
   async delete(id) {
     await detectBackend();
-    
+    let images = [];
+    try {
+      const existing = (await this._getAllRaw()).find(p => String(p.id) === String(id));
+      if (existing) images = normalizeProject(existing).images;
+    } catch (e) {}
+
     if (backendMode === 'firebase' && db) {
-      try {
-        await db.collection('projects').doc(id).delete();
-        return true;
-      } catch (err) {
-        console.error("Firestore delete error:", err);
-      }
+      await db.collection('projects').doc(String(id)).delete();
+    } else if (backendMode === 'local-api') {
+      const res = await fetch(`${apiBaseUrl}/api/projects/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server refused the delete (${res.status})`);
+    } else {
+      this._writeLocal(this._readLocal().filter(p => String(p.id) !== String(id)));
     }
-    
-    if (backendMode === 'local-api') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/api/projects/${id}`, { method: 'DELETE' });
-        if (res.ok) return true;
-      } catch (err) {
-        console.error("Local API delete error:", err);
-      }
-    }
-    
-    const projects = JSON.parse(localStorage.getItem(this.localKey)) || DEFAULT_PROJECTS;
-    const filtered = projects.filter(p => p.id !== id);
-    localStorage.setItem(this.localKey, JSON.stringify(filtered));
+
+    // Remove that project's uploaded photos too (bundled default images are never touched)
+    await Promise.all(images.map(deleteUploadedMedia));
     return true;
   }
 
   async reset() {
     await detectBackend();
-    
+
     if (backendMode === 'firebase' && db) {
-      try {
-        const snap = await db.collection('projects').get();
-        const batch = db.batch();
-        snap.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-        
-        for (let p of DEFAULT_PROJECTS) {
-          await db.collection('projects').doc(p.id).set(p);
-        }
-        await db.collection('settings').doc('categories').set({ list: DEFAULT_CATEGORIES });
-        return true;
-      } catch (err) {
-        console.error("Firestore reset error:", err);
-      }
+      const snap = await db.collection('projects').get();
+      const batch = db.batch();
+      snap.forEach(doc => batch.delete(doc.ref));
+      DEFAULT_PROJECTS.forEach(p => batch.set(db.collection('projects').doc(p.id), p));
+      batch.set(db.collection('settings').doc('categories'), { list: DEFAULT_CATEGORIES });
+      await batch.commit();
+      return true;
     }
-    
+
     if (backendMode === 'local-api') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/api/projects/reset`, { method: 'POST' });
-        if (res.ok) return true;
-      } catch (err) {
-        console.error("Local API reset error:", err);
-      }
+      const res = await fetch(`${apiBaseUrl}/api/projects/reset`, { method: 'POST' });
+      if (!res.ok) throw new Error(`Server refused the reset (${res.status})`);
+      return true;
     }
-    
-    localStorage.setItem(this.localKey, JSON.stringify(DEFAULT_PROJECTS));
+
+    this._writeLocal(DEFAULT_PROJECTS);
     localStorage.setItem(this.catKey, JSON.stringify(DEFAULT_CATEGORIES));
     return true;
   }
@@ -587,16 +722,17 @@ class ProjectsDataStore {
   // Categories Operations
   async getCategories() {
     await detectBackend();
-    
+
     if (backendMode === 'firebase' && db) {
       try {
         const doc = await db.collection('settings').doc('categories').get();
-        if (doc.exists && doc.data().list) return doc.data().list;
+        if (doc.exists && Array.isArray(doc.data().list)) return doc.data().list;
       } catch (err) {
         console.error("Firestore categories read error:", err);
       }
+      return DEFAULT_CATEGORIES.slice();
     }
-    
+
     if (backendMode === 'local-api') {
       try {
         const res = await fetch(`${apiBaseUrl}/api/categories`);
@@ -605,71 +741,85 @@ class ProjectsDataStore {
         console.error("Local API categories read error:", err);
       }
     }
-    
-    return JSON.parse(localStorage.getItem(this.catKey)) || DEFAULT_CATEGORIES;
+
+    try {
+      return JSON.parse(localStorage.getItem(this.catKey)) || DEFAULT_CATEGORIES.slice();
+    } catch (e) {
+      return DEFAULT_CATEGORIES.slice();
+    }
   }
 
   async saveCategory(category) {
+    category = String(category || '').trim();
+    if (!category) return false;
     const list = await this.getCategories();
-    if (category && !list.includes(category)) {
-      list.push(category);
-      
-      if (backendMode === 'firebase' && db) {
-        try {
-          await db.collection('settings').doc('categories').set({ list });
-          return true;
-        } catch (err) {
-          console.error("Firestore category save error:", err);
-        }
-      }
-      
-      if (backendMode === 'local-api') {
-        try {
-          const res = await fetch(`${apiBaseUrl}/api/categories`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ category })
-          });
-          if (res.ok) return true;
-        } catch (err) {
-          console.error("Local API category save error:", err);
-        }
-      }
-      
-      localStorage.setItem(this.catKey, JSON.stringify(list));
+    if (list.some(c => c.toLowerCase() === category.toLowerCase())) return false; // no duplicates like "Retail" + "retail"
+    list.push(category);
+
+    if (backendMode === 'firebase' && db) {
+      await safeFirestoreSet(db.collection('settings').doc('categories'), { list });
+      return true;
     }
+
+    if (backendMode === 'local-api') {
+      const res = await fetch(`${apiBaseUrl}/api/categories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category })
+      });
+      if (!res.ok) throw new Error(`Server refused the save (${res.status})`);
+      return true;
+    }
+
+    localStorage.setItem(this.catKey, JSON.stringify(list));
     return true;
   }
 
   async deleteCategory(category) {
     let list = await this.getCategories();
     list = list.filter(c => c !== category);
-    
+
     if (backendMode === 'firebase' && db) {
-      try {
-        await db.collection('settings').doc('categories').set({ list });
-        return true;
-      } catch (err) {
-        console.error("Firestore category delete error:", err);
-      }
+      await safeFirestoreSet(db.collection('settings').doc('categories'), { list });
+      return true;
     }
-    
+
     if (backendMode === 'local-api') {
-      try {
-        const res = await fetch(`${apiBaseUrl}/api/categories/${category}`, { method: 'DELETE' });
-        if (res.ok) return true;
-      } catch (err) {
-        console.error("Local API category delete error:", err);
-      }
+      const res = await fetch(`${apiBaseUrl}/api/categories/${encodeURIComponent(category)}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server refused the delete (${res.status})`);
+      return true;
     }
-    
+
     localStorage.setItem(this.catKey, JSON.stringify(list));
     return true;
   }
 
-  // Upload File
-  async uploadImage(file, onProgress) {
-    return await uploadImageToFirebase(file, 'projects', onProgress);
+  // Upload one project photo into that project's own folder: projects/<projectId>/...
+  async uploadImage(file, onProgress, projectId) {
+    const folder = projectId ? `projects/${String(projectId).replace(/[^a-zA-Z0-9_-]/g, '_')}` : 'projects/unassigned';
+    return await uploadImageToFirebase(file, folder, onProgress, { allowMediaRef: true, projectId: projectId || null });
+  }
+
+  // Upload many photos at once (3 in parallel). onItem(index, {status, pct, url, error}) reports each file.
+  async uploadImages(files, projectId, onItem) {
+    const list = Array.from(files || []);
+    const results = new Array(list.length);
+    let next = 0;
+    const worker = async () => {
+      while (next < list.length) {
+        const i = next++;
+        try {
+          const url = await this.uploadImage(list[i], (pct) => onItem && onItem(i, { status: 'uploading', pct }), projectId);
+          results[i] = { ok: true, url };
+          onItem && onItem(i, { status: 'done', pct: 100, url });
+        } catch (err) {
+          results[i] = { ok: false, error: err.message || String(err) };
+          onItem && onItem(i, { status: 'error', error: err.message || String(err) });
+        }
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(3, list.length) }, worker));
+    return results;
   }
 }
 
@@ -737,6 +887,7 @@ class CaseStudiesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
+        throw err;
       }
     }
     
@@ -773,6 +924,7 @@ class CaseStudiesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore delete error:", err);
+        throw err;
       }
     }
     
@@ -807,6 +959,7 @@ class CaseStudiesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore reset error:", err);
+        throw err;
       }
     }
     
@@ -1042,6 +1195,7 @@ class ProductsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
+        throw err;
       }
     }
     
@@ -1078,6 +1232,7 @@ class ProductsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore delete error:", err);
+        throw err;
       }
     }
     
@@ -1112,6 +1267,7 @@ class ProductsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore reset error:", err);
+        throw err;
       }
     }
     
@@ -1275,6 +1431,7 @@ class ServicesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
+        throw err;
       }
     }
     
@@ -1311,6 +1468,7 @@ class ServicesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore delete error:", err);
+        throw err;
       }
     }
     
@@ -1345,6 +1503,7 @@ class ServicesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore reset error:", err);
+        throw err;
       }
     }
     
@@ -1516,6 +1675,7 @@ class InsightsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
+        throw err;
       }
     }
     
@@ -1552,6 +1712,7 @@ class InsightsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore delete error:", err);
+        throw err;
       }
     }
     
@@ -1586,6 +1747,7 @@ class InsightsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore reset error:", err);
+        throw err;
       }
     }
     
@@ -1695,6 +1857,7 @@ class CareersDataStore {
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
+        throw err;
       }
     }
     
@@ -1731,6 +1894,7 @@ class CareersDataStore {
         return true;
       } catch (err) {
         console.error("Firestore delete error:", err);
+        throw err;
       }
     }
     
@@ -1765,6 +1929,7 @@ class CareersDataStore {
         return true;
       } catch (err) {
         console.error("Firestore reset error:", err);
+        throw err;
       }
     }
     
@@ -1823,6 +1988,7 @@ class InquiriesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore save error:", err);
+        throw err;
       }
     }
 
@@ -1853,6 +2019,7 @@ class InquiriesDataStore {
         return true;
       } catch (err) {
         console.error("Firestore delete error:", err);
+        throw err;
       }
     }
     if (backendMode === 'local-api') {
@@ -1977,6 +2144,7 @@ class SettingsDataStore {
         return true;
       } catch (err) {
         console.error("Firestore settings save error:", err);
+        throw err;
       }
     }
     if (backendMode === 'local-api') {
@@ -2223,7 +2391,34 @@ class SiteImagesDataStore {
       storedUrls.site_favicon = defaultUrls.site_favicon;
     }
 
-    return Object.assign({}, defaultUrls, storedUrls);
+    // Uploaded images kept as separate media documents are resolved to real URLs here
+    const merged = Object.assign({}, defaultUrls, storedUrls);
+    await Promise.all(Object.keys(merged).map(async k => {
+      if (typeof merged[k] === 'string' && merged[k].startsWith(MEDIA_REF_PREFIX)) {
+        merged[k] = (await resolveMediaRef(merged[k])) || defaultUrls[k] || '';
+      }
+    }));
+    return merged;
+  }
+
+  // All site images used to live inline in ONE settings document, so a handful of uploads pushed it
+  // past Firestore's 1 MB limit and the save failed. Inline images are now moved into their own
+  // media documents (id derived from key + content, so re-saving never creates duplicates).
+  async _externaliseInlineImages(imagesMap) {
+    if (!(backendMode === 'firebase' && db)) return imagesMap;
+    const hash = (str) => { let h = 5381; for (let i = 0; i < str.length; i += 7) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + str.length.toString(36); };
+    const out = {};
+    for (const [k, v] of Object.entries(imagesMap)) {
+      if (typeof v === 'string' && v.startsWith('data:') && v.length > 2000) {
+        const id = `site_${k.replace(/[^a-zA-Z0-9_-]/g, '_')}_${hash(v)}`;
+        await safeFirestoreSet(db.collection('media').doc(id), { url: v, folder: 'site-images', key: k, createdAt: new Date().toISOString() });
+        _mediaCache.set(id, Promise.resolve(v));
+        out[k] = MEDIA_REF_PREFIX + id;
+      } else {
+        out[k] = v;
+      }
+    }
+    return out;
   }
 
   async getItems() {
@@ -2273,9 +2468,11 @@ class SiteImagesDataStore {
     await detectBackend();
     if (backendMode === 'firebase' && db) {
       try {
-        await safeFirestoreSet(db.collection('settings').doc('images'), imagesMap, {}, 1500);
+        const stored = await this._externaliseInlineImages(imagesMap);
+        await safeFirestoreSet(db.collection('settings').doc('images'), stored);
       } catch (err) {
         console.warn("Firestore site images save warning:", err);
+        throw err;
       }
     }
     try {
@@ -2428,10 +2625,43 @@ class AuthDataStore {
     } catch (e) {}
   }
 
+  firebaseAuthAvailable() {
+    return backendMode === 'firebase' && typeof firebase !== 'undefined' && typeof firebase.auth === 'function';
+  }
+
+  // Signed in with the real Firebase admin account (what the database rules check)
+  hasCloudSession() {
+    try {
+      const u = this.firebaseAuthAvailable() && firebase.auth().currentUser;
+      return !!(u && !u.isAnonymous);
+    } catch (e) { return false; }
+  }
+
   async verifyLogin(username, password) {
     const lockout = this.checkLockout();
     if (lockout.locked) {
       return { success: false, error: `Too many failed attempts. Cooldown: ${lockout.remainingSec}s.` };
+    }
+
+    await detectBackend();
+    // Cloud mode: the "username" is the admin email registered in Firebase Authentication.
+    if (this.firebaseAuthAvailable() && String(username || '').includes('@')) {
+      try {
+        await firebase.auth().signInWithEmailAndPassword(String(username).trim(), password);
+        this.resetFailedAttempts();
+        return { success: true, cloud: true };
+      } catch (err) {
+        const code = err && err.code;
+        if (code === 'auth/operation-not-allowed' || code === 'auth/configuration-not-found') {
+          return { success: false, error: 'Email/Password sign-in is not enabled in Firebase Authentication yet.' };
+        }
+        if (code === 'auth/network-request-failed') {
+          return { success: false, error: 'No connection to Firebase. Check your internet and try again.' };
+        }
+        const rec = this.recordFailedAttempt();
+        if (rec.locked) return { success: false, error: 'Account locked for 30s due to repeated failed attempts.' };
+        return { success: false, error: `Invalid email or password. (${rec.remainingAttempts} attempts remaining)` };
+      }
     }
 
     const creds = await this.getCredentials();
@@ -2509,6 +2739,9 @@ class AuthDataStore {
 
   clearSession() {
     try {
+      if (this.firebaseAuthAvailable()) firebase.auth().signOut().catch(() => {});
+    } catch (e) {}
+    try {
       sessionStorage.removeItem(this.sessionKey);
       sessionStorage.removeItem('dw_admin_session');
       localStorage.removeItem(this.persistentKey);
@@ -2516,6 +2749,21 @@ class AuthDataStore {
   }
 
   async changeCredentials(currentPassword, newUsername, newPassword) {
+    await detectBackend();
+    // Cloud admin account: change the real Firebase password
+    if (this.hasCloudSession()) {
+      if (!newPassword || newPassword.length < 8) return { success: false, error: 'New password must be at least 8 characters long.' };
+      const user = firebase.auth().currentUser;
+      try {
+        const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+        await user.reauthenticateWithCredential(cred);
+        await user.updatePassword(newPassword);
+        return { success: true, username: user.email };
+      } catch (err) {
+        if (err && (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential')) return { success: false, error: 'Current password does not match.' };
+        return { success: false, error: (err && err.message) || 'Could not change the password.' };
+      }
+    }
     const creds = await this.getCredentials();
     const curHash = await this.hash(creds.salt, currentPassword);
     if (curHash !== creds.passwordHash) {
@@ -2544,6 +2792,7 @@ class AuthDataStore {
         await safeFirestoreSet(db.collection('settings').doc('auth'), updated);
       } catch (err) {
         console.error("Firestore auth save error:", err);
+        throw err;
       }
     }
     try {
@@ -2555,10 +2804,43 @@ class AuthDataStore {
 
 const AuthStore = new AuthDataStore();
 
+// A brand-new cloud database is empty, and the site shows built-in demo content until the first
+// save. Without this, saving the first project made every other demo project vanish.
+// Copies the current content in once, only into collections that are completely empty.
+async function seedCloudIfEmpty() {
+  await detectBackend();
+  if (backendMode !== 'firebase' || !db) return { seeded: [] };
+  const sets = {
+    projects: DEFAULT_PROJECTS,
+    casestudies: DEFAULT_CASE_STUDIES,
+    products: DEFAULT_PRODUCTS,
+    services: DEFAULT_SERVICES,
+    insights: DEFAULT_INSIGHTS,
+    careers: DEFAULT_CAREERS
+  };
+  const seeded = [];
+  for (const [col, list] of Object.entries(sets)) {
+    const snap = await db.collection(col).limit(1).get({ source: 'server' });
+    if (!snap.empty) continue;
+    const batch = db.batch();
+    list.forEach(item => batch.set(db.collection(col).doc(String(item.id)), item));
+    await batch.commit();
+    seeded.push(col);
+  }
+  const cat = await db.collection('settings').doc('categories').get({ source: 'server' });
+  if (!cat.exists) {
+    await db.collection('settings').doc('categories').set({ list: DEFAULT_CATEGORIES });
+    seeded.push('categories');
+  }
+  return { seeded };
+}
+
 if (typeof window !== 'undefined') {
   window.SettingsStore = SettingsStore;
   window.SiteImagesStore = SiteImagesStore;
   window.AuthStore = AuthStore;
   window.uploadImageToFirebase = uploadImageToFirebase;
   window.compressAndOptimizeImage = compressAndOptimizeImage;
+  window.checkCloudHealth = checkCloudHealth;
+  window.seedCloudIfEmpty = seedCloudIfEmpty;
 }

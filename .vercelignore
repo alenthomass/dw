@@ -1,0 +1,8 @@
+# Internal files that must never be served publicly on displayworldme.com
+*.md
+.env*
+server.js
+package.json
+package-lock.json
+Display_World_SEO_Report.pdf
+uploads

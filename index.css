@@ -2185,3 +2185,12 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
 
 
 
+
+/* ===== Project photo count badge & portfolio filters ===== */
+.pf-photos{position:absolute;top:.85rem;right:.85rem;z-index:2;background:rgba(0,0,0,.6);color:#fff;font-size:.7rem;font-weight:600;letter-spacing:.04em;padding:.3rem .6rem;border-radius:999px;border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(6px)}
+.pf-filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2rem}
+.pf-filters[hidden]{display:none}
+.pf-filter{font-family:var(--font-d);font-size:.78rem;font-weight:600;letter-spacing:.05em;padding:.5rem 1rem;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s}
+.pf-filter:hover{color:var(--white);border-color:var(--pink)}
+.pf-filter.active{background:var(--pink);border-color:var(--pink);color:#fff}
+[data-theme="light"] .pf-filter:hover{color:#111}
