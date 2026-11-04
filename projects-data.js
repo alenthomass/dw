@@ -2249,7 +2249,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: About Showcase Photo",
         description: "Main primary photo in the About Display World section on the homepage.",
-        url: "https://images.unsplash.com/photo-1575719028439-65ce8662c1cc?auto=format&fit=crop&q=75&w=1200"
+        url: "https://images.unsplash.com/photo-1582120031356-35f21bf61055?auto=format&fit=crop&q=75&w=1200"
       },
       home_about_float: {
         key: "home_about_float",
@@ -2257,7 +2257,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: Tech Calibration Badge",
         description: "Floating secondary image showing calibration metrics on the homepage.",
-        url: "https://images.unsplash.com/photo-1643642969389-6db6b7a0fa56?auto=format&fit=crop&q=75&w=700"
+        url: "https://images.unsplash.com/photo-1583795484071-3c453e3a7c71?auto=format&fit=crop&q=75&w=700"
       },
       about_story_main: {
         key: "about_story_main",
@@ -2265,7 +2265,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Company Story Photo",
         description: "Primary high-resolution installation photo on the full About Us page.",
-        url: "https://images.unsplash.com/photo-1791782060626-ce983b06d9ce?auto=format&fit=crop&q=75&w=1200"
+        url: "https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&fit=crop&q=75&w=1200"
       },
       about_story_float: {
         key: "about_story_float",
@@ -2273,7 +2273,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Calibration Badge",
         description: "Floating secondary accent image in the story section on the About Us page.",
-        url: "https://images.unsplash.com/photo-1545164415-0fae860defbd?auto=format&fit=crop&q=75&w=700"
+        url: "https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&fit=crop&q=75&w=700"
       },
       explore_bg_lobby: {
         key: "explore_bg_lobby",

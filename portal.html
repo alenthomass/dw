@@ -980,6 +980,10 @@
     .ov-ic { color: var(--text-dim); display:inline-flex; }
     .pg-actions button { display:inline-flex; align-items:center; justify-content:center; padding:4px 6px; }
     #toggle-pw-btn { display:flex; align-items:center; }
+    /* Sentence case in the admin too */
+    .admin-table th,.modal-field label,.overview-card-header,.settings-field label,.img-badge,.pg-badge,[style*="uppercase"]{text-transform:none!important;letter-spacing:0!important}
+    .admin-table th{font-size:.8rem;color:var(--text-dim)}
+    [style*="monospace"]{font-family:inherit!important}
   </style>
 </head>
 <body>
@@ -1059,7 +1063,6 @@
   <section class="admin-hero section-dark">
     <div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1.5rem;">
       <div>
-        <span class="label-tag">Management Console</span>
         <h1 class="section-title">Display World <br><span class="accent-text">Control Panel</span></h1>
       </div>
       <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
@@ -1292,7 +1295,7 @@
                 <h2>Technical Case Studies</h2>
                 <p>Detail engineering solutions, challenges, and display specifications.</p>
               </div>
-              <button class="btn-primary" id="add-cs-btn" style="background:linear-gradient(135deg, #fa036e, #9c27b0);"><span>Add Case Study</span></button>
+              <button class="btn-primary" id="add-cs-btn"><span>Add Case Study</span></button>
             </div>
             
             <div class="admin-table-wrap">
@@ -1319,7 +1322,7 @@
                 <h2>Products Catalog</h2>
                 <p>Manage visual display products list shown in the Experience Center.</p>
               </div>
-              <button class="btn-primary" id="add-product-btn" style="background:linear-gradient(135deg, #03a9f4, #00bcd4);"><span>Add Product</span></button>
+              <button class="btn-primary" id="add-product-btn"><span>Add Product</span></button>
             </div>
             
             <div class="admin-table-wrap">
@@ -1346,7 +1349,7 @@
                 <h2>Integration Services</h2>
                 <p>Manage system design consultancy and deployment offerings.</p>
               </div>
-              <button class="btn-primary" id="add-service-btn" style="background:linear-gradient(135deg, #4caf50, #8bc34a);"><span>Add Service</span></button>
+              <button class="btn-primary" id="add-service-btn"><span>Add Service</span></button>
             </div>
             
             <div class="admin-table-wrap">
@@ -1374,7 +1377,7 @@
                 <h2>Blog & GCC Insights</h2>
                 <p>Publish signage articles, news, and technical briefings.</p>
               </div>
-              <button class="btn-primary" id="add-insight-btn" style="background:linear-gradient(135deg, #ff9800, #ff5722);"><span>Add Blog Post</span></button>
+              <button class="btn-primary" id="add-insight-btn"><span>Add Blog Post</span></button>
             </div>
             
             <div class="admin-table-wrap">
@@ -2041,7 +2044,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-  <script src="projects-data.js?v=16"></script>
+  <script src="projects-data.js?v=17"></script>
   <script>
     // ==========================================
     // AUTHENTICATION & SESSION MANAGEMENT
