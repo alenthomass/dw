@@ -134,8 +134,9 @@ async function _detectBackendOnce() {
       if (!firebase.apps.length) {
         firebase.initializeApp(FIREBASE_CONFIG);
         try {
-          // Helps on networks/proxies where Firestore's streaming connection stalls (the old "save hangs" issue)
-          firebase.firestore().settings({ experimentalAutoDetectLongPolling: true, merge: true });
+          // Plain HTTPS long-polling instead of a streaming channel. Office/hotel networks and some browsers
+          // block the stream, which made the site wait 10s+ and then show nothing.
+          firebase.firestore().settings({ experimentalForceLongPolling: true, merge: true });
         } catch (setErr) {}
       }
       db = firebase.firestore();
