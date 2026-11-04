@@ -37,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
   <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/portal*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}]}</script>
-  <link rel="stylesheet" href="index.css?v=10">
+  <link rel="stylesheet" href="index.css?v=11">
 
   <!-- Firebase Compat CDNs -->
 
@@ -305,37 +305,31 @@
           <h2 class="section-title">Send us a message</h2>
           <p class="section-desc">Send drawings, photos of the site or a tender document if you have one. A rough idea is fine too.</p>
           
-          <!-- Corporate Contact Card -->
-          <div style="background:#080812; border: 1px solid var(--border); padding: 1.75rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; margin-bottom: 1rem;">
-              <span style="font-family: var(--font-d); font-size: 0.8rem; font-weight:700; color:#fff;">DUBAI HEADQUARTERS</span>
-              <div style="display:flex; align-items:center; gap:0.4rem;">
-                <span style="width:6px; height:6px; background:#61CE70; border-radius:50%; display:inline-block; animation: pulse 1.5s infinite;"></span>
-                <span style="font-size:0.8rem; color:#61CE70;" id="hq-status"></span>
+          <!-- Contact card: one number with two actions, emails labelled -->
+          <div class="contact-card">
+            <div class="contact-card-head">
+              <span class="contact-card-title">Dubai office</span>
+              <span class="contact-card-status"><span class="dot" aria-hidden="true"></span><span id="hq-status"></span></span>
+            </div>
+            <p class="contact-card-address">Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE</p>
+            <div class="contact-card-phone">
+              <span class="contact-card-label">Phone and WhatsApp</span>
+              <a class="contact-card-number" href="tel:+971508411925">+971 50 841 1925</a>
+              <div class="contact-card-actions">
+                <a class="cc-btn cc-call" href="tel:+971508411925">Call</a>
+                <a class="cc-btn cc-wa" href="https://wa.me/971508411925?text=Hello!%20I'm%20interested%20in%20Display%20World's%20solutions." target="_blank" rel="noopener">WhatsApp</a>
               </div>
             </div>
-            <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1rem;">Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE</p>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:1rem;">
-              <div>
-                <span style="font-size:0.65rem; text-transform:uppercase; color:var(--text-dim); display:block;">Phone</span>
-                <a href="tel:+971508411925" style="font-size:0.85rem; color:#fff; font-weight:bold;">+971 50 841 1925</a>
-              </div>
-              <div>
-                <span style="font-size:0.65rem; text-transform:uppercase; color:var(--text-dim); display:block;">WhatsApp</span>
-                <a href="https://wa.me/971508411925?text=Hello!%20I'm%20interested%20in%20Display%20World's%20solutions." target="_blank" rel="noopener" style="font-size:0.85rem; color:#25D366; font-weight:bold;">+971 50 841 1925</a>
-              </div>
+            <div class="contact-card-emails">
+              <div><span class="contact-card-label">Sales and quotes</span><a href="mailto:salessupport@displayworldme.com">salessupport@displayworldme.com</a></div>
+              <div><span class="contact-card-label">Support for existing screens</span><a href="mailto:support@displayworldme.com">support@displayworldme.com</a></div>
             </div>
-            
-          </div>
-          <div style="margin-bottom:1.5rem;">
-            <a href="mailto:salessupport@displayworldme.com" class="contact-email-link" style="font-size: 1.05rem; color: var(--pink); font-weight:700; display:block; margin-bottom:0.4rem;">salessupport@displayworldme.com</a>
-            <a href="mailto:support@displayworldme.com" class="contact-email-link" style="font-size: 1.05rem; color: var(--pink); font-weight:700; display:block;">support@displayworldme.com</a>
           </div>
         </div>
 
         <div class="contact-form-wrap reveal-right" style="display:flex; align-items:center;">
           <form class="contact-form" id="contact-form" style="width:100%;">
-            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-row form-row-2">
               <div class="form-field"><input type="text" placeholder="Your Name" required></div>
               <div class="form-field"><input type="email" placeholder="Email Address" required></div>
             </div>
@@ -489,6 +483,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="projects-data.js?v=21"></script>
-  <script src="index.js?v=10"></script>
+  <script src="index.js?v=11"></script>
 </body>
 </html>

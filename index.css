@@ -2303,3 +2303,26 @@ main > section:first-of-type .section-desc, body > section:first-of-type .sectio
 [style*="monospace"]{font-family:inherit!important}
 .footer-col h4{font-size:.95rem}
 .pf-cat,.product-cat-tag,.insights-meta{font-size:.8rem;font-weight:600}
+
+/* Contact card (contact page) */
+.contact-card{background:#080812;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.75rem;color:#fff}
+.contact-card-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-bottom:.9rem;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.contact-card-title{font-family:var(--font-d);font-weight:700;font-size:1rem}
+.contact-card-status{display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem;color:#61CE70}
+.contact-card-status .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.contact-card-address{font-size:.95rem;line-height:1.6;color:rgba(255,255,255,.72);margin:0 0 1.25rem}
+.contact-card-label{display:block;font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:.25rem}
+.contact-card-phone{padding:1.1rem 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.contact-card-number{display:block;font-family:var(--font-d);font-weight:700;font-size:1.35rem;color:#fff;margin-bottom:.85rem}
+.contact-card-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+.cc-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 1.25rem;border-radius:999px;font-weight:600;font-size:.9rem}
+.cc-call{border:1.5px solid rgba(255,255,255,.35);color:#fff}
+.cc-call:hover{border-color:#fff}
+.cc-wa{background:#25D366;color:#06210f}
+.cc-wa:hover{background:#1fbd5a}
+.contact-card-emails{display:grid;gap:1rem;padding-top:1.1rem}
+.contact-card-emails a{color:var(--pink);font-weight:600;font-size:1rem;word-break:break-word}
+/* Textareas default to a monospace font in browsers; match the rest of the form */
+textarea,input,select,button{font-family:inherit}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:600px){.form-row-2{grid-template-columns:1fr}.contact-card{padding:1.35rem}}

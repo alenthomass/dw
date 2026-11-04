@@ -328,7 +328,9 @@ async function initDynamicFooter() {
           href.includes('567792681') || text.includes('56 779 2681') ||
           href.includes('508411925') || text.includes('50 841 1925')) {
         el.href = `tel:${phoneNum}`;
-        if (text.includes('Call')) {
+        if (el.classList.contains('cc-btn')) {
+          // Button with its own label ("Call"): only the link target changes
+        } else if (text.includes('Call')) {
           el.textContent = `Call ${phoneFormatted}`;
         } else if (text.includes('Tel:') || text.includes('Mob:') || text.includes('Phone:')) {
           el.textContent = `Phone: ${phoneFormatted}`;
