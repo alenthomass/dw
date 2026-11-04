@@ -142,7 +142,8 @@ function initScrollReveal() {
    COUNTER ANIMATION
    ═══════════════════════════════════════ */
 function initCounterAnimation() {
-  const counters = document.querySelectorAll('.stat-num');
+  // Numbers are written in the HTML (so search engines read them). Only animate ones that ask for it.
+  const counters = document.querySelectorAll('.stat-num[data-count]');
   if (counters.length === 0) return;
 
   const observer = new IntersectionObserver((entries) => {
