@@ -31,7 +31,7 @@
   <meta name="twitter:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
 
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=7">
+  <link rel="stylesheet" href="index.css?v=8">
 
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -555,7 +555,7 @@
       downloadBtn.innerHTML = '<span style="display:inline-flex; align-items:center; gap:0.5rem;"><svg class="pulse" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>Compiling Spec Sheet PDF...</span>';
       
       setTimeout(() => {
-        downloadBtn.innerHTML = '<span>✓ Download Complete</span>';
+        downloadBtn.innerHTML = '<span>Download complete</span>';
         
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(activeProduct, null, 2));
         const dlAnchor = document.createElement('a');
@@ -567,8 +567,8 @@
       }, 1500);
     });
   </script>
-  <script src="projects-data.js?v=12"></script>
-  <script src="index.js?v=7"></script>
+  <script src="projects-data.js?v=13"></script>
+  <script src="index.js?v=8"></script>
 
   <!-- FLOATING WIDGETS -->
   <div class="floating-widgets">

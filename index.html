@@ -35,7 +35,8 @@
   <meta name="twitter:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
 
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=7">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="index.css?v=8">
 
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -210,126 +211,23 @@
 
 
   <!-- HERO SECTION -->
-  <section class="hero" id="home">
-    <div class="hero-blob b1"></div>
-    <div class="hero-blob b2"></div>
-    <div class="hero-blob b3"></div>
-    <div class="hero-grid-bg"></div>
-    <div class="hero-noise"></div>
-
-    <div class="container hero-wrap">
-      <div class="hero-left">
-        <div class="hero-badge">
-          <span class="hero-dot"></span>
-          <span>Visionary Digital & Static Signage in the Gulf</span>
-        </div>
-        <h1 class="hero-title">
-          <span class="h-line"><span class="h-word">Next-Gen</span></span>
-          <span class="h-line"><span class="h-word h-accent">LED & LCD</span></span>
-          <span class="h-line"><span class="h-word">Ecosystems</span></span>
-        </h1>
-        <p class="hero-desc">We design, build, and deploy premium, high-impact digital displays and architectural static signage for corporate workspaces, luxury retail hubs, and critical aviation terminals across Dubai and the UAE.</p>
-        <div class="hero-actions">
-          <a href="portfolio.html" class="btn-primary">
-            <span>Explore Projects</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h8.586L5.293 17.293l1.414 1.414L17 8.414V17h2V5H7v2z"/></svg>
-          </a>
-          <a href="contact.html" class="btn-outline">Consult our Engineers</a>
-        </div>
-        
-        <div class="hero-features-list">
-          <div class="hero-feature-item">
-            <span class="h-feat-dot"></span>
-            <div>
-              <strong>24/7 Redundancy</strong>
-              <span>Aviation-grade failovers</span>
-            </div>
-          </div>
-          <div class="hero-feature-item">
-            <span class="h-feat-dot"></span>
-            <div>
-              <strong>Custom Calibration</strong>
-              <span>True-color dynamic balance</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="hero-right">
-        <!-- Premium Interactive Signage Console -->
-        <div class="signage-console">
-          
-          <div class="console-tabs">
-            <button class="console-tab active" data-content="led">LED Screen</button>
-            <button class="console-tab" data-content="lcd">Video Wall</button>
-            <button class="console-tab" data-content="kiosk">Smart Kiosk</button>
-          </div>
-
-          <div class="console-monitor">
-            <div class="monitor-frame">
-              <div class="monitor-glass-overlay"></div>
-              
-              <!-- Overlays -->
-              <div class="monitor-widget widget-clock" id="m-clock">10:45:00 AM</div>
-              <div class="monitor-widget widget-news" id="m-news">
-                <span>+++ DISPLAY WORLD SIGNAGE ACTIVE +++ SYSTEM OK +++</span>
-              </div>
-              <div class="monitor-widget widget-pixelgrid" id="m-grid"></div>
-
-              <!-- LED Screen Screen -->
-              <div class="monitor-screen active" id="ms-led">
-                <div class="led-art-bg">
-                  <div class="led-art-orb o-1"></div>
-                  <div class="led-art-orb o-2"></div>
-                </div>
-                <div class="screen-hud-info">
-                  <span>P1.5 Outdoor Screen</span>
-                  <strong>Uniform D65 Color Calibrated</strong>
-                </div>
-              </div>
-
-              <!-- LCD Screen Screen -->
-              <div class="monitor-screen" id="ms-lcd">
-                <div class="lcd-fids-header">FLIGHT DEPARTURES</div>
-                <table class="lcd-table">
-                  <thead>
-                    <tr><th>Flight</th><th>Dest</th><th>Gate</th><th>Status</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>EK001</td><td>LHR</td><td>A12</td><td class="c-green">Boarding</td></tr>
-                    <tr><td>QR104</td><td>DOH</td><td>B05</td><td class="c-orange">Delayed</td></tr>
-                    <tr><td>EY311</td><td>AUH</td><td>C18</td><td>On Time</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Kiosk Screen Screen -->
-              <div class="monitor-screen" id="ms-kiosk">
-                <div class="kiosk-radar-ring">
-                  <div class="radar-ping-dot"></div>
-                </div>
-                <div class="kiosk-map-overlay">
-                  <span>DXB WAYFINDING TERMINAL</span>
-                  <strong>Map rendering complete</strong>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div class="console-widgets-panel">
-            <span class="widget-panel-label">Toggle Screen Overlays</span>
-            <div class="console-widget-btns">
-              <button class="widget-btn" data-toggle="clock">Live Clock</button>
-              <button class="widget-btn" data-toggle="news">News Ticker</button>
-              <button class="widget-btn" data-toggle="grid">Pixel Grid Test</button>
-            </div>
-          </div>
-
+  <section class="hx" id="home">
+    <img class="hx-photo" data-img-key="home_hero"
+      src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=75&w=1600"
+      srcset="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=75&w=750 750w, https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=75&w=1200 1200w, https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=75&w=1600 1600w, https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=75&w=2200 2200w, https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=75&w=2800 2800w"
+      sizes="100vw" alt="Dubai skyline and Sheikh Zayed Road interchange in the morning"
+      fetchpriority="high" decoding="async">
+    <div class="hx-shade" aria-hidden="true"></div>
+    <div class="container hx-copy">
+      <h1 class="hx-title">Screens and signage for the Gulf's busiest places.</h1>
+      <div class="hx-side">
+        <p class="hx-desc">LED walls, video walls, kiosks and architectural signage. Designed, installed and maintained by our own engineers in Dubai.</p>
+        <div class="hx-actions">
+          <a href="portfolio.html" class="hx-btn hx-btn-primary">See our projects</a>
+          <a href="contact.html" class="hx-btn hx-btn-ghost">Talk to an engineer</a>
         </div>
       </div>
     </div>
-    <div class="hero-scroll"><div class="hero-scroll-line"></div><span>Scroll</span></div>
   </section>
 
   <!-- TRUSTED PARTNERS MARQUEE -->
@@ -470,40 +368,8 @@
         <span class="label-tag">Testimonials</span>
         <h2 class="section-title">What Our <span class="accent-text">Clients Say</span></h2>
       </div>
-      <div class="testimonials-grid stagger-children">
-        <div class="test-card reveal">
-          <div class="test-stars">★★★★★</div>
-          <p class="test-quote">"Display World transformed our entire terminal experience. The FIDS installation has been running 24/7 for over two years with zero downtime. Their R&D background shows in every detail — from color calibration to failover redundancy."</p>
-          <div class="test-author">
-            <div class="test-avatar">AK</div>
-            <div>
-              <h4>Ahmed Al Khalifa</h4>
-              <span>IT Director, Gulf Aviation Authority</span>
-            </div>
-          </div>
-        </div>
-        <div class="test-card reveal">
-          <div class="test-stars">★★★★★</div>
-          <p class="test-quote">"We needed a reliable partner for our store digital signage rollout across the UAE. Display World delivered on time, and their CMS platform makes content management incredibly simple for our team."</p>
-          <div class="test-author">
-            <div class="test-avatar">SF</div>
-            <div>
-              <h4>Sarah Farouk</h4>
-              <span>Head of Visual Merchandising, Retail Group</span>
-            </div>
-          </div>
-        </div>
-        <div class="test-card reveal">
-          <div class="test-stars">★★★★★</div>
-          <p class="test-quote">"The LED facade mesh installation on our headquarters has become a skyline landmark. Display World handled everything from weather-proofing to calibration. They are a true engineering partner."</p>
-          <div class="test-author">
-            <div class="test-avatar">MR</div>
-            <div>
-              <h4>Mohammed Al Rashid</h4>
-              <span>Property Director, Emaar Group</span>
-            </div>
-          </div>
-        </div>
+      <div class="testimonials-grid stagger-children" data-testimonials>
+        <!-- Loaded from the admin portal (Testimonials tab) -->
       </div>
     </div>
   </section>
@@ -603,7 +469,7 @@
     </button>
   </div>
 
-  <script src="projects-data.js?v=12"></script>
+  <script src="projects-data.js?v=13"></script>
   <script>
     async function renderHomePortfolio() {
       const container = document.getElementById('portfolio-container-home');
@@ -638,6 +504,6 @@
     }
     renderHomePortfolio();
   </script>
-  <script src="index.js?v=7"></script>
+  <script src="index.js?v=8"></script>
 </body>
 </html>

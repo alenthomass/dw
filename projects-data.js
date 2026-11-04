@@ -2234,6 +2234,14 @@ class SiteImagesDataStore {
         description: "Centered vertical logo lockup with DW monogram above DISPLAY WORLD typography.",
         url: "assets/dw-logo-stacked.svg"
       },
+      home_hero: {
+        key: "home_hero",
+        category: "home",
+        page: "index.html",
+        title: "Home: Hero Background Photo",
+        description: "Full-screen photo behind the headline at the top of the homepage. Use a wide landscape photo, ideally a real Display World installation.",
+        url: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c"
+      },
       home_about_main: {
         key: "home_about_main",
         category: "home",
@@ -2399,7 +2407,7 @@ class SiteImagesDataStore {
     // Automatic purge for any stale external/Unsplash URLs or old SVG placeholders:
     Object.keys(storedUrls).forEach(k => {
       if (storedUrls[k] && typeof storedUrls[k] === 'string') {
-        if (storedUrls[k].includes('unsplash') || (defaults[k] && defaults[k].url.endsWith('.jpg') && storedUrls[k].endsWith('.svg'))) {
+        if ((storedUrls[k].includes('unsplash') && !(defaults[k] && defaults[k].url.includes('unsplash'))) || (defaults[k] && defaults[k].url.endsWith('.jpg') && storedUrls[k].endsWith('.svg'))) {
           delete storedUrls[k];
         }
       }
@@ -2829,6 +2837,110 @@ class AuthDataStore {
 
 const AuthStore = new AuthDataStore();
 
+
+/* =========================================================================
+   TESTIMONIALS STORE (edited from the admin portal, shown on Home + Projects)
+   ========================================================================= */
+const DEFAULT_TESTIMONIALS = [
+  { id: "t1", order: 1, published: true, rating: 5, name: "Ahmed Al Khalifa", role: "IT Director, Gulf Aviation Authority",
+    quote: "Display World transformed our entire terminal experience. The FIDS installation has been running 24/7 for over two years with zero downtime. Their R&D background shows in every detail, from colour calibration to failover redundancy." },
+  { id: "t2", order: 2, published: true, rating: 5, name: "Sarah Farouk", role: "Head of Visual Merchandising, Retail Group",
+    quote: "We needed a reliable partner for our store digital signage rollout across the UAE. Display World delivered on time, and their CMS platform makes content management simple for our team." },
+  { id: "t3", order: 3, published: true, rating: 5, name: "Mohammed Al Rashid", role: "Property Director",
+    quote: "The LED facade mesh on our headquarters has become a skyline landmark. Display World handled everything from weather-proofing to calibration. They are a true engineering partner." }
+];
+
+class TestimonialsDataStore {
+  constructor() { this.localKey = 'dw_testimonials'; }
+
+  _readLocal() {
+    try { const l = JSON.parse(localStorage.getItem(this.localKey)); return Array.isArray(l) ? l : DEFAULT_TESTIMONIALS.slice(); }
+    catch (e) { return DEFAULT_TESTIMONIALS.slice(); }
+  }
+
+  _sort(list) {
+    return list.sort((a, b) => (Number(a.order) || 999) - (Number(b.order) || 999) || String(a.name).localeCompare(String(b.name)));
+  }
+
+  // Everything, including hidden ones (admin)
+  async getAll() {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        const snap = await db.collection('testimonials').get();
+        if (!snap.empty) { const l = []; snap.forEach(d => l.push({ ...d.data(), id: d.id })); return this._sort(l); }
+      } catch (err) { console.error('Firestore testimonials read error:', err); }
+      return this._sort(DEFAULT_TESTIMONIALS.slice());
+    }
+    if (backendMode === 'local-api') {
+      try { const r = await fetch(`${apiBaseUrl}/api/testimonials`); if (r.ok) return this._sort(await r.json()); } catch (e) {}
+    }
+    return this._sort(this._readLocal());
+  }
+
+  // Only the ones marked "Show on website"
+  async getPublished() {
+    return (await this.getAll()).filter(t => t.published !== false && t.quote && t.name);
+  }
+
+  async save(t) {
+    await detectBackend();
+    const clean = { ...t, id: t.id || 't_' + Date.now(), rating: Math.max(1, Math.min(5, Number(t.rating) || 5)), order: Number(t.order) || 99, published: t.published !== false, updatedAt: new Date().toISOString() };
+    if (backendMode === 'firebase' && db) { await safeFirestoreSet(db.collection('testimonials').doc(clean.id), clean); return true; }
+    if (backendMode === 'local-api') {
+      const r = await fetch(`${apiBaseUrl}/api/testimonials`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(clean) });
+      if (!r.ok) throw new Error(`Server refused the save (${r.status})`);
+      return true;
+    }
+    const list = this._readLocal(); const i = list.findIndex(x => x.id === clean.id);
+    if (i > -1) list[i] = clean; else list.push(clean);
+    localStorage.setItem(this.localKey, JSON.stringify(list));
+    return true;
+  }
+
+  async delete(id) {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) { await db.collection('testimonials').doc(id).delete(); return true; }
+    if (backendMode === 'local-api') {
+      const r = await fetch(`${apiBaseUrl}/api/testimonials/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!r.ok) throw new Error(`Server refused the delete (${r.status})`);
+      return true;
+    }
+    localStorage.setItem(this.localKey, JSON.stringify(this._readLocal().filter(x => x.id !== id)));
+    return true;
+  }
+}
+const TestimonialsStore = new TestimonialsDataStore();
+
+// Renders testimonial cards into any element with [data-testimonials]; hides the section when empty
+async function renderTestimonials() {
+  const grids = document.querySelectorAll('[data-testimonials]');
+  if (!grids.length) return;
+  let list = [];
+  try { list = await TestimonialsStore.getPublished(); } catch (e) { return; }
+  grids.forEach(grid => {
+    const section = grid.closest('section');
+    if (!list.length) { if (section) section.hidden = true; return; }
+    if (section) section.hidden = false;
+    grid.innerHTML = list.map(t => {
+      const initials = String(t.name).trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const stars = '★'.repeat(t.rating || 5) + '☆'.repeat(5 - (t.rating || 5));
+      return `<div class="test-card reveal visible">
+          <div class="test-stars" aria-label="${t.rating || 5} out of 5">${stars}</div>
+          <p class="test-quote">"${escapeHtml(t.quote)}"</p>
+          <div class="test-author">
+            <div class="test-avatar">${escapeHtml(initials)}</div>
+            <div><h4>${escapeHtml(t.name)}</h4>${t.role ? `<span>${escapeHtml(t.role)}</span>` : ''}</div>
+          </div>
+        </div>`;
+    }).join('');
+  });
+}
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderTestimonials);
+  else renderTestimonials();
+}
+
 // A brand-new cloud database is empty, and the site shows built-in demo content until the first
 // save. Without this, saving the first project made every other demo project vanish.
 // Copies the current content in once, only into collections that are completely empty.
@@ -2841,7 +2953,8 @@ async function seedCloudIfEmpty() {
     products: DEFAULT_PRODUCTS,
     services: DEFAULT_SERVICES,
     insights: DEFAULT_INSIGHTS,
-    careers: DEFAULT_CAREERS
+    careers: DEFAULT_CAREERS,
+    testimonials: DEFAULT_TESTIMONIALS
   };
   const seeded = [];
   for (const [col, list] of Object.entries(sets)) {
@@ -2868,4 +2981,5 @@ if (typeof window !== 'undefined') {
   window.compressAndOptimizeImage = compressAndOptimizeImage;
   window.checkCloudHealth = checkCloudHealth;
   window.seedCloudIfEmpty = seedCloudIfEmpty;
+  window.TestimonialsStore = TestimonialsStore;
 }

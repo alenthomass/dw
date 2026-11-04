@@ -412,7 +412,9 @@ async function initDynamicImages() {
         if (el.tagName.toLowerCase() === 'img') {
           if (key === 'logo_header' && (imagesMap[key] === 'assets/dw-logo-white.svg' || imagesMap[key] === 'assets/dw-logo-dark.svg')) {
             el.src = currentTheme === 'light' ? 'assets/dw-logo-dark.svg' : 'assets/dw-logo-white.svg';
-          } else {
+          } else if (el.getAttribute('src') !== imagesMap[key] && !(el.hasAttribute('srcset') && imagesMap[key].startsWith('https://images.unsplash.com/') && el.getAttribute('src').startsWith(imagesMap[key]))) {
+            // A custom upload replaces the responsive default, so drop the default's srcset
+            el.removeAttribute('srcset');
             el.src = imagesMap[key];
           }
         } else if (el.tagName.toLowerCase() === 'link') {

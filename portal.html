@@ -7,7 +7,7 @@
   <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
   <title>Management Portal | Display World</title>
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=7">
+  <link rel="stylesheet" href="index.css?v=8">
   
   <!-- Firebase Compat CDNs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -975,6 +975,12 @@
     [data-theme="light"] .admin-modal input::placeholder,
     [data-theme="light"] .admin-modal textarea::placeholder,
     [data-theme="light"] #new-category-input::placeholder { color: rgba(10,10,18,0.4); }
+    .ic { display:inline-block; vertical-align:middle; flex-shrink:0; }
+    .nav-item-icon { display:inline-flex; align-items:center; justify-content:center; width:20px; opacity:.75; }
+    .sidebar-nav-btn.active .nav-item-icon { opacity:1; }
+    .ov-ic { color: var(--text-dim); display:inline-flex; }
+    .pg-actions button { display:inline-flex; align-items:center; justify-content:center; padding:4px 6px; }
+    #toggle-pw-btn { display:flex; align-items:center; }
   </style>
 </head>
 <body>
@@ -997,7 +1003,7 @@
         <label for="login-username" style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:0.4rem;">Username or Admin Email</label>
         <div style="position:relative;">
           <input type="text" id="login-username" placeholder="admin email" autocomplete="username" style="padding-left:2.5rem;">
-          <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); font-size:1rem; opacity:0.65; pointer-events:none;">👤</span>
+          <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); font-size:1rem; opacity:0.65; pointer-events:none; display:flex;"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
         </div>
       </div>
 
@@ -1005,8 +1011,8 @@
         <label for="login-password" style="display:block; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:0.4rem;">Password</label>
         <div style="position:relative;">
           <input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password" style="padding-left:2.5rem; padding-right:2.5rem;">
-          <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); font-size:1rem; opacity:0.65; pointer-events:none;">🔑</span>
-          <button type="button" id="toggle-pw-btn" style="position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0.25rem;" aria-label="Toggle password visibility">👁️</button>
+          <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); font-size:1rem; opacity:0.65; pointer-events:none; display:flex;"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          <button type="button" id="toggle-pw-btn" style="position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0.25rem;" aria-label="Toggle password visibility"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
 
@@ -1059,7 +1065,7 @@
       </div>
       <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
         <button class="btn-outline" id="reset-btn">Reset Defaults</button>
-        <button class="btn-outline" id="logout-btn" style="border-color:rgba(250,3,110,0.4); color:var(--pink); font-weight:700;"><span>🔒 Log Out</span></button>
+        <button class="btn-outline" id="logout-btn" style="border-color:rgba(250,3,110,0.4); color:var(--pink); font-weight:700;"><span>Log Out</span></button>
       </div>
     </div>
   </section>
@@ -1088,49 +1094,53 @@
           </div>
           <nav class="admin-sidebar-nav">
             <button class="sidebar-nav-btn active" id="tab-overview-btn" onclick="switchTab('overview', this)">
-              <span class="nav-item-icon">📊</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>
               <span class="nav-item-text">Overview</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-projects-btn" onclick="switchTab('projects', this)">
-              <span class="nav-item-icon">🖥️</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
               <span class="nav-item-text">Hardware Projects</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-casestudies-btn" onclick="switchTab('casestudies', this)">
-              <span class="nav-item-icon">📖</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
               <span class="nav-item-text">Case Studies</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-products-btn" onclick="switchTab('products', this)">
-              <span class="nav-item-icon">📦</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>
               <span class="nav-item-text">Products Catalog</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-services-btn" onclick="switchTab('services', this)">
-              <span class="nav-item-icon">🛠️</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0 5 5L22 14l-8 8-2.3-2.3a4 4 0 0 0-5-5L2 10l8-8z" transform="scale(.9) translate(1.3 1.3)"/></svg></span>
               <span class="nav-item-text">Integration Services</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-insights-btn" onclick="switchTab('insights', this)">
-              <span class="nav-item-icon">✍️</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
               <span class="nav-item-text">Blog & Insights</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-inquiries-btn" onclick="switchTab('inquiries', this)">
-              <span class="nav-item-icon">📬</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></svg></span>
               <span class="nav-item-text">Inquiries</span>
               <span class="sidebar-badge" id="sidebar-inquiries-badge" style="display:none;">0</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-careers-btn" onclick="switchTab('careers', this)">
-              <span class="nav-item-icon">💼</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
               <span class="nav-item-text">Job Openings</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-testimonials-btn" onclick="switchTab('testimonials', this)">
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              <span class="nav-item-text">Testimonials</span>
             </button>
             <div style="height:1px; background:var(--border); margin:0.75rem 0;"></div>
             <button class="sidebar-nav-btn" id="tab-settings-btn" onclick="switchTab('settings', this)">
-              <span class="nav-item-icon">⚙️</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>
               <span class="nav-item-text">Site Settings</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-images-btn" onclick="switchTab('images', this)">
-              <span class="nav-item-icon">🖼️</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></span>
               <span class="nav-item-text">Site Images</span>
             </button>
             <button class="sidebar-nav-btn" id="sidebar-logout-btn" style="margin-top:1.5rem; border-top:1px solid var(--border); padding-top:0.85rem; color:var(--pink);">
-              <span class="nav-item-icon">🔒</span>
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg></span>
               <span class="nav-item-text">Log Out</span>
             </button>
           </nav>
@@ -1151,7 +1161,7 @@
             <!-- Unread Alert -->
             <div id="unread-inquiries-alert" style="display:none; background:linear-gradient(90deg, rgba(250,3,110,0.15), rgba(156,39,176,0.15)); border:1px solid var(--pink); border-radius:10px; padding:1.2rem; margin-bottom:2rem; justify-content:space-between; align-items:center; box-shadow: 0 4px 20px rgba(250,3,110,0.15);">
               <div style="display:flex; align-items:center; gap:1rem;">
-                <span style="font-size:1.5rem; filter: drop-shadow(0 2px 5px rgba(250,3,110,0.5));">📬</span>
+                <span style="color:var(--pink); display:flex;"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></svg></span>
                 <div>
                   <strong style="color:var(--white); display:block; font-size:1rem;">New customer messages</strong>
                   <span style="color:var(--text-dim); font-size:0.85rem;" id="unread-inquiries-text">You have customer messages awaiting response.</span>
@@ -1164,7 +1174,7 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Active Projects</span>
-                  <span>🖥️</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-projects-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('projects', document.getElementById('tab-projects-btn'))">Manage Projects →</div>
@@ -1172,7 +1182,7 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Case Studies</span>
-                  <span>📖</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-cases-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('casestudies', document.getElementById('tab-casestudies-btn'))">Manage Case Studies →</div>
@@ -1180,7 +1190,7 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Products Catalog</span>
-                  <span>📦</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-products-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('products', document.getElementById('tab-products-btn'))">Manage Products →</div>
@@ -1188,7 +1198,7 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Integration Services</span>
-                  <span>🛠️</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0 5 5L22 14l-8 8-2.3-2.3a4 4 0 0 0-5-5L2 10l8-8z" transform="scale(.9) translate(1.3 1.3)"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-services-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('services', document.getElementById('tab-services-btn'))">Manage Services →</div>
@@ -1196,7 +1206,7 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Blog Articles</span>
-                  <span>✍️</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-insights-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('insights', document.getElementById('tab-insights-btn'))">Manage Blog Posts →</div>
@@ -1204,7 +1214,7 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Inquiries Received</span>
-                  <span>📬</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-inquiries-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('inquiries', document.getElementById('tab-inquiries-btn'))">View Inbox →</div>
@@ -1212,15 +1222,23 @@
               <div class="overview-card">
                 <div class="overview-card-header">
                   <span>Job Openings</span>
-                  <span>💼</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-careers-count">0</div>
                 <div class="overview-card-cta" onclick="switchTab('careers', document.getElementById('tab-careers-btn'))">Manage Openings →</div>
               </div>
               <div class="overview-card">
                 <div class="overview-card-header">
+                  <span>Testimonials</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                </div>
+                <div class="overview-card-val" id="stat-testimonials-count">0</div>
+                <div class="overview-card-cta" onclick="switchTab('testimonials', document.getElementById('tab-testimonials-btn'))">Manage Testimonials →</div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-card-header">
                   <span>Site Media & Graphics</span>
-                  <span>🖼️</span>
+                  <span class="ov-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></span>
                 </div>
                 <div class="overview-card-val" id="stat-images-count">19</div>
                 <div class="overview-card-cta" onclick="switchTab('images', document.getElementById('tab-images-btn'))">Manage All Site Images →</div>
@@ -1416,7 +1434,7 @@
 
             <!-- Contact Numbers Card -->
             <div class="settings-card">
-              <h3>📞 Contact Numbers</h3>
+              <h3>Contact Numbers</h3>
               <p>Update the telephone and mobile numbers displayed in footers and contact pages.</p>
               <div class="settings-form-grid">
                 <div class="settings-field">
@@ -1454,7 +1472,7 @@
 
             <!-- WhatsApp Settings Card -->
             <div class="settings-card">
-              <h3>💬 WhatsApp Button</h3>
+              <h3>WhatsApp Button</h3>
               <p>Configure the floating WhatsApp chat button that appears on all pages.</p>
               <div class="settings-form-grid">
                 <div class="settings-field">
@@ -1472,7 +1490,7 @@
 
             <!-- WhatsApp Preview -->
             <div class="settings-card" style="text-align:center;">
-              <h3 style="justify-content:center;">👁️ Live Preview</h3>
+              <h3 style="justify-content:center;">Live Preview</h3>
               <p>This is how your WhatsApp link will look:</p>
               <div style="background:rgba(37,211,102,0.08); border:1px solid rgba(37,211,102,0.2); border-radius:12px; padding:1.25rem; display:inline-block; margin:0 auto;">
                 <a id="settings-wa-preview" href="#" target="_blank" rel="noopener noreferrer" style="color:#25d366; font-weight:700; font-size:0.95rem; text-decoration:none; display:flex; align-items:center; gap:0.5rem;">
@@ -1484,7 +1502,7 @@
 
             <!-- Credentials & Security Card -->
             <div class="settings-card" id="security-settings-card">
-              <h3>🔐 Administrator Login Credentials</h3>
+              <h3>Administrator Login Credentials</h3>
               <p>Update the administrator username and password used to unlock this management portal.</p>
               
               <div id="creds-status-msg" style="display:none; padding:0.75rem 1rem; border-radius:10px; font-size:0.85rem; margin-bottom:1.25rem;"></div>
@@ -1513,15 +1531,15 @@
               </div>
               <div style="margin-top:1.25rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
                 <button class="btn-primary" id="save-creds-btn" style="min-width:180px;">
-                  <span>🔑 Update Login Credentials</span>
+                  <span>Update Login Credentials</span>
                 </button>
                 <span style="font-size:0.8rem; color:var(--text-dim);" id="creds-last-updated"></span>
               </div>
             </div>
 
             <div class="settings-actions">
-              <button class="btn-primary" id="save-settings-btn" style="min-width:180px;"><span>💾 Save & Apply to All Pages</span></button>
-              <span class="settings-save-msg" id="settings-save-msg">✓ Settings saved successfully!</span>
+              <button class="btn-primary" id="save-settings-btn" style="min-width:180px;"><span>Save & Apply to All Pages</span></button>
+              <span class="settings-save-msg" id="settings-save-msg">Settings saved successfully!</span>
             </div>
           </div>
 
@@ -1537,7 +1555,7 @@
                   <span>↺ Reset All Defaults</span>
                 </button>
                 <button class="btn-primary" id="save-all-images-btn" style="min-width:180px;">
-                  <span>💾 Save All Site Images</span>
+                  <span>Save All Site Images</span>
                 </button>
               </div>
             </div>
@@ -1545,7 +1563,7 @@
             <!-- Toolbar & Category Filtering -->
             <div class="images-toolbar">
               <div class="images-search-box">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
                 <input type="text" id="img-search-input" placeholder="Search by image name, key, page, or category...">
               </div>
               <div class="images-filter-pills" id="img-filter-pills">
@@ -1563,7 +1581,7 @@
             <!-- Status Save Alert -->
             <div id="images-save-banner" style="display:none; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.3); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.5rem; justify-content:space-between; align-items:center;">
               <div style="display:flex; align-items:center; gap:0.75rem; color:#25d366; font-weight:600; font-size:0.9rem;">
-                <span>✓</span>
+                <span style="display:flex;"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
                 <span id="images-save-text">Site images successfully saved and synced across all pages!</span>
               </div>
             </div>
@@ -1580,9 +1598,9 @@
                 <span style="font-size:0.8rem; color:var(--text-dim);">Changes will immediately reflect across all website pages on save.</span>
               </div>
               <div style="display:flex; gap:1.25rem; align-items:center;">
-                <span class="settings-save-msg" id="images-bottom-save-msg">✓ All images saved successfully!</span>
+                <span class="settings-save-msg" id="images-bottom-save-msg">All images saved successfully!</span>
                 <button class="btn-primary" id="save-all-images-bottom-btn" style="min-width:180px;">
-                  <span>💾 Save All Site Images</span>
+                  <span>Save All Site Images</span>
                 </button>
               </div>
             </div>
@@ -1604,7 +1622,7 @@
                 <h2>Job Openings</h2>
                 <p>Register, update, or remove active job listings displayed on the Careers section of your About page.</p>
               </div>
-              <button class="btn-primary" id="add-job-btn"><span>➕ Add Job Position</span></button>
+              <button class="btn-primary" id="add-job-btn"><span>Add Job Position</span></button>
             </div>
 
             <div class="admin-table-wrap">
@@ -1622,6 +1640,24 @@
                 <tbody id="careers-table-body">
                   <!-- Dynamically populated job rows -->
                 </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="testimonials-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>Testimonials</h2>
+                <p>Client quotes shown on the Home and Projects pages. Hidden ones stay saved but don't appear on the site.</p>
+              </div>
+              <button class="btn-primary" id="add-testimonial-btn"><span>Add Testimonial</span></button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Order</th><th>Client</th><th>Quote</th><th>Rating</th><th>On site</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="testimonials-table-body"></tbody>
               </table>
             </div>
           </div>
@@ -1669,9 +1705,9 @@
             <label>Project Photos</label>
             <div class="pg-dropzone" id="pg-dropzone" tabindex="0" role="button" aria-label="Add project photos">
               <input type="file" id="field-image-file" accept="image/*" multiple hidden>
-              <div class="pg-drop-icon">⬆</div>
+              <div class="pg-drop-icon"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5M12 3v12"/></svg></div>
               <div><strong>Click to choose photos</strong> or drag them here</div>
-              <div class="pg-drop-hint">Add as many as you like. The first photo is the cover. Use ★ on any photo to make it the cover.</div>
+              <div class="pg-drop-hint">Add as many as you like. The first photo is the cover. Use the star on any photo to make it the cover.</div>
             </div>
             <div class="pg-summary" id="pg-summary"></div>
             <div class="pg-grid" id="pg-grid"></div>
@@ -1795,7 +1831,7 @@
           <label for="prod-image">Product Image URL</label>
           <div style="display:flex; gap:0.5rem; align-items:center;">
             <input type="url" id="prod-image" required placeholder="https://..." style="flex:1;">
-            <button type="button" class="btn-outline" style="padding:0.6rem 0.9rem; font-size:0.8rem; white-space:nowrap;" onclick="document.getElementById('prod-file-upload').click()">📁 Upload</button>
+            <button type="button" class="btn-outline" style="padding:0.6rem 0.9rem; font-size:0.8rem; white-space:nowrap;" onclick="document.getElementById('prod-file-upload').click()">Upload</button>
             <input type="file" id="prod-file-upload" accept="image/*" style="display:none;" onchange="handleGenericUpload(this.files[0], 'prod-image', 'prod-upload-status', 'products')">
           </div>
           <div id="prod-upload-status" style="font-size:0.78rem; margin-top:0.3rem; display:none;"></div>
@@ -1897,7 +1933,7 @@
           <label for="insight-image">Featured Image URL</label>
           <div style="display:flex; gap:0.5rem; align-items:center;">
             <input type="url" id="insight-image" required placeholder="https://..." style="flex:1;">
-            <button type="button" class="btn-outline" style="padding:0.6rem 0.9rem; font-size:0.8rem; white-space:nowrap;" onclick="document.getElementById('insight-file-upload').click()">📁 Upload</button>
+            <button type="button" class="btn-outline" style="padding:0.6rem 0.9rem; font-size:0.8rem; white-space:nowrap;" onclick="document.getElementById('insight-file-upload').click()">Upload</button>
             <input type="file" id="insight-file-upload" accept="image/*" style="display:none;" onchange="handleGenericUpload(this.files[0], 'insight-image', 'insight-upload-status', 'insights')">
           </div>
           <div id="insight-upload-status" style="font-size:0.78rem; margin-top:0.3rem; display:none;"></div>
@@ -1959,7 +1995,50 @@
   </div>
 
 
-  <script src="projects-data.js?v=12"></script>
+  <div class="admin-modal" id="testimonial-modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 id="testimonial-modal-title">Add Testimonial</h3>
+        <button class="close-modal" id="close-testimonial-modal-btn">&times;</button>
+      </div>
+      <form id="testimonial-form" class="modal-form-grid">
+        <input type="hidden" id="tm-id">
+        <div class="modal-field">
+          <label for="tm-name">Client Name</label>
+          <input type="text" id="tm-name" required maxlength="80" placeholder="e.g. Ahmed Al Khalifa">
+        </div>
+        <div class="modal-field">
+          <label for="tm-role">Role and Company</label>
+          <input type="text" id="tm-role" maxlength="120" placeholder="e.g. IT Director, Dubai Airports">
+        </div>
+        <div class="modal-field full-width">
+          <label for="tm-quote">Quote</label>
+          <textarea id="tm-quote" rows="5" required maxlength="600" placeholder="What the client said, in their words"></textarea>
+          <span class="field-hint" id="tm-quote-count">0 / 600</span>
+        </div>
+        <div class="modal-field">
+          <label for="tm-rating">Star Rating</label>
+          <select id="tm-rating">
+            <option value="5">★★★★★ 5</option><option value="4">★★★★ 4</option><option value="3">★★★ 3</option><option value="2">★★ 2</option><option value="1">★ 1</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label for="tm-order">Display Order</label>
+          <input type="number" id="tm-order" min="1" max="99" value="1">
+        </div>
+        <div class="modal-field full-width" style="flex-direction:row; align-items:center; gap:0.5rem;">
+          <input type="checkbox" id="tm-published" checked style="width:auto; margin:0;">
+          <label for="tm-published" style="margin:0; text-transform:none; letter-spacing:0;">Show on website</label>
+        </div>
+        <div class="modal-footer" style="grid-column: span 2; width: 100%;">
+          <button type="button" class="btn-outline" id="cancel-testimonial-modal-btn">Cancel</button>
+          <button type="submit" class="btn-primary"><span>Save Testimonial</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="projects-data.js?v=13"></script>
   <script>
     // ==========================================
     // AUTHENTICATION & SESSION MANAGEMENT
@@ -1988,7 +2067,7 @@
       togglePwBtn.addEventListener('click', () => {
         const isPw = loginPassword.type === 'password';
         loginPassword.type = isPw ? 'text' : 'password';
-        togglePwBtn.textContent = isPw ? '🙈' : '👁️';
+        togglePwBtn.innerHTML = isPw ? `<svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10 10 0 0 1 12 19c-6.5 0-10-7-10-7a18 18 0 0 1 4.1-5.1M9.9 5.2A9 9 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M2 2l20 20"/></svg>` : `<svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
       });
     }
 
@@ -2104,10 +2183,10 @@
         }
         if (!health.ok) {
           indicator.style.background = 'var(--pink)';
-          bannerText.textContent = '⚠ ' + health.reason;
+          bannerText.textContent = '' + health.reason;
         } else if (!AuthStore.hasCloudSession()) {
           indicator.style.background = '#f5a623';
-          bannerText.textContent = '⚠ Cloud database online, but you are not signed in with the admin email. Log out and log in with the Firebase admin email, otherwise saves and uploads will be rejected.';
+          bannerText.textContent = 'Cloud database online, but you are not signed in with the admin email. Log out and log in with the Firebase admin email, otherwise saves and uploads will be rejected.';
         } else {
           indicator.style.background = '#61CE70';
           bannerText.textContent = `Cloud database online · signed in as ${firebase.auth().currentUser.email}`;
@@ -2380,6 +2459,34 @@
         careersTableBody.appendChild(row);
       });
 
+      // Load Testimonials
+      try {
+        const tms = await TestimonialsStore.getAll();
+        const tb = document.getElementById('testimonials-table-body');
+        tb.innerHTML = '';
+        tms.forEach(t => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td style="font-family:monospace;">${escapeHtml(t.order)}</td>
+            <td style="font-weight:bold; color:var(--white);">${escapeHtml(t.name)}<br><span style="font-weight:normal; font-size:0.75rem; color:var(--text-dim);">${escapeHtml(t.role || '')}</span></td>
+            <td style="font-size:0.85rem; max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(t.quote)}</td>
+            <td style="color:#f5a623; white-space:nowrap;">${'★'.repeat(t.rating || 5)}</td>
+            <td>${t.published === false ? '<span style="color:var(--text-dim);">Hidden</span>' : '<span style="color:#61CE70;">Visible</span>'}</td>
+            <td><div class="action-btn-row">
+              <button class="action-btn edit" data-act="edit">Edit</button>
+              <button class="action-btn delete" data-act="delete">Delete</button>
+            </div></td>`;
+          row.querySelector('[data-act="edit"]').addEventListener('click', () => openTestimonialModal(t));
+          row.querySelector('[data-act="delete"]').addEventListener('click', () => deleteTestimonial(t.id));
+          tb.appendChild(row);
+        });
+        if (!tms.length) tb.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:2rem;">No testimonials yet. The section is hidden on the website until you add one.</td></tr>`;
+        const sc = document.getElementById('stat-testimonials-count');
+        if (sc) sc.textContent = tms.filter(t => t.published !== false).length;
+      } catch (err) {
+        console.error('Error loading testimonials:', err);
+      }
+
       // Update general count stats
       document.getElementById('stat-projects-count').textContent = projects.length;
       document.getElementById('stat-cases-count').textContent = caseStudies.length;
@@ -2452,10 +2559,10 @@
           ${busy ? `<div class="pg-state">${Math.round(item.pct || 0)}%</div><div class="pg-progress"><span style="width:${Math.round(item.pct || 0)}%"></span></div>` : ''}
           ${item.status === 'error' ? `<div class="pg-state" title="${escapeHtml(item.error)}">Failed<br>${escapeHtml((item.error || '').slice(0, 60))}</div>` : ''}
           <div class="pg-actions" ${busy ? 'hidden' : ''}>
-            <button type="button" data-act="left" title="Move left" ${idx === 0 || busy ? 'disabled' : ''}>◀</button>
-            <button type="button" data-act="cover" title="Make cover photo" ${idx === 0 || item.status !== 'done' ? 'disabled' : ''}>★</button>
-            <button type="button" data-act="right" title="Move right" ${idx === galleryItems.length - 1 || busy ? 'disabled' : ''}>▶</button>
-            <button type="button" data-act="remove" title="Remove photo" ${busy ? 'disabled' : ''}>✕</button>
+            <button type="button" data-act="left" title="Move left" ${idx === 0 || busy ? 'disabled' : ''}><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+            <button type="button" data-act="cover" title="Make cover photo" ${idx === 0 || item.status !== 'done' ? 'disabled' : ''}><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg></button>
+            <button type="button" data-act="right" title="Move right" ${idx === galleryItems.length - 1 || busy ? 'disabled' : ''}><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button type="button" data-act="remove" title="Remove photo" ${busy ? 'disabled' : ''}><svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
           </div>`;
         el.querySelectorAll('button[data-act]').forEach(btn => {
           btn.addEventListener('click', (ev) => { ev.stopPropagation(); galleryAction(item.key, btn.dataset.act); });
@@ -2582,25 +2689,25 @@
       const inputEl = document.getElementById(inputId);
       if (statusEl) {
         statusEl.style.display = 'block';
-        statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading "${escapeHtml(file.name)}"...</span>`;
+        statusEl.innerHTML = `<span style="color:var(--text-dim);">Uploading "${escapeHtml(file.name)}"...</span>`;
       }
       try {
         const url = await uploadImageToFirebase(file, folder, (pct) => {
           if (statusEl) {
-            statusEl.innerHTML = `<span style="color:var(--text-dim);">⏳ Uploading: ${Math.round(pct)}%</span>`;
+            statusEl.innerHTML = `<span style="color:var(--text-dim);">Uploading: ${Math.round(pct)}%</span>`;
           }
         });
         if (url && inputEl) {
           inputEl.value = url;
           if (statusEl) {
-            statusEl.innerHTML = `<span style="color:#61CE70;">✅ Uploaded</span>`;
+            statusEl.innerHTML = `<span style="color:#61CE70;">Uploaded</span>`;
             setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3500);
           }
         }
       } catch (err) {
         console.error('Upload failed:', err);
         if (statusEl) {
-          statusEl.innerHTML = `<span style="color:var(--pink);">❌ ${escapeHtml(err.message || 'Upload failed')}</span>`;
+          statusEl.innerHTML = `<span style="color:var(--pink);">${escapeHtml(err.message || 'Upload failed')}</span>`;
         }
         alert('Upload failed: ' + (err.message || 'Unknown error'));
       }
@@ -3051,6 +3158,66 @@
       }
     };
 
+    // ==========================================
+    // TESTIMONIALS
+    // ==========================================
+    const testimonialModal = document.getElementById('testimonial-modal');
+    const testimonialForm = document.getElementById('testimonial-form');
+    const tmQuote = document.getElementById('tm-quote');
+    const tmCount = document.getElementById('tm-quote-count');
+    tmQuote.addEventListener('input', () => { tmCount.textContent = `${tmQuote.value.length} / 600`; });
+
+    async function openTestimonialModal(t) {
+      testimonialForm.reset();
+      document.getElementById('tm-id').value = t ? t.id : '';
+      document.getElementById('tm-name').value = t ? t.name || '' : '';
+      document.getElementById('tm-role').value = t ? t.role || '' : '';
+      tmQuote.value = t ? t.quote || '' : '';
+      document.getElementById('tm-rating').value = String(t ? t.rating || 5 : 5);
+      let nextOrder = 1;
+      if (!t) { try { nextOrder = (await TestimonialsStore.getAll()).length + 1; } catch (e) {} }
+      document.getElementById('tm-order').value = t ? t.order || 1 : nextOrder;
+      document.getElementById('tm-published').checked = t ? t.published !== false : true;
+      tmCount.textContent = `${tmQuote.value.length} / 600`;
+      document.getElementById('testimonial-modal-title').textContent = t ? 'Edit Testimonial' : 'Add Testimonial';
+      testimonialModal.classList.add('active');
+    }
+    function closeTestimonialModal() { testimonialModal.classList.remove('active'); }
+    document.getElementById('add-testimonial-btn').addEventListener('click', () => openTestimonialModal(null));
+    document.getElementById('close-testimonial-modal-btn').addEventListener('click', closeTestimonialModal);
+    document.getElementById('cancel-testimonial-modal-btn').addEventListener('click', closeTestimonialModal);
+
+    testimonialForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = testimonialForm.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.querySelector('span').textContent = 'Saving...';
+      try {
+        // Strip quote marks the admin may paste in; the site adds its own
+        const quote = tmQuote.value.trim().replace(/^["“”']+|["“”']+$/g, '').trim();
+        await TestimonialsStore.save({
+          id: document.getElementById('tm-id').value || undefined,
+          name: document.getElementById('tm-name').value.trim(),
+          role: document.getElementById('tm-role').value.trim(),
+          quote,
+          rating: Number(document.getElementById('tm-rating').value),
+          order: Number(document.getElementById('tm-order').value) || 1,
+          published: document.getElementById('tm-published').checked
+        });
+        closeTestimonialModal();
+        loadAdminDashboard();
+      } catch (err) {
+        alert('Could not save the testimonial: ' + (err.message || 'Unknown error'));
+      } finally {
+        btn.disabled = false; btn.querySelector('span').textContent = 'Save Testimonial';
+      }
+    });
+
+    window.deleteTestimonial = async function(id) {
+      if (!confirm('Delete this testimonial? To keep it but take it off the website, edit it and untick "Show on website" instead.')) return;
+      try { await TestimonialsStore.delete(id); } catch (err) { alert('Could not delete: ' + (err.message || 'Unknown error')); }
+      loadAdminDashboard();
+    };
+
     // Reset Defaults
     document.getElementById('reset-btn').addEventListener('click', async () => {
       // This wipes every project, product, article and job the client has added, so make it hard to click by accident
@@ -3258,7 +3425,7 @@
         try {
           const res = await AuthStore.changeCredentials(curP, newU, newP);
           if (res.success) {
-            showCredsStatus('✓ Credentials updated successfully! Remember your new login info.', true);
+            showCredsStatus('Credentials updated successfully! Remember your new login info.', true);
             if (changeCurPassInput) changeCurPassInput.value = '';
             if (changeNewPassInput) changeNewPassInput.value = '';
             if (changeConfirmPassInput) changeConfirmPassInput.value = '';
@@ -3270,7 +3437,7 @@
           showCredsStatus('Error updating credentials: ' + err.message, false);
         } finally {
           saveCredsBtn.disabled = false;
-          saveCredsBtn.querySelector('span').textContent = '🔑 Update Login Credentials';
+          saveCredsBtn.querySelector('span').textContent = 'Update Login Credentials';
         }
       });
     }
@@ -3286,7 +3453,7 @@
 
     saveSettingsBtn.addEventListener('click', async () => {
       saveSettingsBtn.disabled = true;
-      saveSettingsBtn.querySelector('span').textContent = '⏳ Saving...';
+      saveSettingsBtn.querySelector('span').textContent = 'Saving...';
       try {
         if (typeof SettingsStore !== 'undefined') {
           const success = await SettingsStore.save({
@@ -3313,7 +3480,7 @@
         alert('Failed to save settings. Check console.');
       }
       saveSettingsBtn.disabled = false;
-      saveSettingsBtn.querySelector('span').textContent = '💾 Save & Apply to All Pages';
+      saveSettingsBtn.querySelector('span').textContent = 'Save & Apply to All Pages';
     });
 
     // ==========================================
@@ -3385,7 +3552,7 @@
       if (filtered.length === 0) {
         siteImagesGrid.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-dim); background: var(--bg2); border-radius: 16px; border: 1px dashed var(--border);">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+            <div style="margin-bottom: 0.5rem; opacity:.5;"><svg class="ic" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
             <h3 style="color: var(--white); margin-bottom: 0.5rem;">No Images Match Your Filter</h3>
             <p style="font-size: 0.85rem;">Try changing your search term or select another category above.</p>
           </div>
@@ -3402,8 +3569,8 @@
                 <div class="site-img-title">${item.title}</div>
                 <div class="site-img-desc">${item.description}</div>
                 <div class="site-img-badges">
-                  <span class="img-badge page">📄 ${item.page}</span>
-                  <span class="img-badge category">🏷️ ${item.category}</span>
+                  <span class="img-badge page">${item.page}</span>
+                  <span class="img-badge category">${item.category}</span>
                   <span class="img-badge ${isCustom ? 'custom' : 'default'}" id="status-badge-${item.key}">
                     ${isCustom ? '★ Customized' : '● Default'}
                   </span>
@@ -3414,7 +3581,7 @@
             <!-- Preview Frame -->
             <div class="site-img-preview-frame" onclick="openLightbox(document.getElementById('input-${item.key}').value, '${item.title.replace(/'/g, "\\'")}')" title="Click to view enlarged image">
               <img id="preview-${item.key}" src="${item.url}" alt="${item.title}" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
-              <div class="site-img-zoom-hint">🔍 Zoom</div>
+              <div class="site-img-zoom-hint">Zoom</div>
             </div>
 
             <!-- Inputs & Controls -->
@@ -3428,7 +3595,7 @@
                 <input type="file" id="file-${item.key}" accept="image/*" style="display:none" onchange="handleImageFileUpload('${item.key}', this.files[0])">
                 
                 <button type="button" class="site-img-btn upload-btn" onclick="document.getElementById('file-${item.key}').click()">
-                  <span>📁 Upload Image</span>
+                  <span>Upload Image</span>
                 </button>
 
                 <button type="button" class="site-img-btn reset-btn" onclick="resetSingleImage('${item.key}')" title="Restore default image">
@@ -3436,16 +3603,16 @@
                 </button>
 
                 <button type="button" class="site-img-btn" onclick="copyImageUrl('${item.key}')" title="Copy URL to clipboard">
-                  <span>📋 Copy</span>
+                  <span>Copy</span>
                 </button>
 
                 <button type="button" class="site-img-btn" onclick="saveSingleImage('${item.key}')" style="margin-left:auto; background:rgba(250,3,110,0.1); border-color:rgba(250,3,110,0.3); color:var(--pink);">
-                  <span>💾 Save</span>
+                  <span>Save</span>
                 </button>
               </div>
 
               <div class="site-img-upload-status" id="upload-status-${item.key}">
-                <span>⏳</span> <span>Uploading image to cloud storage...</span>
+                <span>Uploading image...</span>
               </div>
             </div>
           </div>
@@ -3475,13 +3642,13 @@
       const input = document.getElementById(`input-${key}`);
       if (statusEl) {
         statusEl.classList.add('active');
-        statusEl.innerHTML = `<span>⏳</span> <span>Uploading "${file.name}" to Firebase Storage...</span>`;
+        statusEl.innerHTML = `<span>Uploading "${file.name}" ...</span>`;
       }
 
       try {
         const uploadedUrl = await SiteImagesStore.uploadImage(file, (pct) => {
           if (statusEl) {
-            statusEl.innerHTML = `<span>⏳</span> <span>Uploading to Firebase: ${Math.round(pct)}%</span>`;
+            statusEl.innerHTML = `<span>Uploading: ${Math.round(pct)}%</span>`;
           }
         });
         if (uploadedUrl && input) {
@@ -3489,7 +3656,7 @@
           updateImageCardPreview(key);
           await saveSingleImage(key);
           if (statusEl) {
-            statusEl.innerHTML = `<span>✅</span> <span style="color:var(--green)">Stored in Firebase!</span>`;
+            statusEl.innerHTML = `<span style="color:var(--green)">Uploaded</span>`;
             setTimeout(() => {
               if (statusEl) statusEl.classList.remove('active');
             }, 3000);
@@ -3498,7 +3665,7 @@
       } catch (err) {
         console.error('File upload failed for', key, err);
         if (statusEl) {
-          statusEl.innerHTML = `<span>❌</span> <span style="color:var(--pink)">${err.message || 'Upload failed'}</span>`;
+          statusEl.innerHTML = `<span style="color:var(--pink)">${err.message || 'Upload failed'}</span>`;
         }
         alert('Upload failed: ' + (err.message || 'Unknown error'));
       }
@@ -3557,11 +3724,11 @@
       if (typeof SiteImagesStore === 'undefined') return;
       if (saveAllImagesBtn) {
         saveAllImagesBtn.disabled = true;
-        saveAllImagesBtn.querySelector('span').textContent = '⏳ Saving All Images...';
+        saveAllImagesBtn.querySelector('span').textContent = 'Saving All Images...';
       }
       if (saveAllImagesBottomBtn) {
         saveAllImagesBottomBtn.disabled = true;
-        saveAllImagesBottomBtn.querySelector('span').textContent = '⏳ Saving...';
+        saveAllImagesBottomBtn.querySelector('span').textContent = 'Saving...';
       }
 
       try {
@@ -3585,11 +3752,11 @@
       } finally {
         if (saveAllImagesBtn) {
           saveAllImagesBtn.disabled = false;
-          saveAllImagesBtn.querySelector('span').textContent = '💾 Save All Site Images';
+          saveAllImagesBtn.querySelector('span').textContent = 'Save All Site Images';
         }
         if (saveAllImagesBottomBtn) {
           saveAllImagesBottomBtn.disabled = false;
-          saveAllImagesBottomBtn.querySelector('span').textContent = '💾 Save All Site Images';
+          saveAllImagesBottomBtn.querySelector('span').textContent = 'Save All Site Images';
         }
       }
     }
@@ -3618,7 +3785,7 @@
         setTimeout(() => { imagesSaveBanner.style.display = 'none'; }, 4000);
       }
       if (imagesBottomSaveMsg) {
-        imagesBottomSaveMsg.textContent = '✓ ' + (msg || 'Saved successfully!');
+        imagesBottomSaveMsg.textContent = '' + (msg || 'Saved successfully!');
         imagesBottomSaveMsg.classList.add('visible');
         setTimeout(() => { imagesBottomSaveMsg.classList.remove('visible'); }, 4000);
       }
@@ -3656,6 +3823,6 @@
     loadAdminDashboard();
     console.log("Diagnostic: initial active elements:", Array.from(document.querySelectorAll('.active')).map(el => el.id || el.className));
   </script>
-  <script src="index.js?v=7"></script>
+  <script src="index.js?v=8"></script>
 </body>
 </html>
