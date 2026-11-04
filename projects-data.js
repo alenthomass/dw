@@ -2426,7 +2426,14 @@ class SiteImagesDataStore {
     }
 
     // "Save all" used to store the old default paths; treat those as defaults so new defaults apply
-    const RETIRED_DEFAULTS = ['assets/images/home-about-main.jpg','assets/images/home-about-float.jpg','assets/images/about-story-main.jpg','assets/images/about-story-float.jpg','assets/images/home-about-main.svg','assets/images/home-about-float.svg','assets/images/about-story-main.svg','assets/images/about-story-float.svg'];
+    const RETIRED_DEFAULTS = [
+      // earlier Unsplash defaults (lobby wall, pixel close-up, control desk, blue panel)
+      'https://images.unsplash.com/photo-1575719028439-65ce8662c1cc?auto=format&fit=crop&q=75&w=1200',
+      'https://images.unsplash.com/photo-1643642969389-6db6b7a0fa56?auto=format&fit=crop&q=75&w=700',
+      'https://images.unsplash.com/photo-1791782060626-ce983b06d9ce?auto=format&fit=crop&q=75&w=1200',
+      'https://images.unsplash.com/photo-1545164415-0fae860defbd?auto=format&fit=crop&q=75&w=700',
+      'https://images.unsplash.com/photo-1757564591721-4105db68cd6e?auto=format&fit=crop&q=75&w=1200',
+      'assets/images/home-about-main.jpg','assets/images/home-about-float.jpg','assets/images/about-story-main.jpg','assets/images/about-story-float.jpg','assets/images/home-about-main.svg','assets/images/home-about-float.svg','assets/images/about-story-main.svg','assets/images/about-story-float.svg'];
     Object.keys(storedUrls).forEach(k => { if (RETIRED_DEFAULTS.includes(storedUrls[k])) delete storedUrls[k]; });
 
     // Uploaded images kept as separate media documents are resolved to real URLs here
@@ -2504,6 +2511,10 @@ class SiteImagesDataStore {
 
   async save(imagesMap) {
     await detectBackend();
+    // Store only images the admin actually changed. Saving every default froze them in the
+    // database, so later default updates (new photos shipped in code) never showed.
+    const defaults = this.getDefaults();
+    imagesMap = Object.fromEntries(Object.entries(imagesMap || {}).filter(([k, v]) => v && !(defaults[k] && defaults[k].url === v)));
     if (backendMode === 'firebase' && db) {
       try {
         const stored = await this._externaliseInlineImages(imagesMap);
