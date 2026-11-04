@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
-
 /* ═══════════ TOKENS ═══════════ */
 :root {
   --bg: #000;
@@ -2229,3 +2227,57 @@ a, button, .nav, .svc-card, .test-card, .contact-form-wrap, input, textarea {
   .hx-actions{flex-direction:column}
   .hx-btn{width:100%}
 }
+
+
+/* ===== De-templating pass (site wide) =====
+   1. Headline accent words: no gradient on a single word. Headings read as one sentence.
+   2. Section labels: sentence case, quiet, instead of tracked all-caps pink eyebrows.
+   3. No scroll-triggered fade-ins on every block: content is simply there.
+   4. No floating blurred blobs. */
+.accent-text{background:none;-webkit-text-fill-color:currentColor;color:inherit}
+.label-tag{text-transform:none;letter-spacing:0;font-size:.9rem;font-weight:600;color:var(--pink);margin-bottom:.75rem}
+.reveal,.reveal-left,.reveal-right{opacity:1;transform:none;transition:none}
+.hero-blob,.cta-blob,.hero-noise,.hero-grid-bg{display:none}
+.section-title{letter-spacing:-.025em}
+.cs-points{list-style:none;display:flex;flex-direction:column;gap:.6rem;font-size:.95rem;line-height:1.5;color:var(--text)}
+.cs-points li{padding-left:1.4rem;position:relative}
+.cs-points li::before{content:"";position:absolute;left:0;top:.55em;width:.5rem;height:.5rem;border-radius:50%;background:var(--pink)}
+
+/* ===== Opening animation: one smooth sequence on load, nothing on scroll ===== */
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+body{animation:pageIn .35s ease-out both}
+@keyframes navIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translateX(-50%)}}
+nav.nav{animation:navIn .7s .1s cubic-bezier(.2,.7,.2,1) both}
+.hx-photo{animation:hxIn 1.8s cubic-bezier(.2,.7,.2,1) both}
+.hx-title{animation:riseIn .9s .35s cubic-bezier(.2,.7,.2,1) both}
+.hx-desc{animation:riseIn .9s .55s cubic-bezier(.2,.7,.2,1) both}
+.hx-actions{animation:riseIn .9s .7s cubic-bezier(.2,.7,.2,1) both}
+/* Inner pages: the first heading and intro text settle in once */
+main > section:first-of-type .section-title, body > section:first-of-type .section-title, .admin-hero .section-title{animation:riseIn .8s .2s cubic-bezier(.2,.7,.2,1) both}
+main > section:first-of-type .section-desc, body > section:first-of-type .section-desc, .admin-hero p{animation:riseIn .8s .35s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){
+  body,nav.nav,.hx-photo,.hx-title,.hx-desc,.hx-actions,
+  main > section:first-of-type .section-title, body > section:first-of-type .section-title, .admin-hero .section-title,
+  main > section:first-of-type .section-desc, body > section:first-of-type .section-desc, .admin-hero p{animation:none}
+}
+
+/* Smooth crossfade between pages (Chrome, Edge, Safari 18+) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+/* Client names under the hero: short band, readable in both themes, wraps on phones */
+.clients-strip{padding:2.25rem 0;border-bottom:1px solid var(--border)}
+.clients-heading{font-family:var(--font-b);font-size:.9rem;font-weight:500;color:var(--text);text-align:center;margin:0 0 1.1rem;letter-spacing:0}
+.clients-list{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem 2.25rem;margin:0;padding:0}
+.clients-list li{font-family:var(--font-d);font-weight:700;font-size:1.05rem;color:var(--white);opacity:.72;white-space:nowrap}
+@media (max-width:600px){
+  .clients-strip{padding:1.75rem 0}
+  .clients-list{gap:.5rem 1.4rem}
+  .clients-list li{font-size:.92rem}
+}
+/* Section rhythm: less dead space between blocks, especially on phones */
+.section{padding:7rem 0}
+@media (max-width:900px){.section{padding:5rem 0}}
+@media (max-width:600px){.section{padding:3.75rem 0}}

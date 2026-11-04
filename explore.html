@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Virtual Experience Center &amp; LED Screen Simulator | Display World Dubai</title>
-  <meta name="description" content="Explore Display World's 3D interactive virtual simulator and commercial display catalog: Fine-pitch indoor LED, transparent OLED, outdoor billboards, and CMS software.">
+  <title>LED Wall Size &amp; Resolution Calculator | Display World</title>
+  <meta name="description" content="Pick a wall size and pixel pitch to see the resolution and panels needed, then browse Display World LED, LCD, kiosk and signage products.">
   <meta name="keywords" content="LED display simulator Dubai, virtual experience center, commercial display catalog UAE, fine pitch LED simulator, transparent OLED demo">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://displayworldme.com/explore">
@@ -18,25 +18,28 @@
   <!-- Open Graph -->
   <meta property="og:site_name" content="Display World">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Virtual Experience Center &amp; LED Screen Simulator | Display World Dubai">
-  <meta property="og:description" content="Explore Display World's 3D interactive virtual simulator and commercial display catalog: Fine-pitch indoor LED, transparent OLED, outdoor billboards, and CMS software.">
+  <meta property="og:title" content="LED Wall Size &amp; Resolution Calculator | Display World">
+  <meta property="og:description" content="Pick a wall size and pixel pitch to see the resolution and panels needed, then browse Display World LED, LCD, kiosk and signage products.">
   <meta property="og:url" content="https://displayworldme.com/explore">
   <meta property="og:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
   <meta property="og:locale" content="en_AE">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Virtual Experience Center &amp; LED Screen Simulator | Display World Dubai">
-  <meta name="twitter:description" content="Explore Display World's 3D interactive virtual simulator and commercial display catalog in Dubai, UAE.">
+  <meta name="twitter:title" content="LED Wall Size &amp; Resolution Calculator | Display World">
+  <meta name="twitter:description" content="Pick a wall size and pixel pitch to see the resolution and panels needed, then browse Display World LED, LCD, kiosk and signage products.">
   <meta name="twitter:image" content="https://displayworldme.com/assets/dw-logo-stacked.png">
 
   <link rel="icon" href="assets/dw-favicon.svg" sizes="32x32" data-img-key="site_favicon">
-  <link rel="stylesheet" href="index.css?v=8">
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+  <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/portal*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}]}</script>
+  <link rel="stylesheet" href="index.css?v=9">
 
   <!-- Firebase Compat CDNs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Schema.org Structured Data (AEO / GEO) -->
   <script type="application/ld+json">
@@ -124,9 +127,8 @@
   <!-- HERO SECTION -->
   <section class="admin-hero section-dark">
     <div class="container">
-      <span class="label-tag">Experience Center</span>
-      <h1 class="section-title">Interactive Virtual <br><span class="accent-text">Simulator</span></h1>
-      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem;">Configure displays, adjust sizes, select installation backdrops, and view real-time telemetry specs for brightness, pixel resolution, and power loads.</p>
+      <h1 class="section-title">Try a screen in a room</h1>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem;">Pick a room, set the wall size and pixel pitch, and see the resolution and number of panels you would need. For an exact quote, send us the size.</p>
     </div>
   </section>
 
@@ -186,19 +188,15 @@
 
           <div class="telemetry-board">
             <div class="telemetry-item">
-              <span>Resolutions</span>
+              <span>Resolution</span>
               <strong id="tel-res">3333 x 2083 px</strong>
             </div>
             <div class="telemetry-item">
-              <span>Nits Brightness</span>
+              <span>Typical brightness</span>
               <strong id="tel-nits">1000 nits</strong>
             </div>
             <div class="telemetry-item">
-              <span>Average Power Load</span>
-              <strong id="tel-power">1.8 kW</strong>
-            </div>
-            <div class="telemetry-item">
-              <span>Cabinet Grid</span>
+              <span>Panels needed</span>
               <strong id="tel-cabinets">8 x 5 Panels</strong>
             </div>
           </div>
@@ -211,9 +209,8 @@
   <!-- PRODUCTS CATALOG SECTION -->
   <section class="section" id="products-grid-container" style="scroll-margin-top: 100px;">
     <div class="container">
-      <span class="label-tag">Hardware Catalog</span>
-      <h2 class="section-title">Explore Our Flagship <br><span class="accent-text">Products Catalog</span></h2>
-      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem; margin-bottom: 2.5rem;">Browse our commercial LED and LCD configurations, select categories to filter systems, and inspect hardware spec sheets.</p>
+      <h2 class="section-title">Products</h2>
+      <p style="max-width: 600px; color: var(--text-dim); margin-top: 1rem; margin-bottom: 2.5rem;">Our LED, LCD and signage products. Pick a category to filter, or open one for its specs.</p>
       
       <!-- Filter Tabs -->
       <div class="products-filter-section" style="margin-bottom: 2.5rem;">
@@ -256,7 +253,7 @@
       </div>
     </div>
     <div class="drawer-footer">
-      <button class="btn-outline btn-full" id="dr-download-btn"><span>Download PDF Specs</span></button>
+      <a class="btn-outline btn-full" id="dr-download-btn" target="_blank" rel="noopener" href="https://wa.me/971508411925"><span>Get spec sheet on WhatsApp</span></a>
       <button class="btn-primary btn-full" id="dr-inquire-btn"><span>Request Quote</span></button>
     </div>
   </div>
@@ -264,30 +261,29 @@
   <!-- TECHNOLOGY OVERVIEW SECTION -->
   <section class="section section-dark">
     <div class="container">
-      <span class="label-tag">Our Technologies</span>
-      <h2 class="section-title">Signage Technology <br><span class="accent-text">Matrix</span></h2>
-      <p style="max-width:600px; color:var(--text-dim);">Display World engineers custom visual hardware solutions, selecting screen substrates according to environmental parameters.</p>
+      <h2 class="section-title">Compare display types</h2>
+      <p style="max-width:600px; color:var(--text-dim);">Which screen type suits a space depends on viewing distance, light and budget. Here is how they differ.</p>
       
       <div class="tech-matrix">
         <div class="tech-card reveal">
           <h3>LED (Direct-View)</h3>
-          <p>Seamless, modular self-emissive diodes offering high nits, saturated color profiles, and complete scale flexibility for public lobbies and facades.</p>
+          <p>Modular panels with no visible joins. Very bright and any size, so good for lobbies, facades and outdoor.</p>
         </div>
         <div class="tech-card reveal">
           <h3>LCD Display Panels</h3>
-          <p>High-density backlit liquid crystal displays suitable for storefront windows, digital boards, and ultra-narrow bezel control terminal walls.</p>
+          <p>Sharp, lower cost per screen. Good for shop windows, menu boards and control room walls.</p>
         </div>
         <div class="tech-card reveal">
           <h3>COB (Chip-on-Board)</h3>
-          <p>Advanced microLED packaging encapsulating the pixel array under a dust/moisture protective epoxy seal. Offers extreme durability and pixel-black contrast.</p>
+          <p>LED with the pixels sealed under a protective coat. Tougher, resists dust and moisture, and has deeper blacks.</p>
         </div>
         <div class="tech-card reveal">
           <h3>CMS Control Systems</h3>
-          <p>Synchronized local and cloud-based content control software featuring signal redundancy and live scheduling dashboards.</p>
+          <p>Software to schedule and update what plays on every screen, from one place.</p>
         </div>
         <div class="tech-card reveal">
           <h3>Architectural & Static Signage</h3>
-          <p>Bespoke 3D illuminated channel letters, CNC precision metal fabrication, monumental monolith pylons, and campus-wide directional wayfinding systems.</p>
+          <p>Illuminated 3D letters, metal fabrication, entrance pylons and wayfinding signs.</p>
         </div>
       </div>
     </div>
@@ -302,7 +298,7 @@
           <div class="footer-logo-wrap">
             <img src="assets/dw-logo.svg" alt="Display World Logo" data-img-key="logo_footer" onerror="this.onerror=null; this.src='assets/dw-logo.svg';">
           </div>
-          <p class="footer-brief">Visionary digital signage company in the Gulf. We design, calibrate, and integrate premium LED, LCD, and interactive touch systems for corporate, retail, and aviation hubs.</p>
+          <p class="footer-brief">Digital signage and display installers in Dubai. LED walls, video walls, kiosks and signage for offices, retail and airports across the UAE and Qatar.</p>
           <div class="footer-socials">
             <a href="#" class="social-link" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
             <a href="https://www.instagram.com/displayworld.ae/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
@@ -425,12 +421,6 @@
       if (activeScene === 'control') nits = 600; // Control rooms are dimmer to prevent eye strain
       document.getElementById('tel-nits').textContent = `${nits} nits`;
 
-      // Power draw calculation based on display area (sqm)
-      const area = widthVal * heightVal;
-      // standard cabinet base calculations: Avg 180W per sqm, high brightness outdoor can go up to 300W.
-      const multiplier = activeScene === 'store' ? 0.28 : 0.18;
-      const powerKw = (area * multiplier).toFixed(1);
-      document.getElementById('tel-power').textContent = `${powerKw} kW`;
 
       // Cabinet count grid (assuming standard cabinet of 500mm x 500mm = 0.5m x 0.5m)
       const cabinetsX = Math.round(widthVal / 0.5);
@@ -532,9 +522,8 @@
         window.location.href = `contact.html?inquiry=${encodeURIComponent(p.name)}`;
       };
 
-      // Reset download button
-      downloadBtn.innerHTML = '<span>Download PDF Specs</span>';
-      downloadBtn.disabled = false;
+      // Spec sheet request goes to the sales team on WhatsApp with the product name filled in
+      downloadBtn.href = 'https://wa.me/971508411925?text=' + encodeURIComponent(`Hello, please send me the spec sheet for ${p.name}.`);
 
       drawer.classList.add('open');
       backdrop.classList.add('active');
@@ -547,28 +536,11 @@
       document.body.style.overflow = '';
     };
 
-    // Simulated Spec Download
-    downloadBtn.addEventListener('click', () => {
-      if (!activeProduct) return;
-      
-      downloadBtn.disabled = true;
-      downloadBtn.innerHTML = '<span style="display:inline-flex; align-items:center; gap:0.5rem;"><svg class="pulse" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>Compiling Spec Sheet PDF...</span>';
-      
-      setTimeout(() => {
-        downloadBtn.innerHTML = '<span>Download complete</span>';
-        
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(activeProduct, null, 2));
-        const dlAnchor = document.createElement('a');
-        dlAnchor.setAttribute("href", dataStr);
-        dlAnchor.setAttribute("download", `${activeProduct.name.toLowerCase().replace(/\s+/g, '_')}_specs.json`);
-        document.body.appendChild(dlAnchor);
-        dlAnchor.click();
-        dlAnchor.remove();
-      }, 1500);
-    });
   </script>
-  <script src="projects-data.js?v=14"></script>
-  <script src="index.js?v=8"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="projects-data.js?v=15"></script>
+  <script src="index.js?v=9"></script>
 
   <!-- FLOATING WIDGETS -->
   <div class="floating-widgets">

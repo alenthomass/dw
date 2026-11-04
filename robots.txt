@@ -4,52 +4,62 @@
 User-agent: *
 Allow: /
 Allow: /assets/
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 # AI Answer Engines & Generative Search Crawlers (AEO / GEO)
 User-agent: GPTBot
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: cohere-ai
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: Diffbot
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: Bytespider
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /portal
 Disallow: /portal.html
 Disallow: /admin.html
 
