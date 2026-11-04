@@ -229,6 +229,9 @@
       color: #fff;
       outline: none;
       transition: border-color 0.3s;
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
     .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
       border-color: var(--pink);
@@ -944,6 +947,7 @@
     .pg-actions { position:absolute; inset:auto 0 0 0; display:flex; justify-content:space-between; gap:2px; padding:4px; background:linear-gradient(transparent, rgba(0,0,0,.75)); opacity:0; transition:opacity .15s; }
     .pg-item:hover .pg-actions, .pg-item:focus-within .pg-actions { opacity:1; }
     @media (hover:none) { .pg-actions { opacity:1; } }
+    .pg-actions[hidden] { display:none; }
     .pg-actions button { background:rgba(0,0,0,.6); color:#fff; border:1px solid rgba(255,255,255,.2); border-radius:5px; font-size:0.7rem; padding:3px 6px; cursor:pointer; line-height:1; }
     .pg-actions button:hover { background:var(--pink); border-color:var(--pink); }
     .pg-actions button:disabled { opacity:.3; cursor:default; background:rgba(0,0,0,.6); border-color:rgba(255,255,255,.2); }
@@ -954,6 +958,23 @@
     .admin-thumb { width:44px; height:33px; object-fit:cover; border-radius:5px; border:1px solid var(--border); vertical-align:middle; margin-right:.6rem; }
     .admin-photo-count { font-size:0.7rem; color:var(--text-dim); font-weight:500; margin-left:.4rem; white-space:nowrap; }
     [data-theme="light"] .pg-dropzone strong { color:#111; }
+
+    /* Several fields had inline dark-theme colours (white text, near-black backgrounds) that made
+       typed text invisible in light mode. These rules win over the inline styles. */
+    .admin-modal input:not([type=checkbox]):not([type=file]), .admin-modal textarea, .admin-modal select { font-family: inherit; }
+    .admin-modal select option { background: #11111c; color: #fff; }
+    [data-theme="light"] .admin-modal input:not([type=checkbox]):not([type=file]),
+    [data-theme="light"] .admin-modal textarea,
+    [data-theme="light"] .admin-modal select,
+    [data-theme="light"] #new-category-input {
+      background: #f1f3f5 !important;
+      color: #0a0a12 !important;
+      border-color: rgba(0,0,0,0.12) !important;
+    }
+    [data-theme="light"] .admin-modal select option { background: #fff; color: #0a0a12; }
+    [data-theme="light"] .admin-modal input::placeholder,
+    [data-theme="light"] .admin-modal textarea::placeholder,
+    [data-theme="light"] #new-category-input::placeholder { color: rgba(10,10,18,0.4); }
   </style>
 </head>
 <body>
@@ -1132,7 +1153,7 @@
               <div style="display:flex; align-items:center; gap:1rem;">
                 <span style="font-size:1.5rem; filter: drop-shadow(0 2px 5px rgba(250,3,110,0.5));">📬</span>
                 <div>
-                  <strong style="color:#fff; display:block; font-size:1rem;">New Customer Inquiries Received!</strong>
+                  <strong style="color:var(--white); display:block; font-size:1rem;">New customer messages</strong>
                   <span style="color:var(--text-dim); font-size:0.85rem;" id="unread-inquiries-text">You have customer messages awaiting response.</span>
                 </div>
               </div>
@@ -1645,12 +1666,12 @@
             <input type="text" id="field-location" required>
           </div>
           <div class="modal-field full-width">
-            <label>Project Photos <span style="text-transform:none; letter-spacing:0; font-weight:500; color:var(--text-dim);">(select or drop several at once; the first photo is the cover)</span></label>
+            <label>Project Photos</label>
             <div class="pg-dropzone" id="pg-dropzone" tabindex="0" role="button" aria-label="Add project photos">
               <input type="file" id="field-image-file" accept="image/*" multiple hidden>
               <div class="pg-drop-icon">⬆</div>
               <div><strong>Click to choose photos</strong> or drag them here</div>
-              <div class="pg-drop-hint">JPG, PNG, WebP, GIF or SVG. Up to 25 MB each. Large photos are optimised automatically.</div>
+              <div class="pg-drop-hint">Add as many as you like. The first photo is the cover. Use ★ on any photo to make it the cover.</div>
             </div>
             <div class="pg-summary" id="pg-summary"></div>
             <div class="pg-grid" id="pg-grid"></div>
@@ -2430,7 +2451,7 @@
           ${idx === 0 && item.status !== 'error' ? '<span class="pg-badge">Cover</span>' : ''}
           ${busy ? `<div class="pg-state">${Math.round(item.pct || 0)}%</div><div class="pg-progress"><span style="width:${Math.round(item.pct || 0)}%"></span></div>` : ''}
           ${item.status === 'error' ? `<div class="pg-state" title="${escapeHtml(item.error)}">Failed<br>${escapeHtml((item.error || '').slice(0, 60))}</div>` : ''}
-          <div class="pg-actions">
+          <div class="pg-actions" ${busy ? 'hidden' : ''}>
             <button type="button" data-act="left" title="Move left" ${idx === 0 || busy ? 'disabled' : ''}>◀</button>
             <button type="button" data-act="cover" title="Make cover photo" ${idx === 0 || item.status !== 'done' ? 'disabled' : ''}>★</button>
             <button type="button" data-act="right" title="Move right" ${idx === galleryItems.length - 1 || busy ? 'disabled' : ''}>▶</button>

@@ -18,6 +18,7 @@ service cloud.firestore {
     match /services/{id}     { allow read: if true; allow write: if isAdmin(); }
     match /insights/{id}     { allow read: if true; allow write: if isAdmin(); }
     match /careers/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /testimonials/{id} { allow read: if true; allow write: if isAdmin(); }
 
     // Site settings (contact details, site images, categories). The old password hash stays private.
     match /settings/{id} {

@@ -339,7 +339,7 @@ function uploadToStorage(blob, path, contentType, onProgress) {
     const task = ref.put(blob, { contentType, cacheControl: 'public, max-age=31536000' });
     let lastBytes = -1;
     let lastChange = Date.now();
-    const STALL_MS = 15000;
+    const STALL_MS = 10000;
     const watchdog = setInterval(() => {
       if (Date.now() - lastChange > STALL_MS) {
         clearInterval(watchdog);
@@ -365,6 +365,30 @@ function uploadToStorage(blob, path, contentType, onProgress) {
       }
     );
   });
+}
+
+// When Storage was never set up in Firebase, every photo used to sit at 25% for ~20s waiting for
+// retries. One quick check tells us if the bucket exists; if it doesn't, photos go straight to the database.
+let _bucketProbe = null;
+function probeStorageBucket() {
+  if (!_bucketProbe) {
+    _bucketProbe = (async () => {
+      try {
+        const bucket = FIREBASE_CONFIG.storageBucket;
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const t = setTimeout(() => ctrl && ctrl.abort(), 5000);
+        const res = await fetch(`https://firebasestorage.googleapis.com/v0/b/${bucket}/o?maxResults=1`, ctrl ? { signal: ctrl.signal } : {});
+        clearTimeout(t);
+        if (res.status === 404) {
+          storageUnavailable = true;
+          console.info('Firebase Storage bucket not set up. Photos are stored in Firestore instead.');
+        }
+      } catch (e) {
+        // Network hiccup: leave Storage enabled, the stall watchdog still protects the upload
+      }
+    })();
+  }
+  return _bucketProbe;
 }
 
 // Media references that point at an image stored as a Firestore document look like "media:<docId>"
@@ -412,6 +436,7 @@ async function uploadImageToFirebase(file, folder = 'uploads', onProgress, opts 
   const path = `${folder}/${uid}_${baseName}.${ext}`;
 
   // 1. Firebase Cloud Storage (best option: real files, any size)
+  if (backendMode === 'firebase' && storage && !storageUnavailable) await probeStorageBucket();
   if (backendMode === 'firebase' && storage && !storageUnavailable) {
     try {
       const url = await uploadToStorage(optimized.blob || file, path, blobType, (f) => report(25 + f * 73));
