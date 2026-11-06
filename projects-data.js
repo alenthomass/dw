@@ -392,6 +392,50 @@ function probeStorageBucket() {
   return _bucketProbe;
 }
 
+
+// Original file as a data URL plus its pixel size (no re-encoding, no quality loss)
+function readOriginal(file) {
+  return new Promise((resolve) => {
+    const r = new FileReader();
+    r.onload = (e) => {
+      const dataUrl = e.target.result;
+      if (typeof Image === 'undefined') return resolve({ dataUrl, w: 0, h: 0 });
+      const im = new Image();
+      im.onload = () => resolve({ dataUrl, w: im.naturalWidth, h: im.naturalHeight });
+      im.onerror = () => resolve({ dataUrl, w: 0, h: 0 });
+      im.src = dataUrl;
+    };
+    r.onerror = () => resolve({ dataUrl: '', w: 0, h: 0 });
+    r.readAsDataURL(file);
+  });
+}
+
+// High quality copy: the original untouched when it is up to 4K, otherwise resized to 3840px at near-lossless quality
+async function highQualityImage(file) {
+  const MAX = 3840;
+  const orig = await readOriginal(file);
+  const isWebFormat = /^image\/(jpeg|png|webp|gif|svg\+xml|avif)$/.test(file.type || '');
+  if (isWebFormat && (!orig.w || Math.max(orig.w, orig.h) <= MAX)) {
+    return { dataUrl: orig.dataUrl, blob: file, type: file.type };
+  }
+  const out = await compressAndOptimizeImage(file, MAX, 0.93);
+  return { dataUrl: out.dataUrl, blob: out.blob || file, type: (out.blob && out.blob.type) || 'image/jpeg' };
+}
+
+// Large images are split over several database records (each record is limited to about 1 MB)
+const MEDIA_CHUNK = 900000;
+async function saveMediaChunked(id, dataUrl, meta) {
+  if (dataUrl.length <= MEDIA_CHUNK) {
+    await safeFirestoreSet(db.collection('media').doc(id), { url: dataUrl, ...meta });
+    return;
+  }
+  const parts = [];
+  for (let i = 0; i < dataUrl.length; i += MEDIA_CHUNK) parts.push(dataUrl.slice(i, i + MEDIA_CHUNK));
+  if (parts.length > 40) throw new Error('This photo is too large (over 30 MB). Please use a smaller file.');
+  await Promise.all(parts.map((part, i) => safeFirestoreSet(db.collection('media').doc(`${id}__${i}`), { part, parent: id, i }, {}, 60000)));
+  await safeFirestoreSet(db.collection('media').doc(id), { chunks: parts.length, ...meta });
+}
+
 // Media references that point at an image stored as a Firestore document look like "media:<docId>"
 const MEDIA_REF_PREFIX = 'media:';
 const _mediaCache = new Map();
@@ -406,7 +450,14 @@ async function resolveMediaRef(ref) {
     if (backendMode === 'firebase' && db) {
       try {
         const doc = await db.collection('media').doc(id).get();
-        if (doc.exists) return doc.data().url || '';
+        if (doc.exists) {
+          const d = doc.data();
+          if (d.chunks) {
+            const parts = await Promise.all(Array.from({ length: d.chunks }, (_, i) => db.collection('media').doc(`${id}__${i}`).get()));
+            return parts.map(p => (p.exists ? p.data().part : '')).join('');
+          }
+          return d.url || '';
+        }
       } catch (err) {
         console.warn('Media lookup failed:', id, err);
       }
@@ -427,7 +478,9 @@ async function uploadImageToFirebase(file, folder = 'uploads', onProgress, opts 
   const report = (pct) => { if (typeof onProgress === 'function') onProgress(Math.max(0, Math.min(100, pct))); };
 
   report(5);
-  const optimized = await compressAndOptimizeImage(file, 1920, 0.85);
+  // Photos that can be stored as media references (projects, About page, Site Images) keep full quality.
+  // Other single-image fields keep the older optimised path.
+  const optimized = opts.allowMediaRef ? await highQualityImage(file) : await compressAndOptimizeImage(file, 1920, 0.85);
   report(25);
 
   const baseName = (file.name || 'image').replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9-]/g, '_').slice(0, 60) || 'image';
@@ -447,6 +500,22 @@ async function uploadImageToFirebase(file, folder = 'uploads', onProgress, opts 
       console.warn("Firebase Storage unavailable, falling back to Firestore media:", storageErr);
       storageUnavailable = true;
     }
+  }
+
+  // 2a. Firestore, full quality: the image is stored as its own record, split into parts when large
+  if (backendMode === 'firebase' && db && opts.allowMediaRef) {
+    report(50);
+    const mediaId = uid;
+    await saveMediaChunked(mediaId, optimized.dataUrl, {
+      name: file.name || baseName,
+      folder,
+      projectId: opts.projectId || null,
+      contentType: optimized.type || file.type || 'image/jpeg',
+      createdAt: new Date().toISOString()
+    });
+    _mediaCache.set(mediaId, Promise.resolve(optimized.dataUrl));
+    report(100);
+    return MEDIA_REF_PREFIX + mediaId;
   }
 
   // 2. Firestore fallback: image stored as its own document (never inside the project record)
@@ -500,7 +569,13 @@ async function deleteUploadedMedia(ref) {
   await detectBackend();
   try {
     if (ref.startsWith(MEDIA_REF_PREFIX) && db) {
-      await db.collection('media').doc(ref.slice(MEDIA_REF_PREFIX.length)).delete();
+      const mid = ref.slice(MEDIA_REF_PREFIX.length);
+      try {
+        const d = await db.collection('media').doc(mid).get();
+        const n = d.exists ? (d.data().chunks || 0) : 0;
+        await Promise.all(Array.from({ length: n }, (_, i) => db.collection('media').doc(`${mid}__${i}`).delete()));
+      } catch (e) {}
+      await db.collection('media').doc(mid).delete();
       _mediaCache.delete(ref.slice(MEDIA_REF_PREFIX.length));
     } else if (storage && /firebasestorage\.googleapis\.com|\.firebasestorage\.app/.test(ref) && ref.includes('/projects%2F')) {
       await storage.refFromURL(ref).delete();
@@ -2273,7 +2348,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: About Showcase Photo",
         description: "Main primary photo in the About Display World section on the homepage.",
-        url: "https://images.unsplash.com/photo-1582120031356-35f21bf61055?auto=format&fit=crop&q=85&w=1400"
+        url: "https://images.unsplash.com/photo-1582120031356-35f21bf61055?auto=format&fit=crop&q=90&w=1400"
       },
       home_about_float: {
         key: "home_about_float",
@@ -2281,7 +2356,7 @@ class SiteImagesDataStore {
         page: "index.html",
         title: "Home: Tech Calibration Badge",
         description: "Floating secondary image showing calibration metrics on the homepage.",
-        url: "https://images.unsplash.com/photo-1583795484071-3c453e3a7c71?auto=format&fit=crop&q=85&w=900"
+        url: "https://images.unsplash.com/photo-1583795484071-3c453e3a7c71?auto=format&fit=crop&q=90&w=900"
       },
       about_story_main: {
         key: "about_story_main",
@@ -2289,7 +2364,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Company Story Photo",
         description: "Primary high-resolution installation photo on the full About Us page.",
-        url: "https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&fit=crop&q=85&w=1400"
+        url: "https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&fit=crop&q=90&w=1400"
       },
       about_story_float: {
         key: "about_story_float",
@@ -2297,7 +2372,7 @@ class SiteImagesDataStore {
         page: "about.html",
         title: "About: Calibration Badge",
         description: "Floating secondary accent image in the story section on the About Us page.",
-        url: "https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&fit=crop&q=85&w=900"
+        url: "https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&fit=crop&q=90&w=900"
       },
       explore_bg_lobby: {
         key: "explore_bg_lobby",
@@ -2473,7 +2548,7 @@ class SiteImagesDataStore {
     for (const [k, v] of Object.entries(imagesMap)) {
       if (typeof v === 'string' && v.startsWith('data:') && v.length > 2000) {
         const id = `site_${k.replace(/[^a-zA-Z0-9_-]/g, '_')}_${hash(v)}`;
-        await safeFirestoreSet(db.collection('media').doc(id), { url: v, folder: 'site-images', key: k, createdAt: new Date().toISOString() });
+        await saveMediaChunked(id, v, { folder: 'site-images', key: k, createdAt: new Date().toISOString() });
         _mediaCache.set(id, Promise.resolve(v));
         out[k] = MEDIA_REF_PREFIX + id;
       } else {
@@ -2570,7 +2645,8 @@ class SiteImagesDataStore {
   }
 
   async uploadImage(file, onProgress) {
-    return await uploadImageToFirebase(file, 'site-images', onProgress);
+    // Full quality, stored as its own media record
+    return await uploadImageToFirebase(file, 'site-images', onProgress, { allowMediaRef: true });
   }
 }
 
@@ -2975,6 +3051,75 @@ if (typeof document !== 'undefined') {
 }
 
 
+
+/* =========================================================================
+   ABOUT PAGE CONTENT (one record, fully edited from the admin "About Page" tab)
+   Empty sections are hidden on the site, so nothing invented ever shows.
+   ========================================================================= */
+const DEFAULT_ABOUT = {
+  hero: {
+    title: 'Display engineers and installers in Dubai',
+    intro: 'We design, install and maintain LED walls, video walls, kiosks and signage for retail, hospitality, offices and entertainment venues across the UAE and Qatar.',
+    images: []                 // up to 3 photos; empty = uses the About photos from Site Images
+  },
+  partners: [],                // [{ name, logo }]
+  stats: [
+    { value: '20+', label: 'Years in display engineering' },
+    { value: '500+', label: 'Systems installed' },
+    { value: '15+', label: 'Industries served' }
+  ],
+  story: {
+    heading: 'How we started',
+    text: 'Our founders spent years designing screens for display manufacturers before starting Display World. Screens in malls and venues run all day in serious heat, so every system we install is calibrated, colour matched and mounted for continuous use.\n\nOur office is in Dubai Investment Park, and our engineers handle on-site support across the UAE.',
+    founderName: '', founderRole: '', founderPhoto: '', founded: '', licence: ''
+  },
+  team: [],                    // [{ name, role, photo }]
+  process: [
+    { title: 'Site survey', text: 'We visit the space, check viewing distances, light, power and mounting, and listen to what you need the screens to do.' },
+    { title: 'Design and quote', text: 'You get a drawing, the recommended screen and pixel pitch, a fixed quote and a timeline.' },
+    { title: 'Installation', text: 'Our own team builds the mounts, installs the screens and runs the cabling, usually outside your opening hours.' },
+    { title: 'Calibration and handover', text: 'We match colour and brightness across every panel, set up your content software and train your team.' },
+    { title: 'Maintenance', text: 'Annual maintenance contracts with scheduled visits and fast call-outs keep the screens running.' }
+  ],
+  featuredIds: [],             // empty = the 3 most recent projects
+  office: {
+    address: 'Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE',
+    hours: 'Monday to Friday 08:30 to 18:00\nSaturday 09:00 to 14:00',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Falcon+House+Dubai+Investment+Park',
+    photo: ''
+  },
+  showCareers: true
+};
+
+const AboutStore = {
+  _merge(d) {
+    const o = JSON.parse(JSON.stringify(DEFAULT_ABOUT));
+    if (!d) return o;
+    for (const k of Object.keys(o)) {
+      if (d[k] === undefined) continue;
+      o[k] = (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) ? { ...o[k], ...d[k] } : d[k];
+    }
+    return o;
+  },
+  async get() {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try { const d = await db.collection('settings').doc('about').get(); return this._merge(d.exists ? d.data() : null); } catch (e) { return this._merge(null); }
+    }
+    try { return this._merge(JSON.parse(localStorage.getItem('dw_about'))); } catch (e) { return this._merge(null); }
+  },
+  async save(data) {
+    await detectBackend();
+    const clean = { ...this._merge(data), updatedAt: new Date().toISOString() };
+    if (backendMode === 'firebase' && db) { await safeFirestoreSet(db.collection('settings').doc('about'), clean); return true; }
+    localStorage.setItem('dw_about', JSON.stringify(clean));
+    return true;
+  },
+  async uploadPhoto(file, onProgress) {
+    return uploadImageToFirebase(file, 'about', onProgress, { allowMediaRef: true });
+  }
+};
+
 /* =========================================================================
    CLIENTS STRIP (names scrolling under the home hero), edited in the admin
    ========================================================================= */
@@ -3072,4 +3217,6 @@ if (typeof window !== 'undefined') {
   window.seedCloudIfEmpty = seedCloudIfEmpty;
   window.TestimonialsStore = TestimonialsStore;
   window.ClientsStore = ClientsStore;
+  window.AboutStore = AboutStore;
+  window.resolveMediaRef = resolveMediaRef;
 }

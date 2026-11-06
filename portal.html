@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
@@ -10,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="index.css?v=12">
+  <link rel="stylesheet" href="index.css?v=14">
   
   <!-- Firebase Compat CDNs -->
 
@@ -984,6 +986,42 @@
     .admin-table th,.modal-field label,.overview-card-header,.settings-field label,.img-badge,.pg-badge,[style*="uppercase"]{text-transform:none!important;letter-spacing:0!important}
     .admin-table th{font-size:.8rem;color:var(--text-dim)}
     [style*="monospace"]{font-family:inherit!important}
+
+    /* ===== About page editor ===== */
+    .ae{display:flex;flex-direction:column;gap:1.25rem;padding-bottom:5rem}
+    .ae-card{border:1px solid var(--border);border-radius:14px;padding:1.5rem;background:var(--bg2)}
+    .ae-card h3{font-family:var(--font-d);font-size:1.1rem;margin:0 0 .25rem;color:var(--white)}
+    .ae-card > p{font-size:.85rem;color:var(--text-dim);margin:0 0 1.1rem}
+    .ae-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .ae-field{display:flex;flex-direction:column;gap:.35rem}
+    .ae-field.full{grid-column:1/-1}
+    .ae-field label{font-size:.8rem;font-weight:600;color:var(--text-dim)}
+    .ae-field input,.ae-field textarea{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.7rem .85rem;color:var(--white);font:inherit;font-size:.92rem;outline:none}
+    .ae-field input:focus,.ae-field textarea:focus{border-color:var(--pink)}
+    .ae-field textarea{min-height:90px;resize:vertical;line-height:1.55}
+    [data-theme="light"] .ae-field input,[data-theme="light"] .ae-field textarea{background:#f1f3f5;color:#0a0a12}
+    .ae-imgs{display:flex;flex-wrap:wrap;gap:.75rem}
+    .ae-img{width:150px;display:flex;flex-direction:column;gap:.4rem}
+    .ae-img-box{position:relative;width:150px;height:112px;border:1.5px dashed var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:.75rem;text-align:center;background:rgba(127,127,127,.06)}
+    .ae-img-box img{width:100%;height:100%;object-fit:cover}
+    .ae-img-box.logo img{object-fit:contain;padding:.6rem}
+    .ae-img-row{display:flex;gap:.35rem}
+    .ae-btn{border:1px solid var(--border);background:transparent;color:var(--white);border-radius:7px;font-size:.75rem;padding:.35rem .6rem;cursor:pointer}
+    .ae-btn:hover{border-color:var(--pink);color:var(--pink)}
+    .ae-btn.danger:hover{border-color:#e5484d;color:#e5484d}
+    .ae-item{border:1px solid var(--border);border-radius:10px;padding:1rem;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:start;margin-bottom:.75rem}
+    .ae-item-fields{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .ae-item-tools{display:flex;flex-direction:column;gap:.35rem}
+    .ae-item-num{font-family:var(--font-d);font-weight:700;color:var(--pink);min-width:1.4rem}
+    .ae-add{margin-top:.25rem}
+    .ae-projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem}
+    .ae-projects label{display:flex;gap:.5rem;align-items:center;border:1px solid var(--border);border-radius:8px;padding:.55rem .7rem;font-size:.85rem;cursor:pointer;color:var(--white)}
+    .ae-projects input{width:auto;margin:0}
+    .ae-check{display:flex;gap:.5rem;align-items:center;font-size:.9rem;color:var(--white)}
+    .ae-check input{width:auto;margin:0}
+    .ae-savebar{position:sticky;bottom:1rem;display:flex;justify-content:flex-end;align-items:center;gap:1rem;padding:.85rem 1rem;border:1px solid var(--border);border-radius:12px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:5}
+    #ae-msg{font-size:.85rem}
+    @media (max-width:700px){.ae-grid,.ae-item-fields{grid-template-columns:1fr}.ae-item{grid-template-columns:1fr}.ae-item-tools{flex-direction:row}}
   </style>
 </head>
 <body>
@@ -1127,6 +1165,10 @@
             <button class="sidebar-nav-btn" id="tab-careers-btn" onclick="switchTab('careers', this)">
               <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
               <span class="nav-item-text">Job Openings</span>
+            </button>
+            <button class="sidebar-nav-btn" id="tab-about-btn" onclick="switchTab('about', this)">
+              <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+              <span class="nav-item-text">About Page</span>
             </button>
             <button class="sidebar-nav-btn" id="tab-testimonials-btn" onclick="switchTab('testimonials', this)">
               <span class="nav-item-icon"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
@@ -1665,6 +1707,21 @@
             </div>
           </div>
 
+          <div id="about-section" class="admin-tab-content" style="display:none;">
+            <div class="section-header-bar">
+              <div class="section-title-wrap">
+                <h2>About Page</h2>
+                <p>Everything on the public About page. Sections you leave empty are hidden on the website.</p>
+              </div>
+              <a class="btn-outline" href="about.html" target="_blank" rel="noopener"><span>View page</span></a>
+            </div>
+            <div id="about-editor" class="ae"></div>
+            <div class="ae-savebar">
+              <span id="ae-msg"></span>
+              <button type="button" class="btn-primary" id="ae-save"><span>Save About page</span></button>
+            </div>
+          </div>
+
           <div id="testimonials-section" class="admin-tab-content" style="display:none;">
             <div class="section-header-bar">
               <div class="section-title-wrap">
@@ -2063,7 +2120,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-  <script src="projects-data.js?v=22"></script>
+  <script src="projects-data.js?v=24"></script>
   <script>
     // ==========================================
     // AUTHENTICATION & SESSION MANAGEMENT
@@ -2271,6 +2328,7 @@
       
       // Show target tab
       document.getElementById(`${tabName}-section`).style.display = 'block';
+      if (tabName === 'about' && typeof loadAboutEditor === 'function') loadAboutEditor();
       
       // If we clicked a sidebar button, make it active
       if (btnEl) {
@@ -3203,6 +3261,197 @@
     };
 
     // ==========================================
+    // ABOUT PAGE EDITOR
+    // ==========================================
+    let aboutState = null;
+    const aeEl = document.getElementById('about-editor');
+    const aeEsc = (v) => escapeHtml(v == null ? '' : v);
+
+    // One image slot: preview, upload, remove. Stores the uploaded reference in the given setter.
+    function aeImageSlot(label, ref, onChange, opts = {}) {
+      const wrap = document.createElement('div');
+      wrap.className = 'ae-img';
+      wrap.innerHTML = `<div class="ae-img-box${opts.logo ? ' logo' : ''}">${ref ? '' : 'No photo'}</div>
+        <div class="ae-img-row"><button type="button" class="ae-btn" data-a="up">${ref ? 'Replace' : 'Upload'}</button>${ref ? '<button type="button" class="ae-btn danger" data-a="rm">Remove</button>' : ''}</div>
+        <input type="file" accept="image/*" hidden>`;
+      const box = wrap.querySelector('.ae-img-box');
+      if (ref) resolveMediaRef(ref).then(u => { if (u) box.innerHTML = `<img src="${aeEsc(u)}" alt="${aeEsc(label)}">`; });
+      const file = wrap.querySelector('input[type=file]');
+      wrap.querySelector('[data-a="up"]').onclick = () => file.click();
+      const rm = wrap.querySelector('[data-a="rm"]');
+      if (rm) rm.onclick = () => { onChange(''); renderAboutEditor(); };
+      file.onchange = async () => {
+        const f = file.files[0]; if (!f) return;
+        box.textContent = 'Uploading...';
+        try {
+          const newRef = await AboutStore.uploadPhoto(f, (pct) => { box.textContent = `Uploading ${Math.round(pct)}%`; });
+          onChange(newRef);
+          aeMsg('Photo uploaded. Click "Save About page" to publish.', 'var(--text-dim)');
+          renderAboutEditor();
+        } catch (err) { box.textContent = 'Upload failed'; alert('Upload failed: ' + (err.message || 'Unknown error')); }
+      };
+      return wrap;
+    }
+
+    function aeField(label, value, onInput, opts = {}) {
+      const d = document.createElement('div');
+      d.className = 'ae-field' + (opts.full ? ' full' : '');
+      const id = 'ae-' + Math.random().toString(36).slice(2, 8);
+      d.innerHTML = `<label for="${id}">${aeEsc(label)}</label>` + (opts.area
+        ? `<textarea id="${id}" rows="${opts.rows || 4}" placeholder="${aeEsc(opts.ph || '')}">${aeEsc(value)}</textarea>`
+        : `<input id="${id}" type="text" value="${aeEsc(value)}" placeholder="${aeEsc(opts.ph || '')}">`);
+      d.querySelector('input,textarea').addEventListener('input', (e) => onInput(e.target.value));
+      return d;
+    }
+
+    function aeCard(title, desc) {
+      const c = document.createElement('section');
+      c.className = 'ae-card';
+      c.innerHTML = `<h3>${aeEsc(title)}</h3><p>${aeEsc(desc)}</p>`;
+      aeEl.appendChild(c);
+      return c;
+    }
+
+    // Repeating list (partners, numbers, team, steps): add, remove, move up and down
+    function aeRepeater(card, list, fields, addLabel, blank, opts = {}) {
+      list.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'ae-item';
+        const num = document.createElement('div'); num.className = 'ae-item-num'; num.textContent = idx + 1;
+        const body = document.createElement('div');
+        const grid = document.createElement('div'); grid.className = 'ae-item-fields';
+        fields.forEach(f => {
+          if (f.type === 'image') body.appendChild(aeImageSlot(f.label, item[f.key], v => { item[f.key] = v; }, { logo: f.logo }));
+          else grid.appendChild(aeField(f.label, item[f.key], v => { item[f.key] = v; }, { area: f.area, full: f.full, ph: f.ph, rows: 3 }));
+        });
+        if (fields.some(f => f.type === 'image')) { body.style.display = 'grid'; body.style.gridTemplateColumns = 'auto 1fr'; body.style.gap = '1rem'; }
+        body.appendChild(grid);
+        const tools = document.createElement('div'); tools.className = 'ae-item-tools';
+        tools.innerHTML = `<button type="button" class="ae-btn" data-a="u" ${idx === 0 ? 'disabled' : ''}>Up</button><button type="button" class="ae-btn" data-a="d" ${idx === list.length - 1 ? 'disabled' : ''}>Down</button><button type="button" class="ae-btn danger" data-a="x">Remove</button>`;
+        tools.querySelector('[data-a="u"]').onclick = () => { [list[idx - 1], list[idx]] = [list[idx], list[idx - 1]]; renderAboutEditor(); };
+        tools.querySelector('[data-a="d"]').onclick = () => { [list[idx + 1], list[idx]] = [list[idx], list[idx + 1]]; renderAboutEditor(); };
+        tools.querySelector('[data-a="x"]').onclick = () => { list.splice(idx, 1); renderAboutEditor(); };
+        row.append(num, body, tools);
+        card.appendChild(row);
+      });
+      if (!opts.max || list.length < opts.max) {
+        const add = document.createElement('button');
+        add.type = 'button'; add.className = 'ae-btn ae-add'; add.textContent = '+ ' + addLabel;
+        add.onclick = () => { list.push({ ...blank }); renderAboutEditor(); };
+        card.appendChild(add);
+      }
+    }
+
+    let aeProjects = [];
+    function renderAboutEditor() {
+      const A = aboutState; if (!A) return;
+      const scrollY = window.scrollY;
+      aeEl.innerHTML = '';
+
+      let c = aeCard('1. Top of the page', 'Headline, intro and up to 3 photos of real installations. With no photos added, the About photos from Site Images are used.');
+      let g = document.createElement('div'); g.className = 'ae-grid';
+      g.append(aeField('Headline', A.hero.title, v => A.hero.title = v, { full: true }), aeField('Intro', A.hero.intro, v => A.hero.intro = v, { area: true, full: true }));
+      c.appendChild(g);
+      const imgs = document.createElement('div'); imgs.className = 'ae-imgs'; imgs.style.marginTop = '1rem';
+      A.hero.images = A.hero.images || [];
+      for (let i = 0; i < 3; i++) imgs.appendChild(aeImageSlot(`Photo ${i + 1}`, A.hero.images[i] || '', v => { A.hero.images[i] = v; A.hero.images = A.hero.images.map(x => x || ''); }));
+      c.appendChild(imgs);
+
+      c = aeCard('2. Partner brands', 'Brands you install or are certified for. Add a logo or just the name. Hidden on the site until you add one.');
+      aeRepeater(c, A.partners, [{ key: 'logo', label: 'Logo', type: 'image', logo: true }, { key: 'name', label: 'Brand name', ph: 'e.g. Samsung', full: true }], 'Add brand', { name: '', logo: '' });
+
+      c = aeCard('3. Numbers', 'Short facts shown in a row, like years in business or screens installed.');
+      aeRepeater(c, A.stats, [{ key: 'value', label: 'Number', ph: '500+' }, { key: 'label', label: 'Label', ph: 'Systems installed' }], 'Add number', { value: '', label: '' }, { max: 4 });
+
+      c = aeCard('4. Story and founder', 'The company story. Founder details appear only when a name is filled in.');
+      g = document.createElement('div'); g.className = 'ae-grid';
+      g.append(
+        aeField('Section heading', A.story.heading, v => A.story.heading = v, { full: true }),
+        aeField('Story (leave a blank line between paragraphs)', A.story.text, v => A.story.text = v, { area: true, full: true, rows: 7 }),
+        aeField('Founder name', A.story.founderName, v => A.story.founderName = v, { ph: 'e.g. Thomas P' }),
+        aeField('Founder role', A.story.founderRole, v => A.story.founderRole = v, { ph: 'Founder and Managing Director' }),
+        aeField('Year founded', A.story.founded, v => A.story.founded = v, { ph: 'e.g. 2012' }),
+        aeField('Trade licence number', A.story.licence, v => A.story.licence = v, { ph: 'DED licence no.' })
+      );
+      c.appendChild(g);
+      const fp = document.createElement('div'); fp.className = 'ae-imgs'; fp.style.marginTop = '1rem';
+      fp.appendChild(aeImageSlot('Founder photo', A.story.founderPhoto, v => A.story.founderPhoto = v));
+      c.appendChild(fp);
+
+      c = aeCard('5. Team', 'Real people with photos build the most trust. Hidden on the site until you add someone.');
+      aeRepeater(c, A.team, [{ key: 'photo', label: 'Photo', type: 'image' }, { key: 'name', label: 'Name' }, { key: 'role', label: 'Role', ph: 'Installation lead' }], 'Add person', { name: '', role: '', photo: '' });
+
+      c = aeCard('6. How a project runs', 'The steps a client goes through, in order.');
+      aeRepeater(c, A.process, [{ key: 'title', label: 'Step', full: true }, { key: 'text', label: 'What happens', area: true, full: true }], 'Add step', { title: '', text: '' }, { max: 6 });
+
+      c = aeCard('7. Recent work', 'Pick up to 3 projects to feature. With none picked, the 3 latest projects are shown.');
+      const pl = document.createElement('div'); pl.className = 'ae-projects';
+      A.featuredIds = A.featuredIds || [];
+      aeProjects.forEach(p => {
+        const l = document.createElement('label');
+        const checked = A.featuredIds.includes(String(p.id));
+        l.innerHTML = `<input type="checkbox" ${checked ? 'checked' : ''}> ${aeEsc(p.title)}`;
+        l.querySelector('input').onchange = (e) => {
+          if (e.target.checked) { if (A.featuredIds.length >= 3) { e.target.checked = false; alert('You can feature up to 3 projects.'); return; } A.featuredIds.push(String(p.id)); }
+          else A.featuredIds = A.featuredIds.filter(x => x !== String(p.id));
+        };
+        pl.appendChild(l);
+      });
+      if (!aeProjects.length) pl.textContent = 'No projects yet.';
+      c.appendChild(pl);
+
+      c = aeCard('8. Office', 'Shown near the bottom of the page.');
+      g = document.createElement('div'); g.className = 'ae-grid';
+      g.append(
+        aeField('Address', A.office.address, v => A.office.address = v, { full: true }),
+        aeField('Opening hours (one line each)', A.office.hours, v => A.office.hours = v, { area: true, rows: 3 }),
+        aeField('Google Maps link', A.office.mapUrl, v => A.office.mapUrl = v, { ph: 'https://maps.google.com/...' })
+      );
+      c.appendChild(g);
+      const op = document.createElement('div'); op.className = 'ae-imgs'; op.style.marginTop = '1rem';
+      op.appendChild(aeImageSlot('Office photo', A.office.photo, v => A.office.photo = v));
+      c.appendChild(op);
+
+      c = aeCard('9. Careers and quotes', 'Job openings come from the Job Openings tab and quotes from the Testimonials tab.');
+      const ck = document.createElement('label'); ck.className = 'ae-check';
+      ck.innerHTML = `<input type="checkbox" ${A.showCareers !== false ? 'checked' : ''}> Show job openings on the About page`;
+      ck.querySelector('input').onchange = (e) => { A.showCareers = e.target.checked; };
+      c.appendChild(ck);
+
+      window.scrollTo(0, scrollY);
+    }
+
+    function aeMsg(t, color) { const m = document.getElementById('ae-msg'); m.textContent = t; m.style.color = color || 'var(--text-dim)'; }
+
+    async function loadAboutEditor() {
+      try {
+        aboutState = await AboutStore.get();
+        try { aeProjects = await ProjectsStore.getAll(); } catch (e) { aeProjects = []; }
+        renderAboutEditor();
+      } catch (e) { aeEl.textContent = 'Could not load the About page content.'; }
+    }
+
+    document.getElementById('ae-save').addEventListener('click', async () => {
+      const btn = document.getElementById('ae-save');
+      btn.disabled = true; aeMsg('Saving...');
+      try {
+        const A = aboutState;
+        // drop empty rows before saving
+        A.partners = A.partners.filter(p => p.name || p.logo);
+        A.stats = A.stats.filter(x => x.value || x.label);
+        A.team = A.team.filter(t => t.name || t.photo);
+        A.process = A.process.filter(x => x.title || x.text);
+        A.hero.images = (A.hero.images || []).filter(Boolean);
+        await AboutStore.save(A);
+        aeMsg('Saved. The About page is updated.', '#61CE70');
+        renderAboutEditor();
+      } catch (err) { aeMsg('Could not save: ' + (err.message || 'Unknown error'), 'var(--pink)'); }
+      finally { btn.disabled = false; }
+    });
+
+    loadAboutEditor();
+
+    // ==========================================
     // CLIENT NAMES STRIP
     // ==========================================
     const clientsTa = document.getElementById('clients-textarea');
@@ -3894,6 +4143,6 @@
     loadAdminDashboard();
     console.log("Diagnostic: initial active elements:", Array.from(document.querySelectorAll('.active')).map(el => el.id || el.className));
   </script>
-  <script src="index.js?v=11"></script>
+  <script src="index.js?v=12"></script>
 </body>
 </html>

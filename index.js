@@ -37,7 +37,7 @@ function initThemeToggle() {
   const toggleBtn = document.getElementById('theme-toggle');
   
   // Apply saved theme on load
-  const savedTheme = localStorage.getItem('theme') || 'dark';
+  const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
   updateLogoForTheme(savedTheme);
 
@@ -54,7 +54,7 @@ function initThemeToggle() {
 
 // Immediate run to avoid theme flicker before DOM finishes parsing
 (function() {
-  const savedTheme = localStorage.getItem('theme') || 'dark';
+  const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
 })();
 
@@ -406,7 +406,7 @@ async function initDynamicImages() {
       imagesMap.site_favicon = 'assets/dw-favicon.svg';
     }
 
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
 
     // 1. Update elements with explicit [data-img-key]
     document.querySelectorAll('[data-img-key]').forEach(el => {

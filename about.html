@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light')}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Display World | Display Engineers in Dubai</title>
@@ -37,7 +39,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
   <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/portal*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}]}</script>
-  <link rel="stylesheet" href="index.css?v=12">
+  <link rel="stylesheet" href="index.css?v=14">
 
   <!-- Firebase Compat CDNs -->
 
@@ -133,195 +135,263 @@
     <a href="contact.html" class="nav-link">Let's Talk</a>
     <a href="help-center.html" class="nav-link">Help Center</a>
   </div>
-  <!-- SECTION 1: ABOUT PAGE HERO -->
-  <section class="section section-dark" style="padding-top: 180px; padding-bottom: 5rem;">
+  <!-- ABOUT PAGE (Option B: proof first). Every section is edited in the admin "About Page" tab;
+       sections without content stay hidden. -->
+
+  <!-- 1. Hero: headline + real project photos -->
+  <section class="ab-hero">
+    <div class="container ab-hero-grid">
+      <div class="ab-hero-copy">
+        <h1 class="ab-title" id="ab-title">Display engineers and installers in Dubai</h1>
+        <p class="ab-intro" id="ab-intro">We design, install and maintain LED walls, video walls, kiosks and signage for retail, hospitality, offices and entertainment venues across the UAE and Qatar.</p>
+        <div class="ab-actions">
+          <a href="portfolio.html" class="hx-btn hx-btn-primary">See our projects</a>
+          <a href="contact.html" class="hx-btn ab-btn-ghost">Talk to us</a>
+        </div>
+      </div>
+      <div class="ab-mosaic" id="ab-mosaic" aria-label="Display World installations">
+        <figure class="ab-m1"><img data-img-key="about_story_main" src="https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&amp;fit=crop&amp;q=90&amp;w=1400" alt="Display World installation" fetchpriority="high"></figure>
+        <figure class="ab-m2"><img data-img-key="about_story_float" src="https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&amp;fit=crop&amp;q=90&amp;w=900" alt="Display World installation" loading="lazy"></figure>
+        <figure class="ab-m3" hidden><img src="" alt="Display World installation" loading="lazy"></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Partner brands -->
+  <section class="ab-partners" id="ab-partners" hidden>
     <div class="container">
+      <h2 class="ab-small-heading">Brands we install and support</h2>
+      <ul class="ab-partner-list" id="ab-partner-list"></ul>
+    </div>
+  </section>
+
+  <!-- 3. Numbers -->
+  <section class="ab-stats-wrap">
+    <div class="container">
+      <dl class="ab-stats" id="ab-stats">
+        <div><dt>20+</dt><dd>Years in display engineering</dd></div>
+        <div><dt>500+</dt><dd>Systems installed</dd></div>
+        <div><dt>15+</dt><dd>Industries served</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 4. Story and founder -->
+  <section class="section ab-story">
+    <div class="container ab-story-grid" id="ab-story-grid">
+      <figure class="ab-founder" id="ab-founder" hidden>
+        <img id="ab-founder-photo" src="" alt="">
+        <figcaption><strong id="ab-founder-name"></strong><span id="ab-founder-role"></span></figcaption>
+      </figure>
+      <div class="ab-story-copy">
+        <h2 class="section-title" id="ab-story-heading">How we started</h2>
+        <div class="ab-story-text" id="ab-story-text">
+          <p>Our founders spent years designing screens for display manufacturers before starting Display World. Screens in malls and venues run all day in serious heat, so every system we install is calibrated, colour matched and mounted for continuous use.</p>
+          <p>Our office is in Dubai Investment Park, and our engineers handle on-site support across the UAE.</p>
+        </div>
+        <dl class="ab-facts" id="ab-facts" hidden></dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Team -->
+  <section class="section section-dark ab-team" id="ab-team" hidden>
+    <div class="container">
+      <h2 class="section-title">The team</h2>
+      <p class="section-desc">The people who plan, install and look after your screens.</p>
+      <div class="ab-team-grid" id="ab-team-grid"></div>
+    </div>
+  </section>
+
+  <!-- 6. How a project runs (a real sequence, so the steps are numbered) -->
+  <section class="section ab-process">
+    <div class="container">
+      <h2 class="section-title">How a project runs</h2>
+      <ol class="ab-steps" id="ab-steps"></ol>
+    </div>
+  </section>
+
+  <!-- 7. Featured projects -->
+  <section class="section section-dark ab-work" id="ab-work" hidden>
+    <div class="container">
+      <div class="ab-section-head">
+        <h2 class="section-title">Recent work</h2>
+        <a href="portfolio.html" class="ab-link">All projects</a>
+      </div>
+      <div class="portfolio-grid ab-work-grid" id="ab-work-grid"></div>
+    </div>
+  </section>
+
+  <!-- 8. Client quotes (from the Testimonials tab) -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <h2 class="section-title">What clients say</h2>
+      <div class="testimonials-grid" data-testimonials></div>
+    </div>
+  </section>
+
+  <!-- 9. Office -->
+  <section class="section section-dark ab-office">
+    <div class="container ab-office-grid">
+      <figure class="ab-office-photo" id="ab-office-photo" hidden><img src="" alt="Display World office in Dubai Investment Park" loading="lazy"></figure>
       <div>
-        <div style="display:flex; flex-direction:column; justify-content:center;">
-          <h1 class="section-title">About Display World</h1>
-          <p class="section-desc" style="font-size: 1.25rem;">We're a Dubai team of display engineers and installers. Our founders spent years designing screens for manufacturers before starting Display World.</p>
-        </div>
-        
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 2: ENGINEERING SPECIFIC STORY -->
-  <section class="section">
-    <div class="container">
-      <div class="about-grid">
-        <div class="about-left reveal-left">
-          <h2 class="section-title">How we started</h2>
-          <p class="section-desc">Screens in malls and airports run all day in serious heat, so a consumer TV on a bracket doesn't last. Every system we install is calibrated, colour matched and mounted for continuous use.</p>
-          <p class="section-desc">Our office is in Dubai Investment Park, and our engineers do on-site support across the UAE.</p>
-          
-          <div class="stat-row">
-            <div class="stat">
-              <span class="stat-num">20+</span>
-              <span class="stat-lbl">Years in display engineering</span>
-            </div>
-            <div class="stat">
-              <span class="stat-num">500+</span>
-              <span class="stat-lbl">Systems installed</span>
-            </div>
-            <div class="stat">
-              <span class="stat-num">15+</span>
-              <span class="stat-lbl">Industries served</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="about-right reveal-right">
-          <div class="about-img-stack">
-            <div class="about-img-main">
-              <img src="https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&amp;fit=crop&amp;q=85&amp;w=1400" srcset="https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&amp;fit=crop&amp;q=85&amp;w=800 800w, https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&amp;fit=crop&amp;q=85&amp;w=1400 1400w, https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&amp;fit=crop&amp;q=85&amp;w=2000 2000w, https://images.unsplash.com/photo-1650728768250-29d1061bf84b?auto=format&amp;fit=crop&amp;q=85&amp;w=2600 2600w" sizes="(max-width: 900px) 92vw, 600px" alt="Museum of the Future and the Dubai skyline at night" loading="lazy" decoding="async" data-img-key="about_story_main">
-            </div>
-            <div class="about-img-float">
-              <img src="https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&amp;fit=crop&amp;q=85&amp;w=900" srcset="https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&amp;fit=crop&amp;q=85&amp;w=500 500w, https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&amp;fit=crop&amp;q=85&amp;w=900 900w, https://images.unsplash.com/photo-1686918269961-507270a5a238?auto=format&amp;fit=crop&amp;q=85&amp;w=1300 1300w" sizes="(max-width: 900px) 60vw, 380px" alt="Museum of the Future in Dubai at golden hour" loading="lazy" decoding="async" data-img-key="about_story_float">
-            </div>
-            <div class="about-orb"></div>
-          </div>
+        <h2 class="section-title">Visit our office</h2>
+        <p class="ab-office-address" id="ab-office-address">Office no 203, Falcon House, Dubai Investment Park, Jebel Ali, Dubai, UAE</p>
+        <p class="ab-office-hours" id="ab-office-hours">Monday to Friday 08:30 to 18:00<br>Saturday 09:00 to 14:00</p>
+        <div class="ab-actions">
+          <a class="hx-btn hx-btn-primary" id="ab-office-map" href="https://www.google.com/maps/search/?api=1&amp;query=Falcon+House+Dubai+Investment+Park" target="_blank" rel="noopener">Open in Google Maps</a>
+          <a class="hx-btn ab-btn-ghost" href="contact.html">Contact us</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 3: OUR PRINCIPLES (NEW SECTION) -->
-  <section class="section section-dark" id="principles">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2 class="section-title">How we work</h2>
-        <p class="section-desc center-desc">Three things we check on every job.</p>
+  <!-- 10. Careers (short) -->
+  <section class="section ab-careers" id="ab-careers" hidden>
+    <div class="container ab-careers-inner">
+      <div>
+        <h2 class="section-title">Work with us</h2>
+        <p class="section-desc">We hire display engineers, installers and support technicians in Dubai.</p>
       </div>
-      <div class="services-grid stagger-children">
-        <div class="svc-card reveal">
-          <h3>Accurate colour</h3>
-          <p>We calibrate screens to the D65 standard so colours match your brand, with a Delta E below 0.5.</p>
-        </div>
-        <div class="svc-card reveal">
-          <h3>Built for the heat</h3>
-          <p>Die-cast aluminium frames and proper ventilation keep screens running through UAE summers.</p>
-        </div>
-        <div class="svc-card reveal">
-          <h3>No black screens</h3>
-          <p>Critical screens get a backup signal path and dual power supplies, so one fault doesn't take them down.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 4: INTEGRATION TEAM (NEW SECTION) -->
-  <section class="section" id="team">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2 class="section-title">Our team</h2>
-        <p class="section-desc center-desc">The people who plan, mount and tune each installation.</p>
-      </div>
-      <div class="services-grid stagger-children">
-        <div class="svc-card reveal" style="border: 1px solid var(--border); padding: 2rem; border-radius:16px;">
-          <h4 style="font-family: var(--font-d); font-size: 1.15rem; color: var(--pink); margin-bottom: 0.5rem;">Systems Architect</h4>
-          <p class="section-desc" style="font-size: 0.85rem; margin-bottom: 1rem;">Plans how video gets to every screen, sets up the controllers and the content system.</p>
-          <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-            <span style="font-size:0.65rem; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:#fff; border: 1px solid var(--border);">NovaStar LCT</span>
-            <span style="font-size:0.65rem; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:#fff; border: 1px solid var(--border);">CMS Sync</span>
-          </div>
-        </div>
-        <div class="svc-card reveal" style="border: 1px solid var(--border); padding: 2rem; border-radius:16px;">
-          <h4 style="font-family: var(--font-d); font-size: 1.15rem; color: var(--pink); margin-bottom: 0.5rem;">Structural Designer</h4>
-          <p class="section-desc" style="font-size: 0.85rem; margin-bottom: 1rem;">Draws the steel mounts and ventilation, and signs off that every wall mount is safe.</p>
-          <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-            <span style="font-size:0.65rem; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:#fff; border: 1px solid var(--border);">AutoCAD</span>
-            <span style="font-size:0.65rem; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:#fff; border: 1px solid var(--border);">Thermal Sim</span>
-          </div>
-        </div>
-        <div class="svc-card reveal" style="border: 1px solid var(--border); padding: 2rem; border-radius:16px;">
-          <h4 style="font-family: var(--font-d); font-size: 1.15rem; color: var(--pink); margin-bottom: 0.5rem;">Calibration Expert</h4>
-          <p class="section-desc" style="font-size: 0.85rem; margin-bottom: 1rem;">Measures colour and brightness on site and tunes panels so they match.</p>
-          <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-            <span style="font-size:0.65rem; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:#fff; border: 1px solid var(--border);">D65 Spec</span>
-            <span style="font-size:0.65rem; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px; color:#fff; border: 1px solid var(--border);">Spectrophotometer</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CAREERS SECTION -->
-  <section class="section section-dark">
-    <div class="container">
-      <div class="section-header" style="text-align: center;">
-        <h2 class="section-title">Careers at Display World</h2>
-        <p class="section-desc center-desc">We hire display engineers, installers and support technicians in Dubai. Open roles are below.</p>
-      </div>
-
-      <div class="careers-accordion" id="careers-accordion-container">
-        <!-- Dynamically rendered job rows -->
-      </div>
+      <div class="careers-list" id="careers-accordion-container"></div>
     </div>
   </section>
 
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="projects-data.js?v=22"></script>
+  <script src="projects-data.js?v=24"></script>
   <script>
     function toggleCareer(headerElement) {
       const row = headerElement.parentNode;
       const isOpen = row.classList.contains('open');
-      
-      // Close all accordion rows first
       document.querySelectorAll('.career-row').forEach(r => r.classList.remove('open'));
-      
-      // Toggle current row
-      if (!isOpen) {
-        row.classList.add('open');
+      if (!isOpen) row.classList.add('open');
+    }
+
+    const esc = (v) => escapeHtml(v || '');
+    const paras = (t) => String(t || '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).map(x => `<p>${esc(x).replace(/\n/g, '<br>')}</p>`).join('');
+    async function img(ref) { return ref ? (await resolveMediaRef(ref)) || '' : ''; }
+
+    async function renderAbout() {
+      let A;
+      try { A = await AboutStore.get(); } catch (e) { return; }
+
+      // 1. Hero
+      if (A.hero.title) document.getElementById('ab-title').textContent = A.hero.title;
+      if (A.hero.intro) document.getElementById('ab-intro').textContent = A.hero.intro;
+      const heroImgs = (A.hero.images || []).filter(Boolean);
+      if (heroImgs.length) {
+        const figs = [...document.querySelectorAll('#ab-mosaic figure')];
+        const urls = await Promise.all(heroImgs.slice(0, 3).map(img));
+        figs.forEach((f, i) => {
+          const im = f.querySelector('img');
+          if (urls[i]) { im.removeAttribute('data-img-key'); im.removeAttribute('srcset'); im.src = urls[i]; f.hidden = false; }
+          else if (i >= urls.length) f.hidden = i > 1 && true;
+        });
+        document.getElementById('ab-mosaic').dataset.count = Math.min(3, urls.filter(Boolean).length);
       }
+
+      // 2. Partners
+      const partners = (A.partners || []).filter(p => p.name || p.logo);
+      if (partners.length) {
+        const logos = await Promise.all(partners.map(p => img(p.logo)));
+        document.getElementById('ab-partner-list').innerHTML = partners.map((p, i) =>
+          `<li>${logos[i] ? `<img src="${esc(logos[i])}" alt="${esc(p.name)}" loading="lazy">` : `<span>${esc(p.name)}</span>`}</li>`).join('');
+        document.getElementById('ab-partners').hidden = false;
+      }
+
+      // 3. Stats
+      const stats = (A.stats || []).filter(x => x.value);
+      const statsEl = document.getElementById('ab-stats');
+      if (stats.length) statsEl.innerHTML = stats.map(x => `<div><dt>${esc(x.value)}</dt><dd>${esc(x.label)}</dd></div>`).join('');
+      else statsEl.closest('section').hidden = true;
+
+      // 4. Story and founder
+      if (A.story.heading) document.getElementById('ab-story-heading').textContent = A.story.heading;
+      if (A.story.text) document.getElementById('ab-story-text').innerHTML = paras(A.story.text);
+      if (A.story.founderName) {
+        const ph = await img(A.story.founderPhoto);
+        const f = document.getElementById('ab-founder');
+        const pi = document.getElementById('ab-founder-photo');
+        if (ph) { pi.src = ph; pi.alt = A.story.founderName; } else pi.remove();
+        document.getElementById('ab-founder-name').textContent = A.story.founderName;
+        document.getElementById('ab-founder-role').textContent = A.story.founderRole || '';
+        f.hidden = false;
+        document.getElementById('ab-story-grid').classList.add('has-founder');
+      }
+      const facts = [['Founded', A.story.founded], ['Trade licence', A.story.licence]].filter(x => x[1]);
+      if (facts.length) {
+        const fe = document.getElementById('ab-facts');
+        fe.innerHTML = facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
+        fe.hidden = false;
+      }
+
+      // 5. Team
+      const team = (A.team || []).filter(t => t.name);
+      if (team.length) {
+        const photos = await Promise.all(team.map(t => img(t.photo)));
+        document.getElementById('ab-team-grid').innerHTML = team.map((t, i) => `
+          <figure class="ab-person">
+            ${photos[i] ? `<img src="${esc(photos[i])}" alt="${esc(t.name)}" loading="lazy">` : `<div class="ab-person-initials" aria-hidden="true">${esc(t.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase())}</div>`}
+            <figcaption><strong>${esc(t.name)}</strong><span>${esc(t.role)}</span></figcaption>
+          </figure>`).join('');
+        document.getElementById('ab-team').hidden = false;
+      }
+
+      // 6. Process
+      const steps = (A.process || []).filter(x => x.title);
+      const stepsEl = document.getElementById('ab-steps');
+      if (steps.length) stepsEl.innerHTML = steps.map(x => `<li><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p></li>`).join('');
+      else stepsEl.closest('section').hidden = true;
+
+      // 9. Office
+      if (A.office.address) document.getElementById('ab-office-address').textContent = A.office.address;
+      if (A.office.hours) document.getElementById('ab-office-hours').innerHTML = esc(A.office.hours).replace(/\n/g, '<br>');
+      if (A.office.mapUrl) document.getElementById('ab-office-map').href = A.office.mapUrl;
+      const op = await img(A.office.photo);
+      if (op) { const f = document.getElementById('ab-office-photo'); f.querySelector('img').src = op; f.hidden = false; document.querySelector('.ab-office-grid').classList.add('has-photo'); }
+
+      // 7. Featured projects
+      try {
+        const all = await ProjectsStore.getAll();
+        const ids = (A.featuredIds || []).filter(Boolean);
+        const pick = ids.length ? ids.map(id => all.find(p => String(p.id) === String(id))).filter(Boolean) : all.slice(0, 3);
+        if (pick.length) {
+          document.getElementById('ab-work-grid').innerHTML = pick.slice(0, 3).map(p => `
+            <a href="project-detail.html?id=${encodeURIComponent(p.id)}" class="pf-card">
+              <img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/placeholder.svg';">
+              <div class="pf-overlay"><span class="pf-cat">${esc(p.category)}</span><h3>${esc(p.title)}</h3></div>
+            </a>`).join('');
+          document.getElementById('ab-work').hidden = false;
+        }
+      } catch (e) {}
+
+      // 10. Careers
+      if (A.showCareers !== false) loadDynamicCareers();
     }
 
     async function loadDynamicCareers() {
       const container = document.getElementById('careers-accordion-container');
-      if (!container) return;
-
       try {
         const jobs = await CareersStore.getAll();
-        if (!jobs || jobs.length === 0) {
-          container.innerHTML = `<p style="text-align:center; color:var(--text-dim); padding: 2rem;">No job openings currently listed. Please check back later!</p>`;
-          return;
-        }
-
-        container.innerHTML = '';
-        jobs.forEach(job => {
-          const row = document.createElement('div');
-          row.className = 'career-row';
-
-          // Requirements mapping to bullet list
-          const reqsHtml = (job.requirements || [])
-            .map(r => `<li>${r}</li>`)
-            .join('');
-
-          row.innerHTML = `
+        if (!jobs || !jobs.length) return;
+        container.innerHTML = jobs.map(job => `
+          <div class="career-row">
             <div class="career-header" onclick="toggleCareer(this)">
-              <h3>${job.title}</h3>
-              <div class="career-meta">
-                <span>${job.location}</span>
-                <span>${job.type}</span>
-                <span class="career-arrow">▼</span>
-              </div>
+              <h3>${esc(job.title)}</h3>
+              <div class="career-meta"><span>${esc(job.location)}</span><span>${esc(job.type)}</span><span class="career-arrow" aria-hidden="true">+</span></div>
             </div>
             <div class="career-details">
-              <p>${job.desc}</p>
-              ${reqsHtml ? `<strong>Key Requirements:</strong><ul>${reqsHtml}</ul>` : ''}
-              <a href="contact.html?subject=Job%20Inquiry:%20${encodeURIComponent(job.title)}" class="btn-primary" style="display:inline-block; padding: 6px 16px; font-size: 0.75rem; text-decoration:none;"><span>Apply Now</span></a>
+              <p>${esc(job.desc)}</p>
+              ${(job.requirements || []).length ? `<strong>What we look for</strong><ul>${job.requirements.map(r => `<li>${esc(r)}</li>`).join('')}</ul>` : ''}
+              <a href="contact.html?inquiry=${encodeURIComponent('Job application: ' + job.title)}" class="hx-btn hx-btn-primary" style="min-height:42px;font-size:.85rem;">Apply</a>
             </div>
-          `;
-          container.appendChild(row);
-        });
-      } catch (err) {
-        console.error("Failed to load careers:", err);
-        container.innerHTML = `<p style="text-align:center; color:var(--pink); padding: 2rem;">Error loading careers database.</p>`;
-      }
+          </div>`).join('');
+        document.getElementById('ab-careers').hidden = false;
+      } catch (err) { console.error('Failed to load careers:', err); }
     }
 
-    document.addEventListener('DOMContentLoaded', loadDynamicCareers);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderAbout); else renderAbout();
   </script>
 
   <!-- SECTION 5: CTA BANNER -->
@@ -418,6 +488,6 @@
     </button>
   </div>
 
-  <script src="index.js?v=11"></script>
+  <script src="index.js?v=12"></script>
 </body>
 </html>
