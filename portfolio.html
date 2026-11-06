@@ -37,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
   <script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/portal*"}},{"not":{"selector_matches":"[target=_blank]"}}]},"eagerness":"moderate"}]}</script>
-  <link rel="stylesheet" href="index.css?v=11">
+  <link rel="stylesheet" href="index.css?v=12">
 
   <!-- Firebase Compat CDNs -->
 
@@ -139,27 +139,11 @@
     <div class="container">
       <div class="pf-filters" id="pf-filters" role="group" aria-label="Filter projects by category" hidden></div>
       <div class="portfolio-grid stagger-children" id="portfolio-container">
-        <!-- Server-rendered copy for search and AI crawlers. Replaced by live data from the admin. -->
-        <a href="project-detail.html?id=1" class="pf-card pf-wide">
-          <img src="assets/images/project-fids.jpg" alt="Airport Flight Information Displays, Terminal 3, Dubai, UAE" loading="lazy">
-          <div class="pf-overlay"><span class="pf-cat">Aviation</span><h3>Airport Flight Information Displays</h3><p>24/7 mission-critical FIDS systems, baggage claim displays, and airport wayfinding installations.</p></div>
-        </a>
-        <a href="project-detail.html?id=2" class="pf-card">
-          <img src="assets/images/project-retail.jpg" alt="Luxury Mall Facades, The Dubai Mall, UAE" loading="lazy">
-          <div class="pf-overlay"><span class="pf-cat">Retail</span><h3>Luxury Mall Facades</h3><p>Ultra-high brightness window displays and curved LED pillars for flagship luxury retail stores.</p></div>
-        </a>
-        <a href="project-detail.html?id=3" class="pf-card">
-          <img src="assets/images/project-noc.jpg" alt="Enterprise Command Centers, Dubai Operations Center, Dubai" loading="lazy">
-          <div class="pf-overlay"><span class="pf-cat">Corporate</span><h3>Enterprise Command Centers</h3><p>0.88mm ultra-narrow bezel LCD video walls with dynamic feed management for operation hubs.</p></div>
-        </a>
-        <a href="project-detail.html?id=4" class="pf-card pf-wide">
-          <img src="assets/images/project-billboard.jpg" alt="Smart City Digital Landmarks, Sheikh Zayed Road, Dubai" loading="lazy">
-          <div class="pf-overlay"><span class="pf-cat">Outdoor LED</span><h3>Smart City Digital Landmarks</h3><p>Weatherproof IP65-rated outdoor billboard totems and giant building facade mesh LEDs.</p></div>
-        </a>
-        <a href="project-detail.html?id=5" class="pf-card pf-wide">
-          <img src="assets/images/project-signage.jpg" alt="Flagship Architectural &amp; Static Signage, Downtown Dubai, UAE" loading="lazy">
-          <div class="pf-overlay"><span class="pf-cat">Static Signage</span><h3>Flagship Architectural &amp; Static Signage</h3><p>Bespoke 3D brushed brass and halo-illuminated channel letters, monument entrance pylon, and interior wayfinding.</p></div>
-        </a>
+        <!-- Placeholders while projects load (no outdated demo content) -->
+        <div class="pf-card pf-skeleton pf-wide" aria-hidden="true"></div>
+        <div class="pf-card pf-skeleton" aria-hidden="true"></div>
+        <div class="pf-card pf-skeleton" aria-hidden="true"></div>
+        <div class="pf-card pf-skeleton" aria-hidden="true"></div>
       </div>
     </div>
   </section>
@@ -263,15 +247,14 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="projects-data.js?v=21"></script>
+  <script src="projects-data.js?v=22"></script>
   <script>
     async function renderPortfolio() {
       const container = document.getElementById('portfolio-container');
       if (!container) return;
       
-      allProjects = await ProjectsStore.getAll();
-      renderFilters();
-      drawProjects();
+      const cached = ProjectsStore.getAllFast((fresh) => { allProjects = fresh; renderFilters(); drawProjects(); });
+      if (cached && cached.length) { allProjects = cached; renderFilters(); drawProjects(); }
     }
 
     let allProjects = [];

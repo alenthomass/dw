@@ -2326,3 +2326,9 @@ main > section:first-of-type .section-desc, body > section:first-of-type .sectio
 textarea,input,select,button{font-family:inherit}
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 @media (max-width:600px){.form-row-2{grid-template-columns:1fr}.contact-card{padding:1.35rem}}
+
+/* Loading placeholders for project cards */
+.pf-skeleton{background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 70%);background-size:200% 100%;animation:skel 1.4s ease-in-out infinite;min-height:320px;pointer-events:none}
+[data-theme="light"] .pf-skeleton{background-image:linear-gradient(100deg,rgba(0,0,0,.04) 30%,rgba(0,0,0,.08) 50%,rgba(0,0,0,.04) 70%)}
+@keyframes skel{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.pf-skeleton{animation:none}}

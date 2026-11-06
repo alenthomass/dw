@@ -546,6 +546,40 @@ async function withResolvedImages(p, coverOnly = false) {
   return { ...p, gallery, coverUrl: gallery[0] || 'assets/images/placeholder.svg', photoCount: p.images.length };
 }
 
+
+// Small preview image (about 30 KB) saved inside each project, so listings never have to download
+// the full-size photos (up to ~900 KB each when they live in the database).
+async function makeThumbnail(src, maxW = 640, quality = 0.72) {
+  if (!src || typeof document === 'undefined' || typeof Image === 'undefined') return '';
+  return new Promise((resolve) => {
+    const img = new Image();
+    if (/^https?:/.test(src)) img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const scale = Math.min(1, maxW / img.width);
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        let out = c.toDataURL('image/webp', quality);
+        if (!out.startsWith('data:image/webp')) out = c.toDataURL('image/jpeg', quality);
+        resolve(out.length < 120000 ? out : '');
+      } catch (e) { resolve(''); }
+    };
+    img.onerror = () => resolve('');
+    img.src = src;
+  });
+}
+
+// Remembers the last project list in this browser so pages show it instantly next time,
+// then quietly refresh from the database.
+const PROJECTS_CACHE_KEY = 'dw_projects_cache_v1';
+function readProjectsCache() {
+  try { const c = JSON.parse(localStorage.getItem(PROJECTS_CACHE_KEY)); return c && Array.isArray(c.list) ? c.list : null; } catch (e) { return null; }
+}
+function writeProjectsCache(list) {
+  try { localStorage.setItem(PROJECTS_CACHE_KEY, JSON.stringify({ ts: Date.now(), list })); } catch (e) {}
+}
+
 class ProjectsDataStore {
   constructor() {
     this.localKey = 'dw_projects';
@@ -599,17 +633,12 @@ class ProjectsDataStore {
     await detectBackend();
 
     if (backendMode === 'firebase' && db) {
-      try {
-        const snap = await db.collection('projects').get();
-        if (!snap.empty) {
-          const list = [];
-          snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
-          return list;
-        }
-      } catch (err) {
-        console.error("Firestore read error:", err);
-      }
-      return DEFAULT_PROJECTS.slice();
+      // The client's real projects live here. Never fall back to the old demo projects:
+      // an empty database shows nothing, and a failed read throws so the page keeps its placeholders.
+      const snap = await db.collection('projects').get();
+      const list = [];
+      snap.forEach(doc => list.push({ ...doc.data(), id: doc.id }));
+      return list;
     }
 
     if (backendMode === 'local-api') {
@@ -639,8 +668,37 @@ class ProjectsDataStore {
   // Projects with cover image resolved (for listings)
   async getAll() {
     const list = this._sort((await this._getAllRaw()).map(normalizeProject));
-    const resolved = await Promise.all(list.map(p => withResolvedImages(p, true)));
-    return resolved.map(p => ({ ...p, image: p.coverUrl }));
+    const resolved = await Promise.all(list.map(async p => {
+      // Saved thumbnail first: no extra download. Full cover is only fetched for older projects.
+      if (p.thumb) return { ...p, gallery: [], coverUrl: p.thumb, photoCount: p.images.length };
+      return withResolvedImages(p, true);
+    }));
+    const out = resolved.map(p => ({ ...p, image: p.coverUrl }));
+    if (backendMode === 'firebase') writeProjectsCache(out.map(p => ({ id: p.id, title: p.title, category: p.category, shortDesc: p.shortDesc, location: p.location, client: p.client, image: (p.image || '').length < 150000 ? p.image : '', isWide: p.isWide, photoCount: p.photoCount, sortOrder: p.sortOrder, year: p.year })));
+    return out;
+  }
+
+  // Cached list right away (or null), then calls onFresh with the live list
+  getAllFast(onFresh) {
+    const cached = readProjectsCache();
+    this.getAll().then(list => onFresh && onFresh(list)).catch(() => {});
+    return cached;
+  }
+
+  // Admin only: give older projects a thumbnail so listings load fast (runs quietly in the background)
+  async backfillThumbnails() {
+    if (backendMode !== 'firebase' || !db) return 0;
+    let n = 0;
+    for (const raw of await this._getAllRaw()) {
+      const p = normalizeProject(raw);
+      if (p.thumb || !p.images.length) continue;
+      const src = await resolveMediaRef(p.images[0]);
+      if (!src || !src.startsWith('data:')) continue; // web URLs load fast already
+      const thumb = await makeThumbnail(src);
+      if (!thumb) continue;
+      try { await db.collection('projects').doc(String(p.id)).set({ thumb }, { merge: true }); n++; } catch (e) { break; }
+    }
+    return n;
   }
 
   // One project with every gallery image resolved. `image` stays the display cover,
@@ -659,7 +717,8 @@ class ProjectsDataStore {
     }
 
     if (!raw) {
-      const list = await this._getAllRaw();
+      let list = [];
+      try { list = await this._getAllRaw(); } catch (e) {}
       raw = list.find(p => String(p.id) === String(id)) || null;
     }
     if (!raw) return null;
@@ -674,7 +733,12 @@ class ProjectsDataStore {
     delete clean.gallery;
     delete clean.coverUrl;
     delete clean.photoCount;
+    delete clean.thumb;
     clean.updatedAt = new Date().toISOString();
+    // Thumbnail of the cover photo for fast listings (only needed when the photo lives in the database)
+    if (clean.images[0] && (clean.images[0].startsWith(MEDIA_REF_PREFIX) || clean.images[0].startsWith('data:'))) {
+      try { const t = await makeThumbnail(await resolveMediaRef(clean.images[0])); if (t) clean.thumb = t; } catch (e) {}
+    }
 
     if (backendMode === 'firebase' && db) {
       // Throws on failure so the admin sees the real error (no silent fallback to this browser only)
@@ -2910,12 +2974,67 @@ if (typeof document !== 'undefined') {
   else renderTestimonials();
 }
 
+
+/* =========================================================================
+   CLIENTS STRIP (names scrolling under the home hero), edited in the admin
+   ========================================================================= */
+const DEFAULT_CLIENTS = ['Dubai Airports','Hamad International','Mall of the Emirates','Abu Dhabi Media','Qatar Rail','Emaar Properties','DEWA','Aldar Properties','Marriott Hotels','Dubai Holding'];
+const ClientsStore = {
+  async get() {
+    await detectBackend();
+    if (backendMode === 'firebase' && db) {
+      try {
+        const d = await db.collection('settings').doc('clients').get();
+        if (d.exists && Array.isArray(d.data().list)) return { list: d.data().list, show: d.data().show !== false };
+      } catch (e) {}
+    } else {
+      try { const c = JSON.parse(localStorage.getItem('dw_clients')); if (c && Array.isArray(c.list)) return c; } catch (e) {}
+    }
+    return { list: DEFAULT_CLIENTS.slice(), show: true };
+  },
+  async save(list, show = true) {
+    await detectBackend();
+    const clean = { list: list.map(x => String(x).trim()).filter(Boolean).slice(0, 40), show: !!show, updatedAt: new Date().toISOString() };
+    if (backendMode === 'firebase' && db) { await safeFirestoreSet(db.collection('settings').doc('clients'), clean); return true; }
+    localStorage.setItem('dw_clients', JSON.stringify(clean));
+    return true;
+  }
+};
+
+// Renders the strip. "Mall of | the Emirates" sets which part is pink; otherwise everything after the first word is pink.
+async function renderClientsStrip() {
+  const strip = document.querySelector('.clients-strip');
+  if (!strip) return;
+  let data;
+  try { data = await ClientsStore.get(); } catch (e) { return; }
+  if (!data.show || !data.list.length) { strip.hidden = true; return; }
+  strip.hidden = false;
+  const li = data.list.map(name => {
+    let a, b;
+    if (name.includes('|')) { [a, b] = name.split('|').map(x => x.trim()); }
+    else { const w = name.trim().split(/\s+/); a = w[0]; b = w.slice(1).join(' '); }
+    return `<li>${escapeHtml(a)}${b ? ' <span>' + escapeHtml(b) + '</span>' : ''}</li>`;
+  }).join('');
+  strip.querySelectorAll('.clients-list').forEach(ul => { ul.innerHTML = li; });
+}
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderClientsStrip);
+  else renderClientsStrip();
+}
+
 // A brand-new cloud database is empty, and the site shows built-in demo content until the first
 // save. Without this, saving the first project made every other demo project vanish.
 // Copies the current content in once, only into collections that are completely empty.
 async function seedCloudIfEmpty() {
   await detectBackend();
   if (backendMode !== 'firebase' || !db) return { seeded: [] };
+  // One time only. If the client later deletes everything, the demo content must not come back.
+  const flag = await db.collection('settings').doc('seeded').get({ source: 'server' });
+  const catDoc = await db.collection('settings').doc('categories').get({ source: 'server' });
+  if (flag.exists || catDoc.exists) {
+    if (!flag.exists) { try { await db.collection('settings').doc('seeded').set({ at: new Date().toISOString() }); } catch (e) {} }
+    return { seeded: [] };
+  }
   const sets = {
     projects: DEFAULT_PROJECTS,
     casestudies: DEFAULT_CASE_STUDIES,
@@ -2939,6 +3058,7 @@ async function seedCloudIfEmpty() {
     await db.collection('settings').doc('categories').set({ list: DEFAULT_CATEGORIES });
     seeded.push('categories');
   }
+  try { await db.collection('settings').doc('seeded').set({ at: new Date().toISOString() }); } catch (e) {}
   return { seeded };
 }
 
@@ -2951,4 +3071,5 @@ if (typeof window !== 'undefined') {
   window.checkCloudHealth = checkCloudHealth;
   window.seedCloudIfEmpty = seedCloudIfEmpty;
   window.TestimonialsStore = TestimonialsStore;
+  window.ClientsStore = ClientsStore;
 }
